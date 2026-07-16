@@ -26,12 +26,12 @@ function App() {
   const purposeAmbientField = useRef<HTMLDivElement>(null)
   const scrollCue = useRef<HTMLDivElement>(null)
   const grid = useRef<HTMLElement>(null)
+  const purposeSection = useRef<HTMLElement>(null)
 
   useGSAP(
     () => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         gsap.set(veil.current, { autoAlpha: 0 })
-        gsap.set(purposeCopy.current, { autoAlpha: 0 })
         return
       }
 
@@ -82,15 +82,12 @@ function App() {
         scrollTrigger: {
           trigger: intro.current,
           start: 'top top',
-          end: '+=300%',
+          end: '+=180%',
           pin: true,
           scrub: 0.18,
           anticipatePin: 1,
           onUpdate: (self) => {
-            const stops = [
-              timeline.labels.outside / timeline.duration(),
-              timeline.labels.purpose / timeline.duration(),
-            ]
+            const stops = [timeline.labels.outside / timeline.duration()]
 
             if (self.direction < 0) {
               nextStopIndex = stops.findIndex((stop) => stop > self.progress + 0.002)
@@ -122,9 +119,13 @@ function App() {
         svgOrigin: '500 500',
       })
       gsap.set(content.current, { autoAlpha: 0, scale: 1.04 })
+      gsap.set(ambientField.current, {
+        autoAlpha: 1,
+        xPercent: 0,
+        yPercent: 0,
+        scale: 1,
+      })
       gsap.set(introCopy.current, { autoAlpha: 1, y: 0, filter: 'none' })
-      gsap.set(purposeCopy.current, { autoAlpha: 0, y: 45 })
-      gsap.set(purposeAmbientField.current, { autoAlpha: 0, scale: 1.03 })
 
       timeline
         .addLabel('start')
@@ -173,41 +174,7 @@ function App() {
           0.8,
         )
         .addLabel('outside', 1.08)
-        .to({}, { duration: 0.18 })
-        .to(
-          introCopy.current,
-          { autoAlpha: 0, y: -28, filter: 'blur(7px)', duration: 0.18, ease: 'power2.in' },
-        )
-        .to(
-          ambientField.current,
-          {
-            autoAlpha: 0,
-            xPercent: -5,
-            yPercent: 3,
-            scale: 1.06,
-            duration: 0.36,
-            ease: 'power2.inOut',
-          },
-          '<',
-        )
-        .to(
-          purposeAmbientField.current,
-          {
-            autoAlpha: 1,
-            xPercent: -2,
-            yPercent: 1,
-            scale: 1,
-            duration: 0.36,
-            ease: 'power2.inOut',
-          },
-          '<',
-        )
-        .to(
-          purposeCopy.current,
-          { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
-        )
-        .addLabel('purpose')
-        .to({}, { duration: 0.28 })
+        .to({}, { duration: 0.42 })
 
       grid.current?.querySelectorAll('.project-collection').forEach((collection) => {
         const cards = collection.querySelectorAll('.project-card')
@@ -232,6 +199,26 @@ function App() {
         })
       })
 
+      const purposeTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: purposeSection.current,
+          start: 'top 75%',
+        },
+      })
+
+      purposeTimeline
+        .fromTo(
+          purposeAmbientField.current,
+          { autoAlpha: 0, scale: 1.08 },
+          { autoAlpha: 1, scale: 1, duration: 1.2, ease: 'power2.out' },
+        )
+        .fromTo(
+          purposeCopy.current,
+          { autoAlpha: 0, y: 55 },
+          { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out' },
+          0.22,
+        )
+
       return () => {
         window.clearTimeout(quietTimer)
         window.removeEventListener('wheel', stopMomentum)
@@ -239,6 +226,7 @@ function App() {
         window.removeEventListener('touchmove', stopTouchMomentum)
         window.removeEventListener('touchend', endTouchGesture)
         timeline.kill()
+        purposeTimeline.kill()
       }
     },
     { scope: page },
@@ -253,22 +241,11 @@ function App() {
             <i className="ambient-glow ambient-glow--blue" />
             <i className="ambient-glow ambient-glow--green" />
           </div>
-          <div className="ambient-field ambient-field--purpose" ref={purposeAmbientField} aria-hidden="true">
-            <i className="purpose-glow purpose-glow--blue-main" />
-            <i className="purpose-glow purpose-glow--green-main" />
-            <i className="purpose-glow purpose-glow--blue-small" />
-            <i className="purpose-glow purpose-glow--green-small" />
-            <i className="purpose-glow purpose-glow--red-accent" />
-          </div>
 
           <div className="scene-copy scene-copy--intro" ref={introCopy}>
             <h1>Espacios únicos para<br />elevar tu marca</h1>
           </div>
 
-          <div className="scene-copy scene-copy--purpose" ref={purposeCopy}>
-            <p className="eyebrow">OUR PURPOSE</p>
-            <h2>Built around the way people really use the outdoors.</h2>
-          </div>
         </div>
 
         <svg
@@ -356,6 +333,20 @@ function App() {
               </article>
             </div>
           </section>
+        </div>
+      </section>
+
+      <section className="purpose-section" ref={purposeSection}>
+        <div className="ambient-field ambient-field--purpose" ref={purposeAmbientField} aria-hidden="true">
+          <i className="purpose-glow purpose-glow--blue-main" />
+          <i className="purpose-glow purpose-glow--green-main" />
+          <i className="purpose-glow purpose-glow--blue-small" />
+          <i className="purpose-glow purpose-glow--green-small" />
+          <i className="purpose-glow purpose-glow--red-accent" />
+        </div>
+        <div className="purpose-copy" ref={purposeCopy}>
+          <p className="eyebrow">OUR PURPOSE</p>
+          <h2>Built around the way people really use the outdoors.</h2>
         </div>
       </section>
     </main>

@@ -26,15 +26,13 @@ main { overflow: clip; }
 
 .ambient-field {
   position: absolute;
-  z-index: -2;
+  z-index: 0;
   inset: -15%;
   overflow: hidden;
   will-change: transform;
 }
 
 .ambient-field--purpose {
-  visibility: hidden;
-  opacity: 0;
   background: linear-gradient(135deg, #03131c 0%, #061b17 58%, #07110f 100%);
 }
 
@@ -52,7 +50,7 @@ main { overflow: clip; }
   left: 15%;
   top: 14%;
   background: radial-gradient(ellipse, rgb(255 1 9 / 58%) 0, rgb(255 1 9 / 19%) 38%, transparent 72%);
-  animation: drift-red 15s ease-in-out infinite alternate;
+  animation: drift-red 9s cubic-bezier(.45, 0, .55, 1) infinite alternate;
 }
 
 .ambient-glow--blue {
@@ -61,7 +59,7 @@ main { overflow: clip; }
   left: 59%;
   top: 2%;
   background: radial-gradient(circle, rgb(0 176 244 / 44%) 0, rgb(0 176 244 / 11%) 42%, transparent 72%);
-  animation: drift-blue 18s ease-in-out infinite alternate;
+  animation: drift-blue 11s cubic-bezier(.45, 0, .55, 1) -2s infinite alternate;
 }
 
 .ambient-glow--green {
@@ -70,7 +68,7 @@ main { overflow: clip; }
   left: 2%;
   top: 65%;
   background: radial-gradient(circle, rgb(56 212 48 / 31%) 0, rgb(56 212 48 / 8%) 40%, transparent 72%);
-  animation: drift-green 20s ease-in-out infinite alternate;
+  animation: drift-green 13s cubic-bezier(.45, 0, .55, 1) -4s infinite alternate;
 }
 
 .purpose-glow {
@@ -135,7 +133,7 @@ main { overflow: clip; }
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   opacity: .22;
   background:
     linear-gradient(112deg, transparent 20%, rgb(255 255 255 / 7%) 46%, transparent 64%),
@@ -157,7 +155,7 @@ main { overflow: clip; }
   will-change: transform, opacity, filter;
 }
 
-.scene-copy--purpose h2 {
+.purpose-copy h2 {
   max-width: 1100px;
   margin: 0;
   color: inherit;
@@ -167,7 +165,7 @@ main { overflow: clip; }
   letter-spacing: -.06em;
 }
 
-.scene-copy--purpose .eyebrow { margin-bottom: 2rem; }
+.purpose-copy .eyebrow { margin-bottom: 2rem; }
 
 .eyebrow {
   margin: 0 0 ;
@@ -237,6 +235,32 @@ main { overflow: clip; }
   background: #171717 ;
   color: #ffff;
   box-sizing: border-box;
+}
+
+.purpose-section {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(2rem, 7vw, 7rem);
+  color: #f7f5ef;
+  background: #03131c;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.purpose-section .ambient-field { z-index: 0; }
+
+.purpose-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform, opacity;
 }
 
 .grid-heading {
@@ -423,21 +447,24 @@ main { overflow: clip; }
 }
 
 @keyframes drift-red {
-  0% { transform: translate3d(-4%, 2%, 0); }
-  50% { transform: translate3d(5%, -3%, 0); }
-  100% { transform: translate3d(-1%, 5%, 0); }
+  0% { transform: translate3d(-6%, 2%, 0) scale(.98); }
+  33% { transform: translate3d(6%, -5%, 0) scale(1.025); }
+  66% { transform: translate3d(10%, 6%, 0) scale(1.04); }
+  100% { transform: translate3d(-3%, 9%, 0) scale(1); }
 }
 
 @keyframes drift-blue {
-  0% { transform: translate3d(2%, -4%, 0); }
-  50% { transform: translate3d(-8%, 7%, 0); }
-  100% { transform: translate3d(4%, 10%, 0); }
+  0% { transform: translate3d(4%, -8%, 0) scale(1); }
+  32% { transform: translate3d(-11%, 2%, 0) scale(1.035); }
+  68% { transform: translate3d(-4%, 13%, 0) scale(.98); }
+  100% { transform: translate3d(9%, 6%, 0) scale(1.025); }
 }
 
 @keyframes drift-green {
-  0% { transform: translate3d(-3%, 4%, 0); }
-  50% { transform: translate3d(9%, -7%, 0); }
-  100% { transform: translate3d(4%, 3%, 0); }
+  0% { transform: translate3d(-6%, 5%, 0) scale(.98); }
+  35% { transform: translate3d(12%, -9%, 0) scale(1.04); }
+  65% { transform: translate3d(4%, -3%, 0) scale(1.015); }
+  100% { transform: translate3d(10%, 10%, 0) scale(1.03); }
 }
 
 @keyframes purpose-drift-one {
@@ -468,7 +495,7 @@ main { overflow: clip; }
 @media (max-width: 720px) {
   .scene-copy { padding-inline: 1.25rem; }
   .reveal-content h1 { font-size: clamp(3.5rem, 18vw, 6rem); }
-  .scene-copy--purpose h2 { font-size: clamp(2.8rem, 13vw, 5rem); }
+  .purpose-copy h2 { font-size: clamp(2.8rem, 13vw, 5rem); }
   .grid-heading { grid-template-columns: 1fr; margin-bottom: 4rem; }
   .project-collection + .project-collection { margin-top: 9rem; }
   .indoor-heading,
