@@ -2,32 +2,118 @@ import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+import indoorOne from './assets/images/indoor-1.JPG'
+import indoorTwo from './assets/images/indoor-2.JPG'
+import outdoorOne from './assets/images/outdoor-1.JPG'
+import outdoorTwo from './assets/images/outdoor-2.JPG'
+import outdoorThree from './assets/images/outdoor-3.JPG'
+
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 function App() {
+  const page = useRef<HTMLElement>(null)
   const intro = useRef<HTMLElement>(null)
   const mark = useRef<SVGGElement>(null)
   const colorMark = useRef<SVGGElement>(null)
   const veil = useRef<SVGSVGElement>(null)
   const content = useRef<HTMLDivElement>(null)
+  const introCopy = useRef<HTMLDivElement>(null)
+  const purposeCopy = useRef<HTMLDivElement>(null)
+  const ambientField = useRef<HTMLDivElement>(null)
+  const purposeAmbientField = useRef<HTMLDivElement>(null)
+  const scrollCue = useRef<HTMLDivElement>(null)
+  const grid = useRef<HTMLElement>(null)
 
   useGSAP(
     () => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         gsap.set(veil.current, { autoAlpha: 0 })
+        gsap.set(purposeCopy.current, { autoAlpha: 0 })
         return
       }
+
+      let nextStopIndex = 0
+      let lockedProgress: number | null = null
+      let inputReady = true
+      let quietTimer: ReturnType<typeof window.setTimeout> | undefined
+
+      const markInputQuiet = () => {
+        window.clearTimeout(quietTimer)
+        quietTimer = window.setTimeout(() => {
+          inputReady = true
+        }, 650)
+      }
+
+      const stopMomentum = (event: WheelEvent) => {
+        if (lockedProgress !== null && !inputReady) {
+          event.preventDefault()
+          markInputQuiet()
+          return
+        }
+
+        if (lockedProgress !== null && inputReady) {
+          lockedProgress = null
+        }
+      }
+
+      const startTouchGesture = () => {
+        if (lockedProgress !== null && inputReady) lockedProgress = null
+      }
+
+      const stopTouchMomentum = (event: TouchEvent) => {
+        if (lockedProgress !== null) event.preventDefault()
+      }
+
+      const endTouchGesture = () => {
+        if (lockedProgress !== null) {
+          inputReady = true
+        }
+      }
+
+      window.addEventListener('wheel', stopMomentum, { passive: false })
+      window.addEventListener('touchstart', startTouchGesture, { passive: true })
+      window.addEventListener('touchmove', stopTouchMomentum, { passive: false })
+      window.addEventListener('touchend', endTouchGesture, { passive: true })
 
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: intro.current,
           start: 'top top',
-          end: '+=180%',
+          end: '+=300%',
           pin: true,
-          scrub: 1,
+          scrub: 0.18,
           anticipatePin: 1,
+          onUpdate: (self) => {
+            const stops = [
+              timeline.labels.outside / timeline.duration(),
+              timeline.labels.purpose / timeline.duration(),
+            ]
+
+            if (self.direction < 0) {
+              nextStopIndex = stops.findIndex((stop) => stop > self.progress + 0.002)
+              if (nextStopIndex < 0) nextStopIndex = stops.length
+              lockedProgress = null
+              inputReady = true
+              return
+            }
+
+            if (lockedProgress !== null) {
+              self.scroll(self.start + lockedProgress * (self.end - self.start))
+              return
+            }
+
+            const nextStop = stops[nextStopIndex]
+            if (nextStop !== undefined && self.progress >= nextStop) {
+              lockedProgress = nextStop
+              nextStopIndex += 1
+              inputReady = false
+              self.scroll(self.start + nextStop * (self.end - self.start))
+              markInputQuiet()
+            }
+          },
         },
       })
 
@@ -36,8 +122,12 @@ function App() {
         svgOrigin: '500 500',
       })
       gsap.set(content.current, { autoAlpha: 0, scale: 1.04 })
+      gsap.set(introCopy.current, { autoAlpha: 1, y: 0, filter: 'none' })
+      gsap.set(purposeCopy.current, { autoAlpha: 0, y: 45 })
+      gsap.set(purposeAmbientField.current, { autoAlpha: 0, scale: 1.03 })
 
       timeline
+        .addLabel('start')
         .to([mark.current, colorMark.current], {
           keyframes: [
             {
@@ -76,23 +166,109 @@ function App() {
         })
         .to(colorMark.current, { autoAlpha: 0, duration: 0.18, ease: 'power2.out' }, 0.62)
         .to(veil.current, { autoAlpha: 0, duration: 0.08 }, 0.94)
+        .to(scrollCue.current, { autoAlpha: 0, y: -12, duration: 0.12 }, 0.78)
         .to(
           content.current,
           { autoAlpha: 1, scale: 1, ease: 'power2.out', duration: 0.2 },
           0.8,
         )
+        .addLabel('outside', 1.08)
+        .to({}, { duration: 0.18 })
+        .to(
+          introCopy.current,
+          { autoAlpha: 0, y: -28, filter: 'blur(7px)', duration: 0.18, ease: 'power2.in' },
+        )
+        .to(
+          ambientField.current,
+          {
+            autoAlpha: 0,
+            xPercent: -5,
+            yPercent: 3,
+            scale: 1.06,
+            duration: 0.36,
+            ease: 'power2.inOut',
+          },
+          '<',
+        )
+        .to(
+          purposeAmbientField.current,
+          {
+            autoAlpha: 1,
+            xPercent: -2,
+            yPercent: 1,
+            scale: 1,
+            duration: 0.36,
+            ease: 'power2.inOut',
+          },
+          '<',
+        )
+        .to(
+          purposeCopy.current,
+          { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
+        )
+        .addLabel('purpose')
+        .to({}, { duration: 0.28 })
 
-      return () => timeline.kill()
+      grid.current?.querySelectorAll('.project-collection').forEach((collection) => {
+        const cards = collection.querySelectorAll('.project-card')
+        const label = collection.querySelector('[data-collection-label]')
+
+        gsap.from(label, {
+          x: -30,
+          autoAlpha: 0,
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: collection, start: 'top 82%' },
+        })
+
+        gsap.from(cards, {
+          y: 90,
+          autoAlpha: 0,
+          rotation: (index) => [-2.5, 1.5, -1][index % 3],
+          duration: 0.9,
+          stagger: 0.13,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: collection, start: 'top 72%' },
+        })
+      })
+
+      return () => {
+        window.clearTimeout(quietTimer)
+        window.removeEventListener('wheel', stopMomentum)
+        window.removeEventListener('touchstart', startTouchGesture)
+        window.removeEventListener('touchmove', stopTouchMomentum)
+        window.removeEventListener('touchend', endTouchGesture)
+        timeline.kill()
+      }
     },
-    { scope: intro },
+    { scope: page },
   )
 
   return (
-    <main>
+    <main ref={page}>
       <section className="intro" ref={intro} aria-label="Public Outdoors introduction">
         <div className="reveal-content" ref={content}>
-          <h1>Outside is<br />for everyone.</h1>
-          <p>Scroll to discover public spaces made for gathering, moving, and belonging.</p>
+          <div className="ambient-field" ref={ambientField} aria-hidden="true">
+            <i className="ambient-glow ambient-glow--red" />
+            <i className="ambient-glow ambient-glow--blue" />
+            <i className="ambient-glow ambient-glow--green" />
+          </div>
+          <div className="ambient-field ambient-field--purpose" ref={purposeAmbientField} aria-hidden="true">
+            <i className="purpose-glow purpose-glow--blue-main" />
+            <i className="purpose-glow purpose-glow--green-main" />
+            <i className="purpose-glow purpose-glow--blue-small" />
+            <i className="purpose-glow purpose-glow--green-small" />
+            <i className="purpose-glow purpose-glow--red-accent" />
+          </div>
+
+          <div className="scene-copy scene-copy--intro" ref={introCopy}>
+            <h1>Espacios únicos para<br />elevar tu marca</h1>
+          </div>
+
+          <div className="scene-copy scene-copy--purpose" ref={purposeCopy}>
+            <p className="eyebrow">OUR PURPOSE</p>
+            <h2>Built around the way people really use the outdoors.</h2>
+          </div>
         </div>
 
         <svg
@@ -124,14 +300,63 @@ function App() {
           </g>
         </svg>
 
-        <div className="scroll-cue" aria-hidden="true">
-          <span>Scroll</span><i />
+        <div className="scroll-cue" ref={scrollCue} aria-hidden="true">
+          <span>PUBLIC</span><i />
         </div>
       </section>
 
-      <section className="story">
-        <p className="eyebrow">OUR PURPOSE</p>
-        <h2>Built around the way people really use the outdoors.</h2>
+      <section className="project-grid-section" ref={grid}>
+        <header className="grid-heading">
+          <span />
+          <h2>Places designed to feel alive.</h2>
+        </header>
+
+        <div className="project-collections">
+          <section className="project-collection collection--indoor">
+            <header className="indoor-heading" data-collection-label><p className="eyebrow">INDOOR</p><span /></header>
+            <div className="indoor-grid">
+              <article className="project-card indoor-card indoor-card--one">
+                <div className="card-visual card-visual--image"><img src={indoorOne} alt="Indoor project 1" /></div><h3>Indoor 01</h3>
+              </article>
+              <article className="project-card indoor-card indoor-card--two">
+                <div className="card-visual card-visual--image"><img src={indoorTwo} alt="Indoor project 2" /></div><h3>Indoor 02</h3>
+              </article>
+              <article className="project-card indoor-card indoor-card--three">
+                <div className="card-visual card-visual--green"></div><h3>Placeholder 03</h3>
+              </article>
+            </div>
+          </section>
+
+          <section className="project-collection collection--outdoor">
+            <header className="outdoor-heading" data-collection-label><p className="eyebrow">OUTDOOR</p><span /></header>
+            <div className="outdoor-grid">
+              <article className="project-card outdoor-card outdoor-card--one">
+                <div className="card-visual card-visual--image"><img src={outdoorOne} alt="Outdoor project 1" /></div><h5>Outdoor 01</h5>
+              </article>
+              <article className="project-card outdoor-card outdoor-card--two">
+                <div className="card-visual card-visual--image"><img src={outdoorTwo} alt="Outdoor project 2" /></div><h3>Outdoor 02</h3>
+              </article>
+              <article className="project-card outdoor-card outdoor-card--three">
+                <div className="card-visual card-visual--image"><img src={outdoorThree} alt="Outdoor project 3" /></div><h3>Outdoor 03</h3>
+              </article>
+            </div>
+          </section>
+
+          <section className="project-collection collection--innovations">
+            <header className="innovations-heading" data-collection-label><p className="eyebrow">INNOVATIONS</p><span /></header>
+            <div className="innovations-grid">
+              <article className="project-card innovations-card innovations-card--one">
+                <div className="card-visual card-visual--blue"><span>07</span></div><h3>Placeholder 07</h3>
+              </article>
+              <article className="project-card innovations-card innovations-card--two">
+                <div className="card-visual card-visual--green"><span>08</span></div><h3>Placeholder 08</h3>
+              </article>
+              <article className="project-card innovations-card innovations-card--three">
+                <div className="card-visual card-visual--red"><span>09</span></div><h3>Placeholder 09</h3>
+              </article>
+            </div>
+          </section>
+        </div>
       </section>
     </main>
   )
