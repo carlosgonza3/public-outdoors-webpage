@@ -2,6 +2,13 @@ import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+import indoorOne from './assets/images/indoor-1.JPG'
+import indoorTwo from './assets/images/indoor-2.JPG'
+import outdoorOne from './assets/images/outdoor-1.JPG'
+import outdoorTwo from './assets/images/outdoor-2.JPG'
+import outdoorThree from './assets/images/outdoor-3.JPG'
+
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
@@ -115,6 +122,7 @@ function App() {
         svgOrigin: '500 500',
       })
       gsap.set(content.current, { autoAlpha: 0, scale: 1.04 })
+      gsap.set(introCopy.current, { autoAlpha: 1, y: 0, filter: 'none' })
       gsap.set(purposeCopy.current, { autoAlpha: 0, y: 45 })
       gsap.set(purposeAmbientField.current, { autoAlpha: 0, scale: 1.03 })
 
@@ -194,7 +202,6 @@ function App() {
           },
           '<',
         )
-        .set(introCopy.current, { autoAlpha: 0 })
         .to(
           purposeCopy.current,
           { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
@@ -202,21 +209,28 @@ function App() {
         .addLabel('purpose')
         .to({}, { duration: 0.28 })
 
-      const cards = grid.current?.querySelectorAll('.project-card')
-      if (cards?.length) {
-        gsap.from(cards, {
-          y: 100,
+      grid.current?.querySelectorAll('.project-collection').forEach((collection) => {
+        const cards = collection.querySelectorAll('.project-card')
+        const label = collection.querySelector('[data-collection-label]')
+
+        gsap.from(label, {
+          x: -30,
           autoAlpha: 0,
-          rotation: (index) => [-2, 1.5, -1][index % 3],
-          duration: 1,
-          stagger: 0.14,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: grid.current,
-            start: 'top 78%',
-          },
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: collection, start: 'top 82%' },
         })
-      }
+
+        gsap.from(cards, {
+          y: 90,
+          autoAlpha: 0,
+          rotation: (index) => [-2.5, 1.5, -1][index % 3],
+          duration: 0.9,
+          stagger: 0.13,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: collection, start: 'top 72%' },
+        })
+      })
 
       return () => {
         window.clearTimeout(quietTimer)
@@ -248,8 +262,7 @@ function App() {
           </div>
 
           <div className="scene-copy scene-copy--intro" ref={introCopy}>
-            <h1>Outside is<br />for everyone.</h1>
-            <p>Scroll to discover public spaces made for gathering, moving, and belonging.</p>
+            <h1>Espacios únicos para<br />elevar tu marca</h1>
           </div>
 
           <div className="scene-copy scene-copy--purpose" ref={purposeCopy}>
@@ -294,23 +307,55 @@ function App() {
 
       <section className="project-grid-section" ref={grid}>
         <header className="grid-heading">
-          <p className="eyebrow">EXPLORE THE POSSIBILITIES</p>
+          <span />
           <h2>Places designed to feel alive.</h2>
         </header>
 
-        <div className="project-grid">
-          <article className="project-card project-card--tall">
-            <div className="card-visual card-visual--red"><span>01</span></div>
-            <h3>Gather</h3><p>Spaces that bring people together.</p>
-          </article>
-          <article className="project-card project-card--raised">
-            <div className="card-visual card-visual--blue"><span>02</span></div>
-            <h3>Move</h3><p>Routes made for everyday discovery.</p>
-          </article>
-          <article className="project-card project-card--low">
-            <div className="card-visual card-visual--green"><span>03</span></div>
-            <h3>Belong</h3><p>Welcoming landscapes for everyone.</p>
-          </article>
+        <div className="project-collections">
+          <section className="project-collection collection--indoor">
+            <header className="indoor-heading" data-collection-label><p className="eyebrow">INDOOR</p><span /></header>
+            <div className="indoor-grid">
+              <article className="project-card indoor-card indoor-card--one">
+                <div className="card-visual card-visual--image"><img src={indoorOne} alt="Indoor project 1" /></div><h3>Indoor 01</h3>
+              </article>
+              <article className="project-card indoor-card indoor-card--two">
+                <div className="card-visual card-visual--image"><img src={indoorTwo} alt="Indoor project 2" /></div><h3>Indoor 02</h3>
+              </article>
+              <article className="project-card indoor-card indoor-card--three">
+                <div className="card-visual card-visual--green"></div><h3>Placeholder 03</h3>
+              </article>
+            </div>
+          </section>
+
+          <section className="project-collection collection--outdoor">
+            <header className="outdoor-heading" data-collection-label><p className="eyebrow">OUTDOOR</p><span /></header>
+            <div className="outdoor-grid">
+              <article className="project-card outdoor-card outdoor-card--one">
+                <div className="card-visual card-visual--image"><img src={outdoorOne} alt="Outdoor project 1" /></div><h5>Outdoor 01</h5>
+              </article>
+              <article className="project-card outdoor-card outdoor-card--two">
+                <div className="card-visual card-visual--image"><img src={outdoorTwo} alt="Outdoor project 2" /></div><h3>Outdoor 02</h3>
+              </article>
+              <article className="project-card outdoor-card outdoor-card--three">
+                <div className="card-visual card-visual--image"><img src={outdoorThree} alt="Outdoor project 3" /></div><h3>Outdoor 03</h3>
+              </article>
+            </div>
+          </section>
+
+          <section className="project-collection collection--innovations">
+            <header className="innovations-heading" data-collection-label><p className="eyebrow">INNOVATIONS</p><span /></header>
+            <div className="innovations-grid">
+              <article className="project-card innovations-card innovations-card--one">
+                <div className="card-visual card-visual--blue"><span>07</span></div><h3>Placeholder 07</h3>
+              </article>
+              <article className="project-card innovations-card innovations-card--two">
+                <div className="card-visual card-visual--green"><span>08</span></div><h3>Placeholder 08</h3>
+              </article>
+              <article className="project-card innovations-card innovations-card--three">
+                <div className="card-visual card-visual--red"><span>09</span></div><h3>Placeholder 09</h3>
+              </article>
+            </div>
+          </section>
         </div>
       </section>
     </main>
