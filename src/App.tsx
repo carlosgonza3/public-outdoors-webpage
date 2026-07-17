@@ -6,6 +6,7 @@ import './App.css'
 function App() {
   return (
     <main>
+      <div className="safari-browser-tone" aria-hidden="true" />
       <IntroScene />
       <GalleryScene />
       <PurposeScene />

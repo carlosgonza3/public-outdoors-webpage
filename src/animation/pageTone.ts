@@ -5,6 +5,8 @@ export function setPageTone(color: string) {
 
   activeTone = color
   document.documentElement.style.setProperty('--page-background', color)
+  document.documentElement.style.backgroundColor = color
+  document.body.style.backgroundColor = color
   document
     .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
     ?.setAttribute('content', color)
