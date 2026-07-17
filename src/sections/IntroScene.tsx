@@ -75,7 +75,10 @@ export function IntroScene() {
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const stop = timeline.labels.outside / timeline.duration()
-            setPageTone(self.progress < 0.5 ? '#f7f5ef' : '#07080b')
+            // Keep Safari's browser edges cream only while the opening mask is
+            // completely untouched. As soon as its animation starts, blend the
+            // browser chrome into the dark experience behind the mask.
+            setPageTone(self.progress <= 0.001 ? '#f7f5ef' : '#07080b')
 
             if (self.direction < 0) {
               if (self.progress < stop - 0.002) stopAcknowledged = false
