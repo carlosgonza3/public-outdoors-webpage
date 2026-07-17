@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { setPageTone } from '../animation/pageTone'
 import { ProjectCard } from '../components/ProjectCard'
 import { projectCollections } from '../data/projects'
 
@@ -25,6 +26,7 @@ export function GalleryScene() {
       const collections = gsap.utils.toArray<HTMLElement>('.project-collection')
 
       if (heading && headingBottom && headingSignal) {
+        gsap.set(headingSignal, { autoAlpha: 1 })
         gsap.set(headingSignals, { y: 0, scale: 0.74, autoAlpha: 0.42 })
 
         const typingTimeline = gsap.timeline({
@@ -67,10 +69,19 @@ export function GalleryScene() {
             start: 'top 92%',
             end: 'bottom 68%',
             toggleActions: 'play reverse play reverse',
-            onEnter: () => typingTimeline.play(),
-            onEnterBack: () => typingTimeline.play(),
+            onEnter: () => {
+              setPageTone('#171717')
+              typingTimeline.play()
+            },
+            onEnterBack: () => {
+              setPageTone('#171717')
+              typingTimeline.play()
+            },
             onLeave: () => typingTimeline.pause(),
-            onLeaveBack: () => typingTimeline.pause(),
+            onLeaveBack: () => {
+              setPageTone('#07080b')
+              typingTimeline.pause()
+            },
           },
         })
 
@@ -110,7 +121,6 @@ export function GalleryScene() {
             {
               y: 18,
               scale: 0.94,
-              autoAlpha: 0,
               duration: 0.46,
               ease: 'power3.out',
             },

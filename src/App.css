@@ -1,8 +1,16 @@
-main { overflow: clip; }
+main {
+  overflow: clip;
+  background: #07080b;
+}
+
+.pin-spacer {
+  background: #07080b;
+}
 
 .intro {
   position: relative;
   height: 100svh;
+  height: 100dvh;
   min-height: 620px;
   overflow: hidden;
   background: #07080b;
@@ -433,6 +441,8 @@ main { overflow: clip; }
   gap: clamp(1.1rem, 2vw, 2rem);
   isolation: isolate;
   will-change: transform, opacity;
+  opacity: 1;
+  visibility: visible;
 }
 
 .grid-heading__signal::before {

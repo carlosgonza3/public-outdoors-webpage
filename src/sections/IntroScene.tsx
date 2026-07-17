@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 import { BrandMask } from '../components/BrandMask'
 
@@ -19,6 +20,7 @@ export function IntroScene() {
     () => {
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
+        setPageTone('#07080b')
         return
       }
 
@@ -73,6 +75,7 @@ export function IntroScene() {
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const stop = timeline.labels.outside / timeline.duration()
+            setPageTone(self.progress < 0.5 ? '#f7f5ef' : '#07080b')
 
             if (self.direction < 0) {
               if (self.progress < stop - 0.002) stopAcknowledged = false

@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 
 export function PurposeScene() {
@@ -18,6 +19,9 @@ export function PurposeScene() {
           start: 'top 84%',
           end: 'bottom 62%',
           toggleActions: 'play reverse play reverse',
+          onEnter: () => setPageTone('#03131c'),
+          onEnterBack: () => setPageTone('#03131c'),
+          onLeaveBack: () => setPageTone('#171717'),
         },
       })
 
