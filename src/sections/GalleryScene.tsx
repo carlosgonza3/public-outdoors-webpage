@@ -64,7 +64,7 @@ export function GalleryScene() {
         const headingTimeline = gsap.timeline({
           scrollTrigger: {
             trigger: heading,
-            start: 'top 32%',
+            start: 'top 92%',
             end: 'bottom 68%',
             toggleActions: 'play reverse play reverse',
             onEnter: () => typingTimeline.play(),

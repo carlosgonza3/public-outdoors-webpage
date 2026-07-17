@@ -11,6 +11,7 @@ export function IntroScene() {
   const veil = useRef<SVGSVGElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const copy = useRef<HTMLDivElement>(null)
+  const sloganGlow = useRef<HTMLDivElement>(null)
   const ambient = useRef<HTMLDivElement>(null)
   const scrollCue = useRef<HTMLDivElement>(null)
 
@@ -97,6 +98,7 @@ export function IntroScene() {
       })
 
       const flight = { x: 0, y: 0, rotation: 0, scale: 3.2 }
+      const sloganLines = gsap.utils.toArray<HTMLElement>('.slogan-line > span')
       const renderMark = () => {
         const transform = `translate(${flight.x} ${flight.y}) rotate(${flight.rotation}) scale(${flight.scale})`
         mark.current?.setAttribute('transform', transform)
@@ -106,7 +108,14 @@ export function IntroScene() {
       renderMark()
       gsap.set(content.current, { autoAlpha: 0, scale: 1.04 })
       gsap.set(ambient.current, { autoAlpha: 1, scale: 1 })
-      gsap.set(copy.current, { autoAlpha: 1 })
+      gsap.set(copy.current, {
+        autoAlpha: 0,
+        y: 34,
+        scale: 0.86,
+        filter: 'blur(12px)',
+      })
+      gsap.set(sloganLines, { yPercent: 42 })
+      gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.72 })
 
       timeline
         .to(flight, {
@@ -149,8 +158,71 @@ export function IntroScene() {
         .to(veil.current, { autoAlpha: 0, duration: 0.08 }, 0.94)
         .to(scrollCue.current, { autoAlpha: 0, y: -12, duration: 0.12 }, 0.78)
         .to(content.current, { autoAlpha: 1, scale: 1, duration: 0.2, ease: 'power2.out' }, 0.8)
+        .to(
+          sloganGlow.current,
+          {
+            autoAlpha: 0.82,
+            scale: 1,
+            duration: 0.42,
+            ease: 'power3.out',
+          },
+          0.82,
+        )
+        .to(
+          copy.current,
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.38,
+            ease: 'power3.out',
+          },
+          0.84,
+        )
+        .to(
+          sloganLines,
+          {
+            yPercent: 0,
+            duration: 0.36,
+            stagger: 0.045,
+            ease: 'power4.out',
+          },
+          0.86,
+        )
         .addLabel('outside', 1.08)
-        .to({}, { duration: 0.42 })
+        .to({}, { duration: 0.18 })
+        .to(
+          copy.current,
+          {
+            autoAlpha: 0,
+            yPercent: -24,
+            scale: 1.1,
+            filter: 'blur(14px)',
+            duration: 0.46,
+            ease: 'power3.inOut',
+          },
+        )
+        .to(
+          sloganGlow.current,
+          {
+            autoAlpha: 0,
+            scale: 1.38,
+            duration: 0.46,
+            ease: 'power3.inOut',
+          },
+          '<',
+        )
+        .to(
+          ambient.current,
+          {
+            autoAlpha: 0,
+            scale: 1.14,
+            duration: 0.5,
+            ease: 'power3.inOut',
+          },
+          '<',
+        )
 
       return () => {
         window.clearTimeout(quietTimer)
@@ -172,11 +244,15 @@ export function IntroScene() {
     >
       <div className="reveal-content" ref={content}>
         <AmbientField variant="intro" fieldRef={ambient} />
+        <div className="slogan-glow" ref={sloganGlow} aria-hidden="true" />
         <div className="scene-copy scene-copy--intro" ref={copy}>
           <h1>
-            Espacios únicos para
-            <br />
-            elevar tu marca
+            <span className="slogan-line">
+              <span>Espacios únicos para</span>
+            </span>
+            <span className="slogan-line">
+              <span>elevar tu marca</span>
+            </span>
           </h1>
         </div>
       </div>
