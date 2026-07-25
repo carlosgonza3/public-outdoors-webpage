@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { setPageTone } from '../animation/pageTone'
@@ -7,6 +8,8 @@ import { projectCollections } from '../data/projects'
 
 export function GalleryScene() {
   const section = useRef<HTMLElement>(null)
+  const location = useLocation()
+  const navigate = useNavigate()
 
   useGSAP(
     () => {
@@ -233,7 +236,34 @@ export function GalleryScene() {
             key={collection.id}
           >
             <header className={`${collection.id}-heading`} data-collection-label>
-              <p className="eyebrow">{collection.label}</p>
+              <p className="eyebrow">
+                <Link
+                  to={`/${collection.id}`}
+                  state={{ backgroundLocation: location }}
+                  onClick={(event) => {
+                    if (
+                      event.button !== 0 ||
+                      event.metaKey ||
+                      event.ctrlKey ||
+                      event.shiftKey ||
+                      event.altKey
+                    ) {
+                      return
+                    }
+
+                    event.preventDefault()
+                    navigate(`/${collection.id}`, {
+                      state: {
+                        backgroundLocation: location,
+                        backgroundScrollY: window.scrollY,
+                      },
+                    })
+                  }}
+                  aria-label={`Ver todos los proyectos ${collection.label}`}
+                >
+                  {collection.label}
+                </Link>
+              </p>
               <span />
             </header>
             <div className={`${collection.id}-grid`}>
