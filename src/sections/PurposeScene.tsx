@@ -3,6 +3,7 @@ import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
+import { isIOSSafari } from '../platform/iosSafari'
 
 const questionWords = ['¿No', 'viste', 'tu', 'marca?']
 const statementWords = ['No', 'dejes', 'que', 'pase', 'de', 'nuevo.']
@@ -20,6 +21,7 @@ export function PurposeScene() {
       if (!section.current) return
 
       const stages = [question.current, statement.current, action.current]
+      const iosSafari = isIOSSafari()
 
       if (prefersReducedMotion()) {
         gsap.set(stages, { autoAlpha: 0 })
@@ -56,12 +58,13 @@ export function PurposeScene() {
           start: 'top top',
           end: '+=320%',
           pin: true,
+          pinType: iosSafari ? 'transform' : 'fixed',
           scrub: 1.35,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onEnter: () => setPageTone('#03131c'),
-          onEnterBack: () => setPageTone('#03131c'),
-          onLeaveBack: () => setPageTone('#080b0a'),
+          onEnter: () => setPageTone('#03131c', true),
+          onEnterBack: () => setPageTone('#03131c', true),
+          onLeaveBack: () => setPageTone('#080b0a', true),
         },
       })
 

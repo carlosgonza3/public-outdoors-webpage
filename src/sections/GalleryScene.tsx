@@ -73,16 +73,16 @@ export function GalleryScene() {
             end: 'bottom 68%',
             toggleActions: 'play reverse play reverse',
             onEnter: () => {
-              setPageTone('#171717')
+              setPageTone('#171717', true)
               typingTimeline.play()
             },
             onEnterBack: () => {
-              setPageTone('#171717')
+              setPageTone('#171717', true)
               typingTimeline.play()
             },
             onLeave: () => typingTimeline.pause(),
             onLeaveBack: () => {
-              setPageTone('#07080b')
+              setPageTone('#07080b', true)
               typingTimeline.pause()
             },
           },

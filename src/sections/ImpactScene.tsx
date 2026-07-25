@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { setPageTone } from '../animation/pageTone'
+import { isIOSSafari } from '../platform/iosSafari'
 
 const metrics = [
   {
@@ -44,6 +45,7 @@ export function ImpactScene() {
 
       const reducedMotion = prefersReducedMotion()
       const mobile = window.matchMedia('(max-width: 720px)').matches
+      const iosSafari = isIOSSafari()
       const counterAnimations = new Map<Element, gsap.core.Tween>()
       const playedCounters = new Set<Element>()
 
@@ -132,12 +134,13 @@ export function ImpactScene() {
           start: 'top top',
           end: () => `+=${scrollDistance()}`,
           pin: true,
+          pinType: iosSafari ? 'transform' : 'fixed',
           scrub: mobile ? 0.28 : 0.8,
           anticipatePin: mobile ? 0.5 : 1,
           invalidateOnRefresh: true,
-          onEnter: () => setPageTone('#080b0a'),
-          onEnterBack: () => setPageTone('#080b0a'),
-          onLeaveBack: () => setPageTone('#03131c'),
+          onEnter: () => setPageTone('#080b0a', true),
+          onEnterBack: () => setPageTone('#080b0a', true),
+          onLeaveBack: () => setPageTone('#03131c', true),
         },
       })
 

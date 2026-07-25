@@ -1,7 +1,7 @@
 let activeTone = ''
 
-export function setPageTone(color: string) {
-  if (activeTone === color) return
+export function setPageTone(color: string, force = false) {
+  if (activeTone === color && !force) return
 
   activeTone = color
   const isOpeningTone = color.toLowerCase() === '#f7f5ef'
@@ -19,4 +19,12 @@ export function setPageTone(color: string) {
   document
     .querySelector<HTMLMetaElement>('meta[name="apple-mobile-web-app-status-bar-style"]')
     ?.setAttribute('content', isOpeningTone ? 'default' : 'black-translucent')
+
+  if (force) {
+    window.requestAnimationFrame(() => {
+      document.documentElement.style.setProperty('--page-background', color)
+      document.documentElement.style.backgroundColor = color
+      document.body.style.backgroundColor = color
+    })
+  }
 }

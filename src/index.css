@@ -26,17 +26,33 @@ body {
   overscroll-behavior-y: none;
 }
 
-body::before {
-  content: '';
+.safari-tint-rail {
+  display: none;
+}
+
+.is-ios-safari .safari-tint-rail {
+  display: block;
   position: fixed;
-  z-index: -1;
-  inset:
-    calc(-1 * env(safe-area-inset-top, 0px))
-    calc(-1 * env(safe-area-inset-right, 0px))
-    calc(-1 * env(safe-area-inset-bottom, 0px))
-    calc(-1 * env(safe-area-inset-left, 0px));
+  z-index: 2147483647;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
   background-color: var(--page-background);
   pointer-events: none;
+}
+
+.is-ios-safari .safari-tint-rail--top {
+  top: 0;
+}
+
+.is-ios-safari .safari-tint-rail--bottom {
+  bottom: 0;
+}
+
+.is-ios-safari.debug-safari-tint .safari-tint-rail {
+  height: 12px;
+  outline: 1px solid #ff0109;
 }
 
 #root {

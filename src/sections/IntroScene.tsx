@@ -4,6 +4,7 @@ import { prefersReducedMotion } from '../animation/motion'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 import { BrandMask } from '../components/BrandMask'
+import { isIOSSafari } from '../platform/iosSafari'
 
 export function IntroScene() {
   const section = useRef<HTMLElement>(null)
@@ -28,6 +29,7 @@ export function IntroScene() {
       let inputReady = true
       let stopAcknowledged = false
       let quietTimer: ReturnType<typeof window.setTimeout> | undefined
+      const iosSafari = isIOSSafari()
 
       const markInputQuiet = () => {
         window.clearTimeout(quietTimer)
@@ -70,6 +72,7 @@ export function IntroScene() {
           start: 'top top',
           end: '+=180%',
           pin: true,
+          pinType: iosSafari ? 'transform' : 'fixed',
           scrub: 0.18,
           anticipatePin: 1,
           invalidateOnRefresh: true,
