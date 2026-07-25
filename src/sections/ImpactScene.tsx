@@ -115,7 +115,7 @@ export function ImpactScene() {
         counterObserver.observe(value)
       })
 
-      if (reducedMotion || window.matchMedia('(max-width: 760px)').matches) {
+      if (reducedMotion || window.matchMedia('(max-width: 720px)').matches) {
         return () => {
           counterObserver.disconnect()
           counterAnimations.forEach((animation) => animation.kill())
