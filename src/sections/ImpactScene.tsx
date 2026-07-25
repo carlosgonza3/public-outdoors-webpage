@@ -42,8 +42,6 @@ export function ImpactScene() {
     () => {
       if (!section.current || !track.current) return
 
-      setPageTone('#080b0a')
-
       const reducedMotion = prefersReducedMotion()
       const counterAnimations = new Map<Element, gsap.core.Tween>()
       const playedCounters = new Set<Element>()
@@ -115,7 +113,7 @@ export function ImpactScene() {
         counterObserver.observe(value)
       })
 
-      if (reducedMotion || window.matchMedia('(max-width: 720px)').matches) {
+      if (reducedMotion) {
         return () => {
           counterObserver.disconnect()
           counterAnimations.forEach((animation) => animation.kill())
