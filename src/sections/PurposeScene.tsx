@@ -44,6 +44,10 @@ export function PurposeScene() {
         transformOrigin: '50% 50%',
         force3D: true,
       })
+      gsap.set('.purpose-glow', {
+        transformOrigin: '50% 50%',
+        force3D: true,
+      })
 
       const timeline = gsap.timeline({
         defaults: { ease: 'power3.inOut' },
@@ -107,6 +111,39 @@ export function PurposeScene() {
           },
           '<',
         )
+        .to(
+          '.purpose-glow--blue-main',
+          {
+            xPercent: -14,
+            yPercent: 9,
+            scale: 1.04,
+            duration: 1.05,
+            ease: 'sine.inOut',
+          },
+          '<',
+        )
+        .to(
+          '.purpose-glow--green-main',
+          {
+            xPercent: 16,
+            yPercent: -8,
+            scale: 0.97,
+            duration: 1.08,
+            ease: 'sine.inOut',
+          },
+          '<',
+        )
+        .to(
+          '.purpose-glow--red-accent',
+          {
+            xPercent: -12,
+            yPercent: -14,
+            scale: 1.08,
+            duration: 1.04,
+            ease: 'sine.inOut',
+          },
+          '<',
+        )
 
         // Act two — measured vertical convergence.
         .set(statement.current, { autoAlpha: 1 })
@@ -147,6 +184,39 @@ export function PurposeScene() {
             yPercent: 1,
             scale: 1.015,
             duration: 1.08,
+            ease: 'sine.inOut',
+          },
+          '<',
+        )
+        .to(
+          '.purpose-glow--blue-main',
+          {
+            xPercent: 12,
+            yPercent: -7,
+            scale: 0.98,
+            duration: 1.08,
+            ease: 'sine.inOut',
+          },
+          '<',
+        )
+        .to(
+          '.purpose-glow--green-main',
+          {
+            xPercent: -12,
+            yPercent: 10,
+            scale: 1.05,
+            duration: 1.1,
+            ease: 'sine.inOut',
+          },
+          '<',
+        )
+        .to(
+          '.purpose-glow--red-accent',
+          {
+            xPercent: 14,
+            yPercent: 8,
+            scale: 0.96,
+            duration: 1.06,
             ease: 'sine.inOut',
           },
           '<',
