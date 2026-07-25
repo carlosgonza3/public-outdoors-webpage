@@ -47,7 +47,7 @@ export function PurposeScene() {
     <section className="purpose-section" ref={section} data-scene-id="purpose">
       <AmbientField variant="purpose" fieldRef={ambient} />
       <div className="purpose-copy" ref={copy}>
-        <p className="eyebrow">¿No viste tu anuncio?</p>
+        <p className="eyebrow">¿No viste tu marca?</p>
         <h2>No dejes que pase de nuevo ¡Anúnciate con nosotros!</h2>
       </div>
     </section>
