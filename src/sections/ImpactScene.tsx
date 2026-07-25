@@ -35,6 +35,7 @@ clientLogos.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 export function ImpactScene() {
   const section = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
+  const chrome = useRef<HTMLDivElement>(null)
   const metricValues = useRef<Array<HTMLElement | null>>([])
 
   useGSAP(
@@ -124,9 +125,7 @@ export function ImpactScene() {
       const distance = () =>
         Math.max(0, track.current!.scrollWidth - document.documentElement.clientWidth)
 
-      const horizontalScroll = gsap.to(track.current, {
-        x: () => -distance(),
-        ease: 'none',
+      const horizontalScroll = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
@@ -140,6 +139,27 @@ export function ImpactScene() {
           onLeaveBack: () => setPageTone('#03131c'),
         },
       })
+
+      horizontalScroll
+        .to(
+          chrome.current,
+          {
+            autoAlpha: 0,
+            y: -24,
+            duration: 0.055,
+            ease: 'power2.out',
+          },
+          0,
+        )
+        .to(
+          track.current,
+          {
+            x: () => -distance(),
+            duration: 1,
+            ease: 'none',
+          },
+          0,
+        )
 
       return () => {
         horizontalScroll.kill()
@@ -157,7 +177,7 @@ export function ImpactScene() {
       aria-label="Nuestro impacto y clientes"
       data-scene-id="impact"
     >
-      <div className="impact-section__chrome" aria-hidden="true">
+      <div className="impact-section__chrome" ref={chrome} aria-hidden="true">
         <span>Nuestro impacto</span>
         <span>Desliza para descubrir</span>
       </div>
