@@ -53,12 +53,12 @@
   }
   .impact-section {
     height: 100svh;
-    height: 100dvh;
-    min-height: 560px;
+    min-height: 0;
     overflow: hidden;
-    overscroll-behavior: none;
+    overscroll-behavior-y: none;
     scroll-snap-type: none;
     scrollbar-width: none;
+    touch-action: pan-y;
   }
   .impact-section::-webkit-scrollbar { display: none; }
   .impact-section__chrome {
@@ -80,6 +80,8 @@
     min-height: 0;
     gap: .65rem;
     padding: 4.75rem 1rem 2rem;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
   .impact-metric {
     width: min(86vw, 24rem);

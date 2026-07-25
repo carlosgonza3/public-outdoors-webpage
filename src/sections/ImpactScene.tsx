@@ -43,6 +43,7 @@ export function ImpactScene() {
       if (!section.current || !track.current) return
 
       const reducedMotion = prefersReducedMotion()
+      const mobile = window.matchMedia('(max-width: 720px)').matches
       const counterAnimations = new Map<Element, gsap.core.Tween>()
       const playedCounters = new Set<Element>()
 
@@ -122,15 +123,17 @@ export function ImpactScene() {
 
       const distance = () =>
         Math.max(0, track.current!.scrollWidth - document.documentElement.clientWidth)
+      const leadInProgress = mobile ? 0.055 : 0.035
+      const scrollDistance = () => distance() / (1 - leadInProgress)
 
       const horizontalScroll = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: () => `+=${distance()}`,
+          end: () => `+=${scrollDistance()}`,
           pin: true,
-          scrub: 0.8,
-          anticipatePin: 1,
+          scrub: mobile ? 0.28 : 0.8,
+          anticipatePin: mobile ? 0.5 : 1,
           invalidateOnRefresh: true,
           onEnter: () => setPageTone('#080b0a'),
           onEnterBack: () => setPageTone('#080b0a'),
@@ -139,24 +142,26 @@ export function ImpactScene() {
       })
 
       horizontalScroll
+        .to({}, { duration: leadInProgress })
         .to(
           chrome.current,
           {
             autoAlpha: 0,
             y: -24,
-            duration: 0.055,
+            duration: mobile ? 0.035 : 0.045,
             ease: 'power2.out',
           },
-          0,
+          leadInProgress,
         )
         .to(
           track.current,
           {
             x: () => -distance(),
-            duration: 1,
+            force3D: true,
+            duration: 1 - leadInProgress,
             ease: 'none',
           },
-          0,
+          leadInProgress,
         )
 
       return () => {

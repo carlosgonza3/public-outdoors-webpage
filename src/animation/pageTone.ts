@@ -11,11 +11,6 @@ export function setPageTone(color: string) {
   document.documentElement.style.colorScheme = isOpeningTone ? 'only light' : 'dark'
   document.body.style.backgroundColor = color
   document
-    .querySelectorAll<HTMLElement>('.safari-browser-tone')
-    .forEach((element) => {
-      element.style.backgroundColor = color
-    })
-  document
     .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
     ?.setAttribute('content', color)
   document
