@@ -1,0 +1,43 @@
+@keyframes pulse {
+  0%, 100% { transform: scaleY(.25); opacity: .4; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes drift-red {
+  0% { transform: translate3d(-6%, 2%, 0) scale(.98); }
+  33% { transform: translate3d(6%, -5%, 0) scale(1.025); }
+  66% { transform: translate3d(10%, 6%, 0) scale(1.04); }
+  100% { transform: translate3d(-3%, 9%, 0) scale(1); }
+}
+
+@keyframes drift-blue {
+  0% { transform: translate3d(4%, -8%, 0) scale(1); }
+  32% { transform: translate3d(-11%, 2%, 0) scale(1.035); }
+  68% { transform: translate3d(-4%, 13%, 0) scale(.98); }
+  100% { transform: translate3d(9%, 6%, 0) scale(1.025); }
+}
+
+@keyframes drift-green {
+  0% { transform: translate3d(-6%, 5%, 0) scale(.98); }
+  35% { transform: translate3d(12%, -9%, 0) scale(1.04); }
+  65% { transform: translate3d(4%, -3%, 0) scale(1.015); }
+  100% { transform: translate3d(10%, 10%, 0) scale(1.03); }
+}
+
+@keyframes purpose-drift-one {
+  0% { transform: translate3d(-5%, -2%, 0); }
+  50% { transform: translate3d(8%, 6%, 0); }
+  100% { transform: translate3d(1%, 10%, 0); }
+}
+
+@keyframes purpose-drift-two {
+  0% { transform: translate3d(5%, 6%, 0); }
+  50% { transform: translate3d(-9%, -5%, 0); }
+  100% { transform: translate3d(-2%, 4%, 0); }
+}
+
+@keyframes purpose-drift-three {
+  0% { transform: translate3d(2%, -8%, 0); }
+  50% { transform: translate3d(-12%, 5%, 0); }
+  100% { transform: translate3d(8%, 8%, 0); }
+}

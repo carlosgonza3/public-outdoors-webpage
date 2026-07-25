@@ -1,0 +1,148 @@
+.purpose-section {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(2rem, 7vw, 7rem);
+  color: #f7f5ef;
+  background: #03131c;
+  text-align: center;
+  box-sizing: border-box;
+  perspective: 1200px;
+}
+
+.purpose-section .ambient-field { z-index: 0; }
+
+.purpose-section .purpose-glow {
+  animation: none;
+  will-change: transform, opacity;
+}
+
+.purpose-section .purpose-glow--blue-small,
+.purpose-section .purpose-glow--green-small {
+  display: none;
+}
+
+.purpose-stage {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 7vw, 7rem);
+  box-sizing: border-box;
+  will-change: transform, opacity, filter;
+}
+
+.purpose-stage h2 {
+  position: relative;
+  z-index: 1;
+}
+
+.purpose-stage h2 {
+  margin: 0;
+  color: inherit;
+}
+
+.purpose-question h2 {
+  max-width: 17ch;
+  font-family: inherit;
+  font-size: clamp(3.5rem, 6.8vw, 6.8rem);
+  font-weight: 430;
+  line-height: .94;
+  letter-spacing: -.055em;
+}
+
+.purpose-stage__word,
+.purpose-stage__word > span {
+  display: inline-block;
+}
+
+.purpose-stage__word {
+  overflow: hidden;
+  padding: .04em .02em .12em;
+  margin-bottom: -.12em;
+}
+
+.purpose-stage__word:not(:last-child) {
+  margin-right: .18em;
+}
+
+.purpose-statement {
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.purpose-statement h2 {
+  max-width: 1040px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: .2em;
+  font-size: clamp(3.7rem, 7vw, 7rem);
+  font-weight: 450;
+  line-height: .92;
+  letter-spacing: -.06em;
+}
+
+.purpose-statement__clip,
+.purpose-statement__word {
+  display: inline-block;
+}
+
+.purpose-statement__clip {
+  overflow: hidden;
+  padding: .04em .03em .12em;
+  margin: -.04em -.03em -.12em;
+}
+
+.purpose-statement__word {
+  transform-origin: left bottom;
+}
+
+.purpose-action {
+  overflow: hidden;
+}
+
+.purpose-action h2 {
+  width: auto;
+  font-size: clamp(3.8rem, 7.2vw, 7.2rem);
+  font-weight: 440;
+  line-height: .88;
+  letter-spacing: -.065em;
+  text-wrap: balance;
+}
+
+.purpose-action__word,
+.purpose-action__word > span {
+  display: inline-block;
+}
+
+.purpose-action__word {
+  padding: .05em .03em .12em;
+  margin-bottom: -.12em;
+}
+
+.purpose-action__word:not(:last-child) {
+  margin-right: .18em;
+}
+
+.purpose-action__word--lead {
+  display: block;
+  margin: 0 0 .1em;
+  font-size: 1.08em;
+  font-weight: 520;
+  letter-spacing: -.075em;
+}
+
+.purpose-action__word--support {
+  font-size: .82em;
+  color: rgb(247 245 239 / 82%);
+  letter-spacing: -.045em;
+}
+

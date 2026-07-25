@@ -112,23 +112,23 @@ export function CollectionPage({
       className={`collection-page collection-page--${collection.id}`}
       ref={page}
     >
+      <button
+        className="collection-page__back"
+        type="button"
+        onClick={() => {
+          if (modal || location.state?.backgroundLocation) {
+            navigate(-1)
+            return
+          }
+
+          navigate('/')
+        }}
+      >
+        <span aria-hidden="true">←</span>
+        Volver
+      </button>
+
       <header className="collection-page__header">
-        <button
-          className="collection-page__back"
-          type="button"
-          onClick={() => {
-            if (modal || location.state?.backgroundLocation) {
-              navigate(-1)
-              return
-            }
-
-            navigate('/')
-          }}
-        >
-          <span aria-hidden="true">←</span>
-          Volver
-        </button>
-
         <div className="collection-page__intro">
           <p>{collectionCopy[collection.id]}</p>
           <h1 aria-label={collection.label}>
