@@ -134,7 +134,7 @@ export function GalleryScene() {
       collections.forEach((collection) => {
         const label = collection.querySelector<HTMLElement>('[data-collection-label]')
         const eyebrow = label?.querySelector('.eyebrow')
-        const line = label?.querySelector('span')
+        const line = label?.querySelector('.collection-heading__line')
         const cards = gsap.utils.shuffle(
           gsap.utils.toArray<HTMLElement>('.project-card', collection),
         )
@@ -238,6 +238,7 @@ export function GalleryScene() {
             <header className={`${collection.id}-heading`} data-collection-label>
               <p className="eyebrow">
                 <Link
+                  className="collection-heading__link"
                   to={`/${collection.id}`}
                   state={{ backgroundLocation: location }}
                   onClick={(event) => {
@@ -261,10 +262,19 @@ export function GalleryScene() {
                   }}
                   aria-label={`Ver todos los proyectos ${collection.label}`}
                 >
-                  {collection.label}
+                  <span className="collection-heading__title">
+                    {collection.label}
+                  </span>
+                  <svg
+                    className="collection-heading__icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
                 </Link>
               </p>
-              <span />
+              <span className="collection-heading__line" />
             </header>
             <div className={`${collection.id}-grid`}>
               {collection.projects.map((project, index) => (

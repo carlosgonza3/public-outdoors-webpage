@@ -4,7 +4,9 @@ import {
   Routes,
   useLocation,
 } from 'react-router-dom'
-import { CollectionPage } from './pages/CollectionPage'
+import { IndoorPage } from './pages/IndoorPage'
+import { InnovationsPage } from './pages/InnovationsPage'
+import { OutdoorPage } from './pages/OutdoorPage'
 import { GalleryScene } from './sections/GalleryScene'
 import { ImpactScene } from './sections/ImpactScene'
 import { IntroScene } from './sections/IntroScene'
@@ -30,29 +32,17 @@ function App() {
     <>
       <Routes location={backgroundLocation ?? location}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/indoor" element={<CollectionPage collectionId="indoor" />} />
-        <Route path="/outdoor" element={<CollectionPage collectionId="outdoor" />} />
-        <Route
-          path="/innovations"
-          element={<CollectionPage collectionId="innovations" />}
-        />
+        <Route path="/indoor" element={<IndoorPage />} />
+        <Route path="/outdoor" element={<OutdoorPage />} />
+        <Route path="/innovations" element={<InnovationsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       {backgroundLocation && (
         <Routes>
-          <Route
-            path="/indoor"
-            element={<CollectionPage collectionId="indoor" modal />}
-          />
-          <Route
-            path="/outdoor"
-            element={<CollectionPage collectionId="outdoor" modal />}
-          />
-          <Route
-            path="/innovations"
-            element={<CollectionPage collectionId="innovations" modal />}
-          />
+          <Route path="/indoor" element={<IndoorPage modal />} />
+          <Route path="/outdoor" element={<OutdoorPage modal />} />
+          <Route path="/innovations" element={<InnovationsPage modal />} />
         </Routes>
       )}
     </>

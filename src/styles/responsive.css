@@ -25,6 +25,14 @@
   .innovations-heading .eyebrow {
     font-size: clamp(1.8rem, 8vw, 2.8rem);
   }
+  .collection-heading__link {
+    gap: .7rem;
+    padding-left: .38em;
+  }
+  .collection-heading__icon {
+    width: 1.45rem;
+    height: 1.45rem;
+  }
   .collection-page { padding-inline: 1.25rem; }
   .route-modal { padding: 0; }
   .route-modal__panel {
@@ -35,12 +43,16 @@
   }
   .collection-page__header { min-height: 82svh; }
   .collection-page__intro {
-    grid-template-columns: 1fr;
-    align-items: end;
+    align-items: stretch;
+    gap: 2rem;
+    padding-inline: 0;
   }
   .collection-page__intro h1 {
-    font-size: clamp(4.2rem, 22vw, 7rem);
+    font-size: clamp(2.9rem, 12.5vw, 5rem);
     text-align: left;
+  }
+  .collection-page--innovations .collection-page__intro h1 {
+    font-size: clamp(2.65rem, 10.4vw, 4.25rem);
   }
   .collection-page__projects {
     display: block;

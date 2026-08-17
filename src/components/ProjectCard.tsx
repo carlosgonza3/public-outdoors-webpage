@@ -1,4 +1,5 @@
 import type { Project } from '../data/projects'
+import { LightboxImage } from './ImageLightbox'
 
 interface ProjectCardProps {
   project: Project
@@ -13,7 +14,14 @@ export function ProjectCard({ project, collectionId, index }: ProjectCardProps) 
     <article className={className}>
       {project.image ? (
         <div className="card-visual card-visual--image">
-          <img src={project.image} alt={project.alt ?? ''} loading="lazy" decoding="async" />
+          <LightboxImage
+            src={project.image}
+            alt={project.alt ?? project.title}
+            caption={project.title}
+            triggerClassName="image-lightbox-trigger--fill"
+            loading="lazy"
+            decoding="async"
+          />
           <h3 className="image-card-title">{project.title}</h3>
         </div>
       ) : (

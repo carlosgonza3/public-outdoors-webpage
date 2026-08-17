@@ -1,36 +1,24 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
-import {
-  projectCollections,
-  type ProjectCollection,
-} from '../data/projects'
-
-type CollectionId = ProjectCollection['id']
 
 interface CollectionPageProps {
-  collectionId: CollectionId
+  children: ReactNode
+  collectionId: 'indoor' | 'outdoor' | 'innovations'
+  label: string
   modal?: boolean
 }
 
-const collectionCopy: Record<CollectionId, string> = {
-  indoor:
-    'Presencia estratégica en espacios donde las personas esperan, compran y se conectan.',
-  outdoor:
-    'Formatos de alto impacto que convierten la ciudad y sus recorridos en oportunidades.',
-  innovations:
-    'Nuevas tecnologías y experiencias que amplifican la relación entre marcas y audiencias.',
-}
-
 export function CollectionPage({
+  children,
   collectionId,
+  label,
   modal = false,
 }: CollectionPageProps) {
   const page = useRef<HTMLElement>(null)
   const location = useLocation()
   const navigate = useNavigate()
-  const collection = projectCollections.find(({ id }) => id === collectionId)!
 
   useEffect(() => {
     if (modal) return
@@ -58,17 +46,26 @@ export function CollectionPage({
     () => {
       if (prefersReducedMotion()) return
 
+      const backButton = page.current?.querySelector('.collection-page__back')
+      const titleLines = page.current?.querySelectorAll(
+        '.collection-page__title-line > span',
+      )
+      const introCopy = page.current?.querySelector('.collection-page__intro p')
+      const projects = page.current?.querySelectorAll('.collection-page__project')
       const timeline = gsap.timeline()
 
-      timeline
-        .from('.collection-page__back', {
+      if (backButton) {
+        timeline.from(backButton, {
           y: -12,
           autoAlpha: 0,
           duration: 0.45,
           ease: 'power3.out',
         })
-        .from(
-          '.collection-page__title-line > span',
+      }
+
+      if (titleLines?.length) {
+        timeline.from(
+          titleLines,
           {
             yPercent: 110,
             duration: 0.75,
@@ -77,8 +74,11 @@ export function CollectionPage({
           },
           0.06,
         )
-        .from(
-          '.collection-page__intro p',
+      }
+
+      if (introCopy) {
+        timeline.from(
+          introCopy,
           {
             y: 20,
             autoAlpha: 0,
@@ -87,8 +87,11 @@ export function CollectionPage({
           },
           0.24,
         )
-        .from(
-          '.collection-page__project',
+      }
+
+      if (projects?.length) {
+        timeline.from(
+          projects,
           {
             y: 48,
             autoAlpha: 0,
@@ -99,6 +102,7 @@ export function CollectionPage({
           },
           0.34,
         )
+      }
 
       return () => timeline.kill()
     },
@@ -109,7 +113,7 @@ export function CollectionPage({
 
   const pageContent = (
     <Root
-      className={`collection-page collection-page--${collection.id}`}
+      className={`collection-page collection-page--${collectionId}`}
       ref={page}
     >
       <button
@@ -128,48 +132,7 @@ export function CollectionPage({
         Volver
       </button>
 
-      <header className="collection-page__header">
-        <div className="collection-page__intro">
-          <p>{collectionCopy[collection.id]}</p>
-          <h1 aria-label={collection.label}>
-            <span className="collection-page__title-line">
-              <span>{collection.label}</span>
-            </span>
-          </h1>
-        </div>
-      </header>
-
-      <section
-        className="collection-page__projects"
-        aria-label={`Proyectos ${collection.label}`}
-      >
-        {collection.projects.map((project, index) => (
-          <article className="collection-page__project" key={project.id}>
-            <div
-              className={`collection-page__visual ${
-                project.image
-                  ? 'collection-page__visual--image'
-                  : `collection-page__visual--${project.tone}`
-              }`}
-            >
-              {project.image ? (
-                <img
-                  src={project.image}
-                  alt={project.alt ?? ''}
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  decoding="async"
-                />
-              ) : (
-                <span>{project.id}</span>
-              )}
-            </div>
-            <div className="collection-page__project-meta">
-              <span>{project.id}</span>
-              <h2>{project.title}</h2>
-            </div>
-          </article>
-        ))}
-      </section>
+      {children}
     </Root>
   )
 
@@ -180,7 +143,7 @@ export function CollectionPage({
       className="route-modal"
       role="dialog"
       aria-modal="true"
-      aria-label={`Proyectos ${collection.label}`}
+      aria-label={`Proyectos ${label}`}
     >
       <button
         className="route-modal__backdrop"

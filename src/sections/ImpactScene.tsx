@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { LightboxImage } from '../components/ImageLightbox'
 import { setPageTone } from '../animation/pageTone'
 import { isIOSSafari } from '../platform/iosSafari'
 
@@ -218,7 +219,12 @@ export function ImpactScene() {
         <div className="clients-list" aria-label="Logotipos de nuestros clientes">
           {clientLogos.map((logo, index) => (
             <figure className="client-logo" key={logo}>
-              <img src={logo} alt={`Cliente ${index + 1}`} />
+              <LightboxImage
+                src={logo}
+                alt={`Cliente ${index + 1}`}
+                caption={`Cliente ${index + 1}`}
+                triggerClassName="image-lightbox-trigger--contain"
+              />
             </figure>
           ))}
         </div>
