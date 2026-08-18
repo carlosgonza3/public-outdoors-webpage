@@ -146,3 +146,45 @@
   letter-spacing: -.045em;
 }
 
+.purpose-contact {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 4rem);
+  pointer-events: none;
+  perspective: 1600px;
+  box-sizing: border-box;
+}
+
+.purpose-contact__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(5 7 9 / 56%);
+  backdrop-filter: blur(22px) saturate(.72);
+  -webkit-backdrop-filter: blur(22px) saturate(.72);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.purpose-contact .contact-card-embed {
+  position: relative;
+  z-index: 1;
+  width: min(72rem, 100%);
+  pointer-events: none;
+}
+
+.purpose-contact .contact-card__motion,
+.purpose-contact .contact-card__stage {
+  width: 100%;
+}
+
+.purpose-contact .contact-card__stage {
+  pointer-events: auto;
+}
+
+@media (max-width: 820px) {
+  .purpose-contact { padding: .75rem; }
+  .purpose-contact .contact-card-embed { width: 100%; }
+}

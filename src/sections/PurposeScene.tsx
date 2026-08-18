@@ -3,6 +3,7 @@ import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
+import { ContactCard } from '../components/ContactCard'
 import { isIOSSafari } from '../platform/iosSafari'
 
 const questionWords = ['¿No', 'viste', 'tu', 'marca?']
@@ -15,17 +16,30 @@ export function PurposeScene() {
   const question = useRef<HTMLDivElement>(null)
   const statement = useRef<HTMLDivElement>(null)
   const action = useRef<HTMLDivElement>(null)
+  const contact = useRef<HTMLDivElement>(null)
+  const contactBackdrop = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
       if (!section.current) return
 
       const stages = [question.current, statement.current, action.current]
+      const siteNavigation = document.querySelector<HTMLElement>(
+        '.site-overlay-nav',
+      )
+      const contactContainer = contact.current
+      const backdrop = contactBackdrop.current
+      const contactMotion = contactContainer?.querySelector<HTMLElement>(
+        '.contact-card__motion',
+      )
       const iosSafari = isIOSSafari()
+
+      if (!contactContainer || !backdrop || !contactMotion) return
 
       if (prefersReducedMotion()) {
         gsap.set(stages, { autoAlpha: 0 })
         gsap.set(action.current, { autoAlpha: 1 })
+        gsap.set(contactContainer, { autoAlpha: 0 })
         return
       }
 
@@ -42,6 +56,16 @@ export function PurposeScene() {
         xPercent: 28,
         autoAlpha: 0,
       })
+      gsap.set(contactContainer, { autoAlpha: 1 })
+      gsap.set(backdrop, { autoAlpha: 0 })
+      gsap.set(contactMotion, {
+        autoAlpha: 0,
+        xPercent: -12,
+        rotationY: -48,
+        scale: 0.96,
+        clipPath: 'inset(0 82% 0 0 round 1.5rem)',
+        transformOrigin: 'left center',
+      })
       gsap.set(ambient.current, {
         transformOrigin: '50% 50%',
         force3D: true,
@@ -56,7 +80,7 @@ export function PurposeScene() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: '+=320%',
+          end: '+=500%',
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
           scrub: 1.35,
@@ -246,8 +270,84 @@ export function PurposeScene() {
           '-=.42',
         )
         .to({}, { duration: 0.75 })
+        .to(action.current, {
+          autoAlpha: 0,
+          yPercent: -10,
+          scale: 1.06,
+          filter: 'blur(12px)',
+          duration: 0.6,
+          ease: 'power3.inOut',
+        })
+        .to(
+          backdrop,
+          {
+            autoAlpha: 1,
+            duration: 0.42,
+            ease: 'power2.out',
+          },
+          '-=.24',
+        )
+        .to(
+          siteNavigation,
+          {
+            autoAlpha: 0,
+            y: -10,
+            filter: 'blur(6px)',
+            duration: 0.35,
+            ease: 'power3.in',
+          },
+          '<',
+        )
+        .to(
+          contactMotion,
+          {
+            autoAlpha: 1,
+            xPercent: 0,
+            rotationY: 0,
+            scale: 1,
+            clipPath: 'inset(0 0% 0 0 round 1.5rem)',
+            duration: 0.82,
+            ease: 'power4.out',
+          },
+          '<',
+        )
+        .set(contactMotion, { clipPath: 'none' })
+        .to({}, { duration: 0.9 })
+        .to(contactMotion, {
+          xPercent: 16,
+          rotationX: 0,
+          rotationY: 62,
+          scale: 0.91,
+          clipPath: 'inset(0 0 0 100% round 1.5rem)',
+          autoAlpha: 0,
+          duration: 0.72,
+          ease: 'power3.inOut',
+          transformOrigin: 'right center',
+        })
+        .to(
+          backdrop,
+          {
+            autoAlpha: 0,
+            duration: 0.38,
+            ease: 'power2.in',
+          },
+          '-=.48',
+        )
+        .to(
+          siteNavigation,
+          {
+            autoAlpha: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.35,
+            ease: 'power3.out',
+          },
+          '-=.12',
+        )
 
-      return () => timeline.kill()
+      return () => {
+        timeline.kill()
+      }
     },
     { scope: section },
   )
@@ -291,6 +391,15 @@ export function PurposeScene() {
             </span>
           ))}
         </h2>
+      </div>
+
+      <div className="purpose-contact" ref={contact}>
+        <div
+          className="purpose-contact__backdrop"
+          ref={contactBackdrop}
+          aria-hidden="true"
+        />
+        <ContactCard mode="scroll" />
       </div>
     </section>
   )

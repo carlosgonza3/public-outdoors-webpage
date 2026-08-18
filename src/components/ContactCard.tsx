@@ -6,7 +6,8 @@ import { prefersReducedMotion } from '../animation/motion'
 import butterflyLogo from '../assets/public-butterfly.svg'
 
 type ContactCardProps = {
-  onClose: () => void
+  onClose?: () => void
+  mode?: 'modal' | 'scroll'
 }
 
 type ShareState = 'idle' | 'exporting' | 'shared' | 'error'
@@ -93,8 +94,9 @@ async function copyText(value: string) {
   textarea.remove()
 }
 
-export function ContactCard({ onClose }: ContactCardProps) {
+export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
   const overlay = useRef<HTMLDivElement>(null)
+  const cardMotion = useRef<HTMLDivElement>(null)
   const cardStage = useRef<HTMLDivElement>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
   const closing = useRef(false)
@@ -110,10 +112,11 @@ export function ContactCard({ onClose }: ContactCardProps) {
 
   useGSAP(
     () => {
-      if (!overlay.current || !cardStage.current) return
+      if (!overlay.current || !cardMotion.current) return
+      if (mode === 'scroll') return
 
       if (prefersReducedMotion()) {
-        gsap.set([overlay.current, cardStage.current], { autoAlpha: 1 })
+        gsap.set([overlay.current, cardMotion.current], { autoAlpha: 1 })
         tiltReady.current = true
         return
       }
@@ -125,13 +128,12 @@ export function ContactCard({ onClose }: ContactCardProps) {
           },
         })
         .set(overlay.current, { autoAlpha: 0 })
-        .set(cardStage.current, {
+        .set(cardMotion.current, {
           autoAlpha: 0,
-          xPercent: -18,
-          rotationY: -68,
-          scale: 0.9,
-          filter: 'blur(10px)',
-          clipPath: 'inset(0 100% 0 0 round 1.5rem)',
+          xPercent: -12,
+          rotationY: -48,
+          scale: 0.96,
+          clipPath: 'inset(0 82% 0 0 round 1.5rem)',
           transformOrigin: 'left center',
         })
         .to(overlay.current, {
@@ -140,73 +142,56 @@ export function ContactCard({ onClose }: ContactCardProps) {
           ease: 'power2.out',
         })
         .to(
-          cardStage.current,
+          cardMotion.current,
           {
             autoAlpha: 1,
-            xPercent: -7,
-            rotationY: -34,
-            scale: 0.95,
-            filter: 'blur(4px)',
-            clipPath: 'inset(0 48% 0 0 round 1.5rem)',
-            duration: 0.42,
-            ease: 'power3.out',
-          },
-          0.08,
-        )
-        .to(
-          cardStage.current,
-          {
             xPercent: 0,
             rotationY: 0,
             scale: 1,
-            filter: 'blur(0px)',
             clipPath: 'inset(0 0% 0 0 round 1.5rem)',
-            duration: 0.58,
+            duration: 0.82,
             ease: 'power4.out',
           },
-          0.42,
+          0.06,
         )
-        .from(
-          '.contact-card__reveal',
-          {
-            y: 24,
-            autoAlpha: 0,
-            duration: 0.5,
-            stagger: 0.055,
-            ease: 'power3.out',
-          },
-          0.56,
-        )
-        .set(cardStage.current, { clipPath: 'none' }, 1.01)
+        .set(cardMotion.current, { clipPath: 'none' }, 0.88)
     },
     { scope: overlay },
   )
 
   useEffect(() => {
     const stage = cardStage.current
-    const canTilt = window.matchMedia(
-      '(hover: hover) and (pointer: fine)',
-    ).matches
 
-    if (!stage || !canTilt || prefersReducedMotion()) return
+    if (!stage || prefersReducedMotion()) return
+
+    if (mode === 'scroll') tiltReady.current = true
+
+    gsap.set(stage, {
+      transformPerspective: 1400,
+      transformOrigin: 'center center',
+    })
 
     const rotateX = gsap.quickTo(stage, 'rotationX', {
-      duration: 0.7,
+      duration: 0.58,
       ease: 'power3.out',
     })
     const rotateY = gsap.quickTo(stage, 'rotationY', {
-      duration: 0.7,
+      duration: 0.58,
       ease: 'power3.out',
     })
 
     const handlePointerMove = (event: PointerEvent) => {
-      if (!tiltReady.current || closing.current) return
+      if (
+        event.pointerType === 'touch' ||
+        !tiltReady.current ||
+        closing.current
+      ) return
 
-      const horizontal = event.clientX / window.innerWidth - 0.5
-      const vertical = event.clientY / window.innerHeight - 0.5
+      const horizontal = (event.clientX / window.innerWidth - 0.5) * 2
+      const vertical = (event.clientY / window.innerHeight - 0.5) * 2
 
-      rotateX(vertical * -3.2)
-      rotateY(horizontal * 4)
+      rotateX(vertical * -4)
+      rotateY(horizontal * 5.5)
     }
 
     const resetTilt = () => {
@@ -224,11 +209,18 @@ export function ContactCard({ onClose }: ContactCardProps) {
       window.removeEventListener('blur', resetTilt)
       document.documentElement.removeEventListener('pointerleave', resetTilt)
       gsap.killTweensOf(stage, ['rotationX', 'rotationY'])
+      tiltReady.current = false
     }
-  }, [])
+  }, [mode])
 
   const requestClose = useCallback(() => {
-    if (closing.current || !overlay.current || !cardStage.current) return
+    if (
+      mode !== 'modal' ||
+      !onClose ||
+      closing.current ||
+      !overlay.current ||
+      !cardMotion.current
+    ) return
     closing.current = true
     tiltReady.current = false
 
@@ -239,12 +231,11 @@ export function ContactCard({ onClose }: ContactCardProps) {
 
     gsap
       .timeline({ onComplete: onClose })
-      .to(cardStage.current, {
+      .to(cardMotion.current, {
         xPercent: 16,
         rotationX: 0,
         rotationY: 62,
         scale: 0.91,
-        filter: 'blur(8px)',
         clipPath: 'inset(0 0 0 100% round 1.5rem)',
         autoAlpha: 0,
         duration: 0.62,
@@ -260,9 +251,11 @@ export function ContactCard({ onClose }: ContactCardProps) {
         },
         0.24,
       )
-  }, [onClose])
+  }, [mode, onClose])
 
   useEffect(() => {
+    if (mode !== 'modal') return
+
     const previouslyFocused = document.activeElement as HTMLElement | null
     const previousOverflow = document.body.style.overflow
     const appRoot = document.getElementById('root')
@@ -305,7 +298,7 @@ export function ContactCard({ onClose }: ContactCardProps) {
       if (appRoot) appRoot.inert = previousInert
       previouslyFocused?.focus({ preventScroll: true })
     }
-  }, [requestClose])
+  }, [mode, requestClose])
 
   const handleCopy = async (id: string, value: string) => {
     try {
@@ -328,15 +321,19 @@ export function ContactCard({ onClose }: ContactCardProps) {
     try {
       await document.fonts.ready
 
-      const dataUrl = await toPng(stage, {
-        cacheBust: true,
+      const exportTarget =
+        stage.querySelector<HTMLElement>('.contact-card') ?? stage
+
+      const dataUrl = await toPng(exportTarget, {
+        cacheBust: false,
         pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-        backgroundColor: '#090b0d',
+        backgroundColor: '#f5f2eb',
         style: {
           transform: 'none',
           transformOrigin: 'center',
           filter: 'none',
           clipPath: 'none',
+          overflow: 'visible',
         },
         filter: (node) =>
           !(
@@ -390,21 +387,18 @@ export function ContactCard({ onClose }: ContactCardProps) {
     error: 'Reintentar',
   }[shareState]
 
-  return createPortal(
-    <div
-      className="contact-overlay"
-      ref={overlay}
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) requestClose()
-      }}
-    >
+  const titleId = mode === 'modal'
+    ? 'contact-card-title'
+    : 'purpose-contact-card-title'
+
+  const cardContent = (
+    <div className="contact-card__motion" ref={cardMotion}>
       <div className="contact-card__stage" ref={cardStage}>
         <article
           className="contact-card"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="contact-card-title"
+          role={mode === 'modal' ? 'dialog' : 'region'}
+          aria-modal={mode === 'modal' ? true : undefined}
+          aria-labelledby={titleId}
         >
         <header className="contact-card__header contact-card__reveal">
           <p>Public · El Salvador</p>
@@ -424,18 +418,20 @@ export function ContactCard({ onClose }: ContactCardProps) {
                 <path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 13v5.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V13" />
               </svg>
             </button>
-            <button
-              className="contact-card__close"
-              type="button"
-              ref={closeButton}
-              onClick={requestClose}
-              aria-label="Cerrar información de contacto"
-            >
-              <span>Cerrar</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M5 5l14 14M19 5L5 19" />
-              </svg>
-            </button>
+            {mode === 'modal' && (
+              <button
+                className="contact-card__close"
+                type="button"
+                ref={closeButton}
+                onClick={requestClose}
+                aria-label="Cerrar información de contacto"
+              >
+                <span>Cerrar</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 5l14 14M19 5L5 19" />
+                </svg>
+              </button>
+            )}
           </div>
         </header>
 
@@ -447,7 +443,7 @@ export function ContactCard({ onClose }: ContactCardProps) {
               alt="Public"
             />
             <p>Hagamos visible tu próxima idea.</p>
-            <h2 id="contact-card-title">Hablemos.</h2>
+            <h2 id={titleId}>Hablemos.</h2>
           </div>
 
           <div className="contact-card__details">
@@ -508,6 +504,23 @@ export function ContactCard({ onClose }: ContactCardProps) {
 
         </article>
       </div>
+    </div>
+  )
+
+  if (mode === 'scroll') {
+    return <div className="contact-card-embed">{cardContent}</div>
+  }
+
+  return createPortal(
+    <div
+      className="contact-overlay"
+      ref={overlay}
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) requestClose()
+      }}
+    >
+      {cardContent}
     </div>,
     document.body,
   )
