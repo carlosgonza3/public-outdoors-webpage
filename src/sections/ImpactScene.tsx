@@ -1,6 +1,7 @@
 import { useRef } from 'react'
-import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
+import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { isMobileExperience } from '../animation/mobile'
 import { LightboxImage } from '../components/ImageLightbox'
 import { setPageTone } from '../animation/pageTone'
 import { isIOSSafari } from '../platform/iosSafari'
@@ -44,8 +45,8 @@ export function ImpactScene() {
     () => {
       if (!section.current || !track.current) return
 
+      const mobile = isMobileExperience()
       const reducedMotion = prefersReducedMotion()
-      const mobile = window.matchMedia('(max-width: 720px)').matches
       const iosSafari = isIOSSafari()
       const counterAnimations = new Map<Element, gsap.core.Tween>()
       const playedCounters = new Set<Element>()
@@ -77,6 +78,22 @@ export function ImpactScene() {
 
             playedCounters.add(value)
             counterObserver.unobserve(value)
+
+            if (mobile) {
+              const animation = gsap.fromTo(
+                value,
+                { autoAlpha: 0, yPercent: 10 },
+                {
+                  autoAlpha: 1,
+                  yPercent: 0,
+                  duration: 0.42,
+                  ease: 'power3.out',
+                  onComplete: () => counterAnimations.delete(value),
+                },
+              )
+              counterAnimations.set(value, animation)
+              return
+            }
 
             const animation = gsap.to(
               { progress: 0 },
@@ -112,7 +129,11 @@ export function ImpactScene() {
       metricValues.current.forEach((value) => {
         if (!value) return
         if (!reducedMotion) {
-          gsap.set(value, { autoAlpha: 0, yPercent: 14, filter: 'blur(10px)' })
+          gsap.set(value, {
+            autoAlpha: 0,
+            yPercent: mobile ? 10 : 14,
+            filter: mobile ? 'none' : 'blur(10px)',
+          })
         }
         counterObserver.observe(value)
       })
@@ -124,29 +145,21 @@ export function ImpactScene() {
         }
       }
 
-      if (mobile) {
-        gsap.set(track.current, { clearProps: 'transform' })
-
-        const mobileTone = ScrollTrigger.create({
-          trigger: section.current,
-          start: 'top 65%',
-          end: 'bottom 35%',
-          onEnter: () => setPageTone('#080b0a', true),
-          onEnterBack: () => setPageTone('#080b0a', true),
-          onLeaveBack: () => setPageTone('#171717', true),
-        })
-
-        return () => {
-          mobileTone.kill()
-          counterObserver.disconnect()
-          counterAnimations.forEach((animation) => animation.kill())
-        }
-      }
-
       const distance = () =>
         Math.max(0, track.current!.scrollWidth - document.documentElement.clientWidth)
-      const leadInProgress = 0.035
-      const scrollDistance = () => distance() / (1 - leadInProgress)
+      const leadInProgress = mobile ? 0 : 0.035
+      const scrollDistance = () => {
+        if (!mobile) return distance() / (1 - leadInProgress)
+
+        // Keep the complete horizontal journey, but cap its vertical pin time
+        // so a phone never feels trapped inside the scene. The track still
+        // reaches its exact endpoint; it simply travels farther per scroll px.
+        const viewportHeight = window.innerHeight
+        return Math.max(
+          viewportHeight * 1.35,
+          Math.min(distance() * 0.62, viewportHeight * 2.4),
+        )
+      }
 
       const horizontalScroll = gsap.timeline({
         scrollTrigger: {
@@ -155,12 +168,12 @@ export function ImpactScene() {
           end: () => `+=${scrollDistance()}`,
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: 0.8,
+          scrub: mobile ? true : 0.8,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onEnter: () => setPageTone('#080b0a', true),
           onEnterBack: () => setPageTone('#080b0a', true),
-          onLeaveBack: () => setPageTone('#03131c', true),
+          onLeaveBack: () => setPageTone(mobile ? '#171717' : '#03131c', true),
         },
       })
 

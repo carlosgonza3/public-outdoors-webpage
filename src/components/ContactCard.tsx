@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { toPng } from 'html-to-image'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { isMobileExperience } from '../animation/mobile'
 import butterflyLogo from '../assets/public-butterfly.svg'
 
 type ContactCardProps = {
@@ -80,18 +81,30 @@ function SocialIcon({ id }: { id: string }) {
 
 async function copyText(value: string) {
   if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(value)
-    return
+    try {
+      await navigator.clipboard.writeText(value)
+      return
+    } catch {
+      // Safari and embedded browsers can expose the Clipboard API while still
+      // rejecting it. Fall through to the selection-based copy path.
+    }
   }
 
   const textarea = document.createElement('textarea')
+  const previouslyFocused = document.activeElement as HTMLElement | null
   textarea.value = value
   textarea.style.position = 'fixed'
   textarea.style.opacity = '0'
+  textarea.style.pointerEvents = 'none'
+  textarea.setAttribute('readonly', '')
   document.body.appendChild(textarea)
+  textarea.focus({ preventScroll: true })
   textarea.select()
-  document.execCommand('copy')
+  const copied = document.execCommand('copy')
   textarea.remove()
+  previouslyFocused?.focus({ preventScroll: true })
+
+  if (!copied) throw new Error('Copy command was rejected')
 }
 
 export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
@@ -114,6 +127,37 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     () => {
       if (!overlay.current || !cardMotion.current) return
       if (mode === 'scroll') return
+
+      if (isMobileExperience()) {
+        tiltReady.current = false
+        const timeline = gsap
+          .timeline()
+          .set(overlay.current, { autoAlpha: 0 })
+          .set(cardMotion.current, {
+            autoAlpha: 0,
+            y: 24,
+            scale: 0.98,
+            transformOrigin: 'center center',
+          })
+          .to(overlay.current, {
+            autoAlpha: 1,
+            duration: 0.28,
+            ease: 'power2.out',
+          })
+          .to(
+            cardMotion.current,
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.48,
+              ease: 'power3.out',
+            },
+            0.04,
+          )
+
+        return () => timeline.kill()
+      }
 
       if (prefersReducedMotion()) {
         gsap.set([overlay.current, cardMotion.current], { autoAlpha: 1 })
@@ -161,8 +205,16 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
   useEffect(() => {
     const stage = cardStage.current
+    const canTilt = window.matchMedia(
+      '(any-hover: hover) and (any-pointer: fine)',
+    ).matches
 
-    if (!stage || prefersReducedMotion()) return
+    if (
+      !stage ||
+      !canTilt ||
+      isMobileExperience() ||
+      prefersReducedMotion()
+    ) return
 
     if (mode === 'scroll') tiltReady.current = true
 
@@ -226,6 +278,28 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
     if (prefersReducedMotion()) {
       onClose()
+      return
+    }
+
+    if (isMobileExperience()) {
+      gsap
+        .timeline({ onComplete: onClose })
+        .to(cardMotion.current, {
+          autoAlpha: 0,
+          y: -14,
+          scale: 0.985,
+          duration: 0.28,
+          ease: 'power2.in',
+        })
+        .to(
+          overlay.current,
+          {
+            autoAlpha: 0,
+            duration: 0.24,
+            ease: 'power2.in',
+          },
+          0.06,
+        )
       return
     }
 
@@ -392,7 +466,11 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     : 'purpose-contact-card-title'
 
   const cardContent = (
-    <div className="contact-card__motion" ref={cardMotion}>
+    <div
+      className="contact-card__motion"
+      ref={cardMotion}
+      onPointerDown={(event) => event.stopPropagation()}
+    >
       <div className="contact-card__stage" ref={cardStage}>
         <article
           className="contact-card"
@@ -516,7 +594,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       className="contact-overlay"
       ref={overlay}
       role="presentation"
-      onMouseDown={(event) => {
+      onPointerDown={(event) => {
         if (event.target === event.currentTarget) requestClose()
       }}
     >

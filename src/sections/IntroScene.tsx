@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 import { BrandMask } from '../components/BrandMask'
@@ -21,6 +22,8 @@ export function IntroScene() {
     () => {
       const siteNavigation = document.querySelector<HTMLElement>('.site-overlay-nav')
 
+      const mobile = isMobileExperience()
+
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
         gsap.set(siteNavigation, {
@@ -34,14 +37,154 @@ export function IntroScene() {
         return
       }
 
+      if (mobile) {
+        const sloganLines = gsap.utils.toArray<HTMLElement>(
+          '.slogan-line > span',
+        )
+        let darkToneActive = false
+        const maskFlight = { scale: 3.2, rotation: 0 }
+        const renderMobileMask = () => {
+          const transform =
+            `rotate(${maskFlight.rotation}) scale(${maskFlight.scale})`
+          mark.current?.setAttribute('transform', transform)
+          colorMark.current?.setAttribute('transform', transform)
+        }
+
+        renderMobileMask()
+        gsap.set(colorMark.current, { autoAlpha: 1 })
+        gsap.set(content.current, { autoAlpha: 1, scale: 1.02 })
+        gsap.set(copy.current, { autoAlpha: 0, y: 24 })
+        gsap.set(sloganLines, { yPercent: 34 })
+        gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.84 })
+        gsap.set(siteNavigation, {
+          autoAlpha: 1,
+          y: 0,
+          color: '#07080b',
+          textShadow: 'none',
+        })
+
+        const mobileTimeline = gsap.timeline({
+          scrollTrigger: {
+            id: 'intro-scene-mobile',
+            trigger: section.current,
+            start: 'top top',
+            end: '+=125%',
+            pin: true,
+            pinType: 'fixed',
+            scrub: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              const shouldUseDarkTone = self.progress > 0.04
+              if (shouldUseDarkTone === darkToneActive) return
+              darkToneActive = shouldUseDarkTone
+              setPageTone(shouldUseDarkTone ? '#07080b' : '#f7f5ef')
+            },
+          },
+        })
+
+        mobileTimeline
+          .to(
+            maskFlight,
+            {
+              scale: 5.2,
+              rotation: -1.25,
+              duration: 0.12,
+              ease: 'power2.out',
+              onUpdate: renderMobileMask,
+            },
+            0,
+          )
+          .to(
+            maskFlight,
+            {
+              scale: 45,
+              rotation: -3,
+              duration: 0.24,
+              ease: 'power3.inOut',
+              onUpdate: renderMobileMask,
+            },
+            0.12,
+          )
+          .to(
+            colorMark.current,
+            {
+              autoAlpha: 0,
+              duration: 0.16,
+              ease: 'power2.inOut',
+            },
+            0.1,
+          )
+          .to(
+            veil.current,
+            {
+              autoAlpha: 0,
+              duration: 0.16,
+              ease: 'power2.inOut',
+            },
+            0.1,
+          )
+          .to(
+            scrollCue.current,
+            { autoAlpha: 0, y: -8, duration: 0.14, ease: 'power2.out' },
+            0.12,
+          )
+          .to(
+            content.current,
+            { autoAlpha: 1, scale: 1, duration: 0.24, ease: 'power2.out' },
+            0.16,
+          )
+          .to(
+            siteNavigation,
+            {
+              color: 'rgb(255 255 255 / 86%)',
+              textShadow: '0 .2rem 1rem rgb(0 0 0 / 22%)',
+              duration: 0.2,
+            },
+            0.18,
+          )
+          .to(
+            sloganGlow.current,
+            { autoAlpha: 0.72, scale: 1, duration: 0.25, ease: 'power2.out' },
+            0.2,
+          )
+          .to(
+            copy.current,
+            { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
+            0.22,
+          )
+          .to(
+            sloganLines,
+            { yPercent: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out' },
+            0.22,
+          )
+          .to({}, { duration: 0.28 })
+          .to(copy.current, {
+            autoAlpha: 0,
+            yPercent: -16,
+            scale: 1.035,
+            duration: 0.2,
+            ease: 'power2.inOut',
+          })
+          .to(
+            sloganGlow.current,
+            { autoAlpha: 0, scale: 1.18, duration: 0.2, ease: 'power2.inOut' },
+            '<',
+          )
+          .to(
+            ambient.current,
+            { autoAlpha: 0, scale: 1.06, duration: 0.22, ease: 'power2.inOut' },
+            '<',
+          )
+
+        return () => mobileTimeline.kill()
+      }
+
       let lockedProgress: number | null = null
       let inputReady = true
       let stopAcknowledged = false
       let quietTimer: ReturnType<typeof window.setTimeout> | undefined
       const iosSafari = isIOSSafari()
-      const mobile = window.matchMedia(
-        '(max-width: 720px), (pointer: coarse)',
-      ).matches
 
       const markInputQuiet = () => {
         window.clearTimeout(quietTimer)
@@ -79,12 +222,10 @@ export function IntroScene() {
         inputReady = true
       }
 
-      if (!mobile) {
-        window.addEventListener('wheel', stopMomentum, { passive: false })
-        window.addEventListener('touchstart', startTouchGesture, { passive: true })
-        window.addEventListener('touchmove', stopTouchMomentum, { passive: false })
-        window.addEventListener('touchend', endTouchGesture, { passive: true })
-      }
+      window.addEventListener('wheel', stopMomentum, { passive: false })
+      window.addEventListener('touchstart', startTouchGesture, { passive: true })
+      window.addEventListener('touchmove', stopTouchMomentum, { passive: false })
+      window.addEventListener('touchend', endTouchGesture, { passive: true })
       window.addEventListener(
         'public:navigate-to-media',
         releaseIntroForNavigation,
@@ -98,7 +239,7 @@ export function IntroScene() {
           end: '+=180%',
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: mobile ? true : 0.18,
+          scrub: 0.18,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -107,11 +248,6 @@ export function IntroScene() {
             // completely untouched. As soon as its animation starts, blend the
             // browser chrome into the dark experience behind the mask.
             setPageTone(self.progress <= 0.001 ? '#f7f5ef' : '#07080b')
-
-            // Touch momentum and programmatic scroll correction fight each
-            // other on mobile. Let the timeline follow the finger directly;
-            // the deliberate pause remains a desktop interaction only.
-            if (mobile) return
 
             if (self.direction < 0) {
               if (self.progress < stop - 0.002) stopAcknowledged = false
@@ -282,12 +418,10 @@ export function IntroScene() {
 
       return () => {
         window.clearTimeout(quietTimer)
-        if (!mobile) {
-          window.removeEventListener('wheel', stopMomentum)
-          window.removeEventListener('touchstart', startTouchGesture)
-          window.removeEventListener('touchmove', stopTouchMomentum)
-          window.removeEventListener('touchend', endTouchGesture)
-        }
+        window.removeEventListener('wheel', stopMomentum)
+        window.removeEventListener('touchstart', startTouchGesture)
+        window.removeEventListener('touchmove', stopTouchMomentum)
+        window.removeEventListener('touchend', endTouchGesture)
         window.removeEventListener(
           'public:navigate-to-media',
           releaseIntroForNavigation,

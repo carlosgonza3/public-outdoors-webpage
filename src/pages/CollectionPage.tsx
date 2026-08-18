@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { isMobileExperience } from '../animation/mobile'
 
 interface CollectionPageProps {
   children: ReactNode
@@ -46,6 +47,8 @@ export function CollectionPage({
     () => {
       if (prefersReducedMotion()) return
 
+      const mobile = isMobileExperience()
+
       const backButton = page.current?.querySelector('.collection-page__back')
       const titleLines = page.current?.querySelectorAll(
         '.collection-page__title-line > span',
@@ -56,7 +59,7 @@ export function CollectionPage({
 
       if (backButton) {
         timeline.from(backButton, {
-          y: -12,
+          y: mobile ? -8 : -12,
           autoAlpha: 0,
           duration: 0.45,
           ease: 'power3.out',
@@ -68,8 +71,8 @@ export function CollectionPage({
           titleLines,
           {
             yPercent: 110,
-            duration: 0.75,
-            stagger: 0.08,
+            duration: mobile ? 0.55 : 0.75,
+            stagger: mobile ? 0.05 : 0.08,
             ease: 'power4.out',
           },
           0.06,
@@ -80,9 +83,9 @@ export function CollectionPage({
         timeline.from(
           introCopy,
           {
-            y: 20,
+            y: mobile ? 12 : 20,
             autoAlpha: 0,
-            duration: 0.55,
+            duration: mobile ? 0.4 : 0.55,
             ease: 'power3.out',
           },
           0.24,
@@ -93,11 +96,11 @@ export function CollectionPage({
         timeline.from(
           projects,
           {
-            y: 48,
+            y: mobile ? 28 : 48,
             autoAlpha: 0,
-            scale: 0.97,
-            duration: 0.72,
-            stagger: 0.1,
+            scale: mobile ? 1 : 0.97,
+            duration: mobile ? 0.5 : 0.72,
+            stagger: mobile ? 0.06 : 0.1,
             ease: 'power4.out',
           },
           0.34,

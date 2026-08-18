@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 import { ContactCard } from '../components/ContactCard'
@@ -32,10 +33,7 @@ export function PurposeScene() {
       const contactMotion = contactContainer?.querySelector<HTMLElement>(
         '.contact-card__motion',
       )
-      const iosSafari = isIOSSafari()
-      const mobile = window.matchMedia(
-        '(max-width: 720px), (pointer: coarse)',
-      ).matches
+      const mobile = isMobileExperience()
 
       if (!contactContainer || !backdrop || !contactMotion) return
 
@@ -45,6 +43,170 @@ export function PurposeScene() {
         gsap.set(contactContainer, { autoAlpha: 0 })
         return
       }
+
+      if (mobile) {
+        const questionWords = gsap.utils.toArray<HTMLElement>(
+          '.purpose-stage__word > span',
+        )
+        const statementWords = gsap.utils.toArray<HTMLElement>(
+          '.purpose-statement__word',
+        )
+        const actionLead = gsap.utils.toArray<HTMLElement>(
+          '.purpose-action__word--lead > span',
+        )
+        const actionSupport = gsap.utils.toArray<HTMLElement>(
+          '.purpose-action__word--support > span',
+        )
+
+        gsap.set(statement.current, { autoAlpha: 0 })
+        gsap.set(action.current, { autoAlpha: 0 })
+        gsap.set(questionWords, { yPercent: 90, autoAlpha: 0 })
+        gsap.set(statementWords, { yPercent: 64, autoAlpha: 0 })
+        gsap.set(actionLead, { yPercent: 52, scale: 0.9, autoAlpha: 0 })
+        gsap.set(actionSupport, { xPercent: 18, autoAlpha: 0 })
+        gsap.set(contactContainer, { autoAlpha: 1, pointerEvents: 'none' })
+        gsap.set(backdrop, { autoAlpha: 0 })
+        gsap.set(contactMotion, {
+          autoAlpha: 0,
+          yPercent: 7,
+          scale: 0.98,
+          transformOrigin: 'center center',
+        })
+        gsap.set(ambient.current, {
+          autoAlpha: 1,
+          scale: 1,
+          transformOrigin: '50% 50%',
+          force3D: true,
+        })
+
+        const mobileTimeline = gsap.timeline({
+          defaults: { ease: 'power2.inOut' },
+          scrollTrigger: {
+            trigger: section.current,
+            start: 'top top',
+            end: '+=390%',
+            pin: true,
+            pinType: 'fixed',
+            scrub: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onEnter: () => setPageTone('#03131c', true),
+            onEnterBack: () => setPageTone('#03131c', true),
+            onLeaveBack: () => setPageTone('#080b0a', true),
+          },
+        })
+
+        mobileTimeline
+          .to(questionWords, {
+            yPercent: 0,
+            autoAlpha: 1,
+            duration: 0.55,
+            stagger: 0.045,
+            ease: 'power3.out',
+          })
+          .to({}, { duration: 0.32 })
+          .to(question.current, {
+            autoAlpha: 0,
+            yPercent: -8,
+            scale: 0.985,
+            duration: 0.38,
+          })
+          .to(
+            ambient.current,
+            { xPercent: 1.5, scale: 1.02, duration: 0.38 },
+            '<',
+          )
+          .set(statement.current, { autoAlpha: 1 })
+          .to(statementWords, {
+            yPercent: 0,
+            autoAlpha: 1,
+            duration: 0.52,
+            stagger: 0.035,
+            ease: 'power3.out',
+          })
+          .to({}, { duration: 0.34 })
+          .to(statement.current, {
+            autoAlpha: 0,
+            yPercent: -8,
+            duration: 0.38,
+          })
+          .to(
+            ambient.current,
+            { xPercent: -1, scale: 1.01, duration: 0.38 },
+            '<',
+          )
+          .set(action.current, { autoAlpha: 1 })
+          .to(actionLead, {
+            yPercent: 0,
+            scale: 1,
+            autoAlpha: 1,
+            duration: 0.5,
+            ease: 'power3.out',
+          })
+          .to(
+            actionSupport,
+            {
+              xPercent: 0,
+              autoAlpha: 1,
+              duration: 0.42,
+              stagger: 0.055,
+              ease: 'power3.out',
+            },
+            '-=.28',
+          )
+          .to({}, { duration: 0.42 })
+          .to(action.current, {
+            autoAlpha: 0,
+            yPercent: -7,
+            scale: 1.025,
+            duration: 0.38,
+          })
+          .set(contactContainer, { pointerEvents: 'auto' })
+          .to(
+            backdrop,
+            { autoAlpha: 1, duration: 0.28, ease: 'power2.out' },
+            '-=.14',
+          )
+          .to(
+            siteNavigation,
+            { autoAlpha: 0, y: -8, duration: 0.24, ease: 'power2.in' },
+            '<',
+          )
+          .to(
+            contactMotion,
+            {
+              autoAlpha: 1,
+              yPercent: 0,
+              scale: 1,
+              duration: 0.48,
+              ease: 'power3.out',
+            },
+            '<',
+          )
+          .to({}, { duration: 0.58 })
+          .to(contactMotion, {
+            autoAlpha: 0,
+            yPercent: -6,
+            scale: 0.98,
+            duration: 0.42,
+            ease: 'power2.inOut',
+          })
+          .set(contactContainer, { pointerEvents: 'none' })
+          .to(
+            backdrop,
+            { autoAlpha: 0, duration: 0.26, ease: 'power2.in' },
+            '-=.26',
+          )
+          .to(
+            siteNavigation,
+            { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power2.out' },
+            '-=.08',
+          )
+
+        return () => mobileTimeline.kill()
+      }
+
+      const iosSafari = isIOSSafari()
 
       gsap.set(statement.current, { autoAlpha: 0 })
       gsap.set(action.current, { autoAlpha: 0 })
@@ -59,15 +221,18 @@ export function PurposeScene() {
         xPercent: 28,
         autoAlpha: 0,
       })
-      gsap.set(contactContainer, { autoAlpha: 1 })
+      gsap.set(contactContainer, {
+        autoAlpha: 1,
+        pointerEvents: 'none',
+      })
       gsap.set(backdrop, { autoAlpha: 0 })
       gsap.set(contactMotion, {
         autoAlpha: 0,
-        xPercent: mobile ? 0 : -12,
-        yPercent: mobile ? 7 : 0,
-        rotationY: mobile ? 0 : -48,
-        scale: mobile ? 0.975 : 0.96,
-        clipPath: mobile ? 'none' : 'inset(0 82% 0 0 round 1.5rem)',
+        xPercent: -12,
+        yPercent: 0,
+        rotationY: -48,
+        scale: 0.96,
+        clipPath: 'inset(0 82% 0 0 round 1.5rem)',
         transformOrigin: 'left center',
       })
       gsap.set(ambient.current, {
@@ -84,11 +249,11 @@ export function PurposeScene() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: mobile ? '+=420%' : '+=500%',
+          end: '+=500%',
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: mobile ? true : 1.35,
-          anticipatePin: mobile ? 0.5 : 1,
+          scrub: 1.35,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
           onEnter: () => setPageTone('#03131c', true),
           onEnterBack: () => setPageTone('#03131c', true),
@@ -278,10 +443,11 @@ export function PurposeScene() {
           autoAlpha: 0,
           yPercent: -10,
           scale: 1.06,
-          filter: mobile ? 'none' : 'blur(12px)',
+          filter: 'blur(12px)',
           duration: 0.6,
           ease: 'power3.inOut',
         })
+        .set(contactContainer, { pointerEvents: 'auto' })
         .to(
           backdrop,
           {
@@ -310,7 +476,7 @@ export function PurposeScene() {
             yPercent: 0,
             rotationY: 0,
             scale: 1,
-            clipPath: mobile ? 'none' : 'inset(0 0% 0 0 round 1.5rem)',
+            clipPath: 'inset(0 0% 0 0 round 1.5rem)',
             duration: 0.82,
             ease: 'power4.out',
           },
@@ -319,17 +485,18 @@ export function PurposeScene() {
         .set(contactMotion, { clipPath: 'none' })
         .to({}, { duration: 0.9 })
         .to(contactMotion, {
-          xPercent: mobile ? 0 : 16,
-          yPercent: mobile ? -7 : 0,
+          xPercent: 16,
+          yPercent: 0,
           rotationX: 0,
-          rotationY: mobile ? 0 : 62,
-          scale: mobile ? 0.975 : 0.91,
-          clipPath: mobile ? 'none' : 'inset(0 0 0 100% round 1.5rem)',
+          rotationY: 62,
+          scale: 0.91,
+          clipPath: 'inset(0 0 0 100% round 1.5rem)',
           autoAlpha: 0,
           duration: 0.72,
           ease: 'power3.inOut',
           transformOrigin: 'right center',
         })
+        .set(contactContainer, { pointerEvents: 'none' })
         .to(
           backdrop,
           {

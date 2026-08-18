@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
+import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
 import { ProjectCard } from '../components/ProjectCard'
 import { projectCollections } from '../data/projects'
@@ -14,6 +15,8 @@ export function GalleryScene() {
   useGSAP(
     () => {
       if (prefersReducedMotion()) return
+
+      const mobile = isMobileExperience()
 
       const heading = section.current?.querySelector<HTMLElement>('.grid-heading')
       const headingTop = heading?.querySelector<HTMLElement>('.grid-heading__top')
@@ -71,7 +74,10 @@ export function GalleryScene() {
             trigger: heading,
             start: 'top 92%',
             end: 'bottom 68%',
-            toggleActions: 'play reverse play reverse',
+            toggleActions: mobile
+              ? 'play none none none'
+              : 'play reverse play reverse',
+            once: mobile,
             onEnter: () => {
               setPageTone('#171717', true)
               typingTimeline.play()
@@ -146,17 +152,19 @@ export function GalleryScene() {
 
         if (!eyebrow || !line) return
 
-        gsap
-          .timeline({
+        const collectionTimeline = gsap.timeline({
             scrollTrigger: {
               trigger: collection,
               start: 'top 82%',
               end: 'bottom 58%',
-              toggleActions: 'play reverse play reverse',
+              toggleActions: mobile
+                ? 'play none none none'
+                : 'play reverse play reverse',
+              once: mobile,
             },
           })
           .from(eyebrow, {
-            y: 12,
+            y: mobile ? 8 : 12,
             autoAlpha: 0,
             duration: 0.34,
             ease: 'power3.out',
@@ -176,16 +184,20 @@ export function GalleryScene() {
             cards,
             {
               y: 44,
-              scale: 0.965,
+              scale: mobile ? 1 : 0.965,
               autoAlpha: 0,
-              rotation: (index) => [-1.25, 0.8, -0.55][index % 3],
-              duration: 0.58,
-              stagger: 0.06,
+              rotation: mobile
+                ? 0
+                : (index) => [-1.25, 0.8, -0.55][index % 3],
+              duration: mobile ? 0.48 : 0.58,
+              stagger: mobile ? 0.045 : 0.06,
               ease: 'power4.out',
             },
             0.05,
           )
-          .from(
+
+        if (!mobile) {
+          collectionTimeline.from(
             visuals,
             {
               scale: 1.045,
@@ -195,6 +207,7 @@ export function GalleryScene() {
             },
             0.05,
           )
+        }
       })
     },
     { scope: section },

@@ -13,17 +13,35 @@
   .route-modal__panel { animation: none; }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   .intro {
     height: 100svh;
     min-height: 0;
   }
+
+  .logo-veil { display: block; }
+
+  .reveal-content,
+  .scene-copy,
+  .slogan-glow,
+  .ambient-field {
+    will-change: auto;
+  }
+
+  .ambient-glow,
+  .purpose-glow {
+    animation: none;
+  }
+
+  .ambient-glow { filter: blur(18px) saturate(108%); }
 
   .site-overlay-nav {
     top: .9rem;
     right: 1rem;
     font-size: clamp(.75rem, 3.2vw, .86rem);
     letter-spacing: .08em;
+    text-shadow: 0 .2rem 1rem rgb(0 0 0 / 26%);
+    transition: opacity .3s ease, transform .3s ease;
   }
 
   .site-overlay-nav__toggle {
@@ -92,8 +110,8 @@
       0 1px 0 rgb(255 255 255 / 10%) inset,
       0 1.25rem 3rem rgb(0 0 0 / 24%);
     color: #f7f5ef;
-    backdrop-filter: blur(18px) saturate(115%);
-    -webkit-backdrop-filter: blur(18px) saturate(115%);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     transform: translateY(-.55rem) scale(.97);
     transform-origin: top right;
     pointer-events: none;
@@ -180,12 +198,11 @@
     height: 100svh;
     min-height: 0;
     overflow: hidden;
-    overscroll-behavior: none;
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
     scroll-snap-type: none;
-    scrollbar-width: none;
-    touch-action: auto;
+    touch-action: pan-y;
   }
-  .impact-section::-webkit-scrollbar { display: none; }
   .impact-section__chrome {
     position: absolute;
     z-index: 4;
@@ -204,26 +221,22 @@
   .impact-section__chrome span { white-space: nowrap; }
   .impact-section__chrome span:last-child { display: block; }
   .impact-track {
-    width: 100%;
-    max-width: 100vw;
+    width: max-content;
+    max-width: none;
     height: 100%;
     min-height: 0;
     gap: .65rem;
     padding: 7.25rem 1rem 2rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    scroll-padding-inline: 1rem;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    touch-action: pan-x pan-y;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible;
+    scroll-snap-type: none;
+    touch-action: pan-y;
+    contain: layout paint;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
     backface-visibility: hidden;
   }
-  .impact-track::-webkit-scrollbar { display: none; }
-  .impact-track > * { scroll-snap-align: center; }
-  .impact-track > :first-child { scroll-snap-align: start; }
-  .impact-track__end { scroll-snap-align: end; }
+
+  .impact-track * { touch-action: pan-y; }
   .impact-metric {
     width: min(86vw, 24rem);
     min-height: 21rem;
@@ -275,6 +288,11 @@
   }
   .purpose-section {
     min-height: 100svh;
+  }
+  .project-grid-section {
+    min-height: 0;
+    margin-top: -18svh;
+    padding-top: 3rem;
   }
   .grid-heading {
     min-height: 100svh;
@@ -353,4 +371,36 @@
   }
 
   .project-card:nth-child(2) .card-visual { height: min(100vw, 540px); }
+
+  .collection-heading__link {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .grid-heading__signal,
+  .grid-heading__signal i,
+  .project-card {
+    will-change: auto;
+  }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .scene-copy--intro,
+  .scroll-cue { animation: none; }
+
+  .project-grid-section { margin-top: 0; }
+
+  .impact-section {
+    height: auto;
+    min-height: 100svh;
+    overflow-x: auto;
+    touch-action: pan-x pan-y;
+  }
+
+  .impact-track {
+    height: min(760px, 100svh);
+    contain: none;
+    transform: none !important;
+    will-change: auto;
+  }
 }

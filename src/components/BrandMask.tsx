@@ -25,7 +25,7 @@ export function BrandMask({ veilRef, markRef, colorMarkRef }: BrandMaskProps) {
         <mask id="mark-cutout">
           <rect width="1000" height="1000" fill="white" />
           <g transform="translate(500 500)">
-            <g ref={markRef}>
+            <g className="brand-mark brand-mark--cutout" ref={markRef}>
               <g transform="translate(-22.25 -25)">
                 <MarkPaths color="black" />
               </g>
@@ -35,7 +35,7 @@ export function BrandMask({ veilRef, markRef, colorMarkRef }: BrandMaskProps) {
       </defs>
       <rect width="1000" height="1000" fill="#f7f5ef" mask="url(#mark-cutout)" />
       <g transform="translate(500 500)">
-        <g ref={colorMarkRef}>
+        <g className="brand-mark brand-mark--color" ref={colorMarkRef}>
           <g transform="translate(-22.25 -25)">
             <path d="M43.0353 26.6296L44.4875 2.77441L34.9963 4.44748L35.902 16.4822L31.1837 39.0645L29.9401 43.0015L37.3543 37.6176L43.0353 26.6296Z" fill="#00B0F4" />
             <path d="M37.3544 37.6178L21.248 49.1966C21.248 49.1966 19.4579 39.5513 31.8109 31.1765C36.144 30.2517 37.3556 37.6189 37.3556 37.6189L37.3544 37.6178Z" fill="#38D430" />
