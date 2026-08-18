@@ -233,6 +233,7 @@ export function GalleryScene() {
           <section
             className={`project-collection collection--${collection.id}`}
             data-scene-id={collection.id}
+            id={collection.id === 'indoor' ? 'indoor-gallery' : undefined}
             key={collection.id}
           >
             <header className={`${collection.id}-heading`} data-collection-label>

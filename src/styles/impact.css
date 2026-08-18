@@ -28,8 +28,10 @@
   top: 0;
   right: clamp(1.25rem, 4vw, 4rem);
   left: clamp(1.25rem, 4vw, 4rem);
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 1rem;
   padding: clamp(1.3rem, 2.5vw, 2.25rem) 0 1rem;
   border-bottom: 1px solid rgb(245 241 229 / 22%);
   color: rgb(245 241 229 / 62%);
@@ -37,6 +39,12 @@
   font-weight: 700;
   letter-spacing: .17em;
   text-transform: uppercase;
+}
+
+.impact-section__chrome span:first-child { grid-column: 1; }
+.impact-section__chrome span:last-child {
+  grid-column: 2;
+  justify-self: center;
 }
 
 .impact-track {

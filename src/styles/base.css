@@ -6,3 +6,78 @@ main {
 .pin-spacer {
   background: var(--page-background, #07080b);
 }
+
+.site-overlay-nav {
+  position: fixed;
+  z-index: 90;
+  top: clamp(1rem, 2vw, 1.75rem);
+  right: clamp(1rem, 2.5vw, 2.5rem);
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.35rem, 2.5vw, 2.5rem);
+  opacity: 0;
+  visibility: hidden;
+  color: rgb(255 255 255 / 78%);
+  font-size: clamp(.58rem, .65vw, .7rem);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-shadow: 0 .2rem 1rem rgb(0 0 0 / 22%);
+  text-transform: uppercase;
+  will-change: transform, opacity, filter;
+}
+
+.site-overlay-nav > * {
+  position: relative;
+  display: block;
+  padding: .4rem 0;
+  color: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    color .35s ease,
+    transform .45s cubic-bezier(.2, .8, .2, 1),
+    text-shadow .4s ease;
+}
+
+.site-overlay-nav > *::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #fff 18%, #fff 82%, transparent);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition:
+    transform .45s cubic-bezier(.2, .8, .2, 1),
+    opacity .35s ease;
+}
+
+.site-overlay-nav a:focus-visible {
+  color: #fff;
+  outline: none;
+}
+
+.site-overlay-nav a:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.site-overlay-nav span {
+  color: rgb(255 255 255 / 54%);
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .site-overlay-nav > *:hover {
+    color: #fff;
+    text-shadow: 0 0 1.4rem rgb(255 255 255 / 32%);
+    transform: translateY(-2px);
+  }
+
+  .site-overlay-nav > *:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}

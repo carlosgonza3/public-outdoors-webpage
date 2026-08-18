@@ -19,8 +19,15 @@ export function IntroScene() {
 
   useGSAP(
     () => {
+      const siteNavigation = document.querySelector<HTMLElement>('.site-overlay-nav')
+
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
+        gsap.set(siteNavigation, {
+          autoAlpha: 1,
+          y: 0,
+          filter: 'blur(0px)',
+        })
         setPageTone('#07080b')
         return
       }
@@ -60,10 +67,21 @@ export function IntroScene() {
         if (lockedProgress !== null) inputReady = true
       }
 
+      const releaseIntroForNavigation = () => {
+        window.clearTimeout(quietTimer)
+        lockedProgress = null
+        stopAcknowledged = true
+        inputReady = true
+      }
+
       window.addEventListener('wheel', stopMomentum, { passive: false })
       window.addEventListener('touchstart', startTouchGesture, { passive: true })
       window.addEventListener('touchmove', stopTouchMomentum, { passive: false })
       window.addEventListener('touchend', endTouchGesture, { passive: true })
+      window.addEventListener(
+        'public:navigate-to-media',
+        releaseIntroForNavigation,
+      )
 
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -125,6 +143,11 @@ export function IntroScene() {
       })
       gsap.set(sloganLines, { yPercent: 42 })
       gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.72 })
+      gsap.set(siteNavigation, {
+        autoAlpha: 0,
+        y: -10,
+        filter: 'blur(6px)',
+      })
 
       timeline
         .to(flight, {
@@ -167,6 +190,17 @@ export function IntroScene() {
         .to(veil.current, { autoAlpha: 0, duration: 0.08 }, 0.94)
         .to(scrollCue.current, { autoAlpha: 0, y: -12, duration: 0.12 }, 0.78)
         .to(content.current, { autoAlpha: 1, scale: 1, duration: 0.2, ease: 'power2.out' }, 0.8)
+        .to(
+          siteNavigation,
+          {
+            autoAlpha: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.28,
+            ease: 'power3.out',
+          },
+          0.82,
+        )
         .to(
           sloganGlow.current,
           {
@@ -239,6 +273,10 @@ export function IntroScene() {
         window.removeEventListener('touchstart', startTouchGesture)
         window.removeEventListener('touchmove', stopTouchMomentum)
         window.removeEventListener('touchend', endTouchGesture)
+        window.removeEventListener(
+          'public:navigate-to-media',
+          releaseIntroForNavigation,
+        )
         timeline.kill()
       }
     },

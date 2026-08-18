@@ -14,13 +14,39 @@ import { PurposeScene } from './sections/PurposeScene'
 import './App.css'
 
 function HomePage() {
+  const scrollToIndoor = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const indoorCollection = document.getElementById('indoor-gallery')
+
+    if (!indoorCollection) return
+
+    event.preventDefault()
+    window.dispatchEvent(new Event('public:navigate-to-media'))
+    window.requestAnimationFrame(() => {
+      indoorCollection.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth',
+        block: 'start',
+      })
+    })
+  }
+
   return (
-    <main>
-      <IntroScene />
-      <GalleryScene />
-      <ImpactScene />
-      <PurposeScene />
-    </main>
+    <>
+      <nav className="site-overlay-nav" aria-label="Navegación principal">
+        <a href="#indoor-gallery" onClick={scrollToIndoor}>
+          Nuestros medios
+        </a>
+        <span aria-label="Contáctanos, próximamente">Contáctanos</span>
+      </nav>
+
+      <main>
+        <IntroScene />
+        <GalleryScene />
+        <ImpactScene />
+        <PurposeScene />
+      </main>
+    </>
   )
 }
 
