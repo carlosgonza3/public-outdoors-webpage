@@ -487,6 +487,17 @@
   .contact-card__socials { gap: .4rem; }
   .contact-card__socials > span { display: none; }
   .contact-card__socials a { width: 1.55rem; height: 1.55rem; }
+
+  .contact-card__stage::before,
+  .contact-card__stage::after {
+    animation: none;
+  }
+
+  .contact-card__stage::after {
+    inset: -4px;
+    opacity: .38;
+    filter: blur(8px);
+  }
 }
 
 @media (max-width: 820px) and (max-height: 700px) {

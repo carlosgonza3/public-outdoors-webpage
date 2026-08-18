@@ -33,6 +33,9 @@ export function PurposeScene() {
         '.contact-card__motion',
       )
       const iosSafari = isIOSSafari()
+      const mobile = window.matchMedia(
+        '(max-width: 720px), (pointer: coarse)',
+      ).matches
 
       if (!contactContainer || !backdrop || !contactMotion) return
 
@@ -60,10 +63,11 @@ export function PurposeScene() {
       gsap.set(backdrop, { autoAlpha: 0 })
       gsap.set(contactMotion, {
         autoAlpha: 0,
-        xPercent: -12,
-        rotationY: -48,
-        scale: 0.96,
-        clipPath: 'inset(0 82% 0 0 round 1.5rem)',
+        xPercent: mobile ? 0 : -12,
+        yPercent: mobile ? 7 : 0,
+        rotationY: mobile ? 0 : -48,
+        scale: mobile ? 0.975 : 0.96,
+        clipPath: mobile ? 'none' : 'inset(0 82% 0 0 round 1.5rem)',
         transformOrigin: 'left center',
       })
       gsap.set(ambient.current, {
@@ -80,11 +84,11 @@ export function PurposeScene() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: '+=500%',
+          end: mobile ? '+=420%' : '+=500%',
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: 1.35,
-          anticipatePin: 1,
+          scrub: mobile ? true : 1.35,
+          anticipatePin: mobile ? 0.5 : 1,
           invalidateOnRefresh: true,
           onEnter: () => setPageTone('#03131c', true),
           onEnterBack: () => setPageTone('#03131c', true),
@@ -274,7 +278,7 @@ export function PurposeScene() {
           autoAlpha: 0,
           yPercent: -10,
           scale: 1.06,
-          filter: 'blur(12px)',
+          filter: mobile ? 'none' : 'blur(12px)',
           duration: 0.6,
           ease: 'power3.inOut',
         })
@@ -303,9 +307,10 @@ export function PurposeScene() {
           {
             autoAlpha: 1,
             xPercent: 0,
+            yPercent: 0,
             rotationY: 0,
             scale: 1,
-            clipPath: 'inset(0 0% 0 0 round 1.5rem)',
+            clipPath: mobile ? 'none' : 'inset(0 0% 0 0 round 1.5rem)',
             duration: 0.82,
             ease: 'power4.out',
           },
@@ -314,11 +319,12 @@ export function PurposeScene() {
         .set(contactMotion, { clipPath: 'none' })
         .to({}, { duration: 0.9 })
         .to(contactMotion, {
-          xPercent: 16,
+          xPercent: mobile ? 0 : 16,
+          yPercent: mobile ? -7 : 0,
           rotationX: 0,
-          rotationY: 62,
-          scale: 0.91,
-          clipPath: 'inset(0 0 0 100% round 1.5rem)',
+          rotationY: mobile ? 0 : 62,
+          scale: mobile ? 0.975 : 0.91,
+          clipPath: mobile ? 'none' : 'inset(0 0 0 100% round 1.5rem)',
           autoAlpha: 0,
           duration: 0.72,
           ease: 'power3.inOut',

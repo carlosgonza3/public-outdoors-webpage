@@ -39,6 +39,9 @@ export function IntroScene() {
       let stopAcknowledged = false
       let quietTimer: ReturnType<typeof window.setTimeout> | undefined
       const iosSafari = isIOSSafari()
+      const mobile = window.matchMedia(
+        '(max-width: 720px), (pointer: coarse)',
+      ).matches
 
       const markInputQuiet = () => {
         window.clearTimeout(quietTimer)
@@ -76,10 +79,12 @@ export function IntroScene() {
         inputReady = true
       }
 
-      window.addEventListener('wheel', stopMomentum, { passive: false })
-      window.addEventListener('touchstart', startTouchGesture, { passive: true })
-      window.addEventListener('touchmove', stopTouchMomentum, { passive: false })
-      window.addEventListener('touchend', endTouchGesture, { passive: true })
+      if (!mobile) {
+        window.addEventListener('wheel', stopMomentum, { passive: false })
+        window.addEventListener('touchstart', startTouchGesture, { passive: true })
+        window.addEventListener('touchmove', stopTouchMomentum, { passive: false })
+        window.addEventListener('touchend', endTouchGesture, { passive: true })
+      }
       window.addEventListener(
         'public:navigate-to-media',
         releaseIntroForNavigation,
@@ -93,7 +98,7 @@ export function IntroScene() {
           end: '+=180%',
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: 0.18,
+          scrub: mobile ? true : 0.18,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -102,6 +107,11 @@ export function IntroScene() {
             // completely untouched. As soon as its animation starts, blend the
             // browser chrome into the dark experience behind the mask.
             setPageTone(self.progress <= 0.001 ? '#f7f5ef' : '#07080b')
+
+            // Touch momentum and programmatic scroll correction fight each
+            // other on mobile. Let the timeline follow the finger directly;
+            // the deliberate pause remains a desktop interaction only.
+            if (mobile) return
 
             if (self.direction < 0) {
               if (self.progress < stop - 0.002) stopAcknowledged = false
@@ -272,10 +282,12 @@ export function IntroScene() {
 
       return () => {
         window.clearTimeout(quietTimer)
-        window.removeEventListener('wheel', stopMomentum)
-        window.removeEventListener('touchstart', startTouchGesture)
-        window.removeEventListener('touchmove', stopTouchMomentum)
-        window.removeEventListener('touchend', endTouchGesture)
+        if (!mobile) {
+          window.removeEventListener('wheel', stopMomentum)
+          window.removeEventListener('touchstart', startTouchGesture)
+          window.removeEventListener('touchmove', stopTouchMomentum)
+          window.removeEventListener('touchend', endTouchGesture)
+        }
         window.removeEventListener(
           'public:navigate-to-media',
           releaseIntroForNavigation,

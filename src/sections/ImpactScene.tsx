@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { gsap, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { LightboxImage } from '../components/ImageLightbox'
 import { setPageTone } from '../animation/pageTone'
@@ -124,9 +124,28 @@ export function ImpactScene() {
         }
       }
 
+      if (mobile) {
+        gsap.set(track.current, { clearProps: 'transform' })
+
+        const mobileTone = ScrollTrigger.create({
+          trigger: section.current,
+          start: 'top 65%',
+          end: 'bottom 35%',
+          onEnter: () => setPageTone('#080b0a', true),
+          onEnterBack: () => setPageTone('#080b0a', true),
+          onLeaveBack: () => setPageTone('#171717', true),
+        })
+
+        return () => {
+          mobileTone.kill()
+          counterObserver.disconnect()
+          counterAnimations.forEach((animation) => animation.kill())
+        }
+      }
+
       const distance = () =>
         Math.max(0, track.current!.scrollWidth - document.documentElement.clientWidth)
-      const leadInProgress = mobile ? 0.055 : 0.035
+      const leadInProgress = 0.035
       const scrollDistance = () => distance() / (1 - leadInProgress)
 
       const horizontalScroll = gsap.timeline({
@@ -136,8 +155,8 @@ export function ImpactScene() {
           end: () => `+=${scrollDistance()}`,
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: mobile ? 0.28 : 0.8,
-          anticipatePin: mobile ? 0.5 : 1,
+          scrub: 0.8,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
           onEnter: () => setPageTone('#080b0a', true),
           onEnterBack: () => setPageTone('#080b0a', true),
@@ -152,7 +171,7 @@ export function ImpactScene() {
           {
             autoAlpha: 0,
             y: -24,
-            duration: mobile ? 0.035 : 0.045,
+            duration: 0.045,
             ease: 'power2.out',
           },
           leadInProgress,
