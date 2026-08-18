@@ -179,6 +179,9 @@
   .grid-heading__signal i {
     width: clamp(2.75rem, 15vw, 4.25rem);
   }
+  .gallery-merge__droplet {
+    width: clamp(2.75rem, 15vw, 4.25rem);
+  }
   .project-collection + .project-collection { margin-top: 4rem; }
   .indoor-heading,
   .outdoor-heading,
