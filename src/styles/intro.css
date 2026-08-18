@@ -226,21 +226,22 @@
 .scroll-cue {
   position: absolute;
   z-index: 3;
-  bottom: 2rem;
+  bottom: clamp(1.5rem, 3vh, 2.5rem);
   left: 50%;
   display: grid;
   justify-items: center;
-  gap: .65rem;
+  gap: .55rem;
   transform: translateX(-50%);
-  font-size: 1.65rem;
+  font-size: clamp(.62rem, .72vw, .72rem);
   font-weight: 700;
   color: #07080b;
   letter-spacing: .18em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .scroll-cue i {
-  margin-top: 1rem;
+  margin-top: .4rem;
   display: block;
   width: 1px;
   height: 2.5rem;
@@ -249,4 +250,3 @@
   color: #7d0007;
   animation: pulse 3.8s ease-in-out infinite;
 }
-

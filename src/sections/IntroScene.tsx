@@ -27,6 +27,8 @@ export function IntroScene() {
           autoAlpha: 1,
           y: 0,
           filter: 'blur(0px)',
+          color: 'rgb(255 255 255 / 86%)',
+          textShadow: '0 .2rem 1rem rgb(0 0 0 / 22%)',
         })
         setPageTone('#07080b')
         return
@@ -144,9 +146,11 @@ export function IntroScene() {
       gsap.set(sloganLines, { yPercent: 42 })
       gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.72 })
       gsap.set(siteNavigation, {
-        autoAlpha: 0,
-        y: -10,
-        filter: 'blur(6px)',
+        autoAlpha: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        color: '#07080b',
+        textShadow: 'none',
       })
 
       timeline
@@ -193,13 +197,12 @@ export function IntroScene() {
         .to(
           siteNavigation,
           {
-            autoAlpha: 1,
-            y: 0,
-            filter: 'blur(0px)',
+            color: 'rgb(255 255 255 / 86%)',
+            textShadow: '0 .2rem 1rem rgb(0 0 0 / 22%)',
             duration: 0.28,
             ease: 'power3.out',
           },
-          0.82,
+          0.78,
         )
         .to(
           sloganGlow.current,
@@ -307,7 +310,7 @@ export function IntroScene() {
       <BrandMask veilRef={veil} markRef={mark} colorMarkRef={colorMark} />
 
       <div className="scroll-cue" ref={scrollCue} aria-hidden="true">
-        <span>PUBLIC</span>
+        <span>Desliza para explorar</span>
         <i />
       </div>
     </section>

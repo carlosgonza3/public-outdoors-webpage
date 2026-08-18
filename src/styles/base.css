@@ -14,11 +14,8 @@ main {
   right: clamp(1rem, 2.5vw, 2.5rem);
   display: inline-flex;
   align-items: center;
-  gap: clamp(1.35rem, 2.5vw, 2.5rem);
-  opacity: 0;
-  visibility: hidden;
-  color: rgb(255 255 255 / 78%);
-  font-size: clamp(.58rem, .65vw, .7rem);
+  color: #07080b;
+  font-size: clamp(.78rem, .95vw, 1rem);
   font-weight: 700;
   letter-spacing: .14em;
   text-shadow: 0 .2rem 1rem rgb(0 0 0 / 22%);
@@ -26,7 +23,15 @@ main {
   will-change: transform, opacity, filter;
 }
 
-.site-overlay-nav > * {
+.site-overlay-nav__toggle { display: none; }
+
+.site-overlay-nav__menu {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.35rem, 2.5vw, 2.5rem);
+}
+
+.site-overlay-nav__menu > * {
   position: relative;
   display: block;
   padding: .4rem 0;
@@ -39,7 +44,17 @@ main {
     text-shadow .4s ease;
 }
 
-.site-overlay-nav > *::after {
+.site-overlay-nav button {
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.site-overlay-nav__menu > *::after {
   content: '';
   position: absolute;
   right: 0;
@@ -54,29 +69,28 @@ main {
     opacity .35s ease;
 }
 
-.site-overlay-nav a:focus-visible {
+.site-overlay-nav__menu > *:focus-visible {
   color: #fff;
   outline: none;
 }
 
-.site-overlay-nav a:focus-visible::after {
+.site-overlay-nav__menu > *:focus-visible::after {
   transform: scaleX(1);
   transform-origin: left center;
 }
 
-.site-overlay-nav span {
-  color: rgb(255 255 255 / 54%);
-  cursor: default;
+.site-overlay-nav button {
+  color: inherit;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .site-overlay-nav > *:hover {
+  .site-overlay-nav__menu > *:hover {
     color: #fff;
     text-shadow: 0 0 1.4rem rgb(255 255 255 / 32%);
     transform: translateY(-2px);
   }
 
-  .site-overlay-nav > *:hover::after {
+  .site-overlay-nav__menu > *:hover::after {
     transform: scaleX(1);
     transform-origin: left center;
   }
