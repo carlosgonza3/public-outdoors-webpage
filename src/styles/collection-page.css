@@ -206,6 +206,17 @@
   grid-column: 2 / span 9;
 }
 
+.collection-page--innovations .collection-page__project:only-child {
+  grid-column: 1 / -1;
+}
+
+.collection-page--innovations
+  .collection-page__project:only-child
+  .collection-page__visual {
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
 .collection-page__visual {
   position: relative;
   height: clamp(26rem, 58vw, 52rem);
@@ -224,6 +235,12 @@
   display: block;
   object-fit: cover;
   transition: transform .9s cubic-bezier(.2, .8, .2, 1);
+}
+
+.collection-page--outdoor
+  .collection-page__project:nth-child(2)
+  .collection-page__visual--image img {
+  object-position: 68% center;
 }
 
 .collection-page__project:hover .collection-page__visual--image img {

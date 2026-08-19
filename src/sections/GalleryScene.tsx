@@ -290,7 +290,11 @@ export function GalleryScene() {
               </p>
               <span className="collection-heading__line" />
             </header>
-            <div className={`${collection.id}-grid`}>
+            <div
+              className={`${collection.id}-grid${
+                collection.projects.length === 1 ? ' is-single-project' : ''
+              }`}
+            >
               {collection.projects.map((project, index) => (
                 <ProjectCard
                   project={project}

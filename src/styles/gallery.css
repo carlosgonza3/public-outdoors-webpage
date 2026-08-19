@@ -368,6 +368,18 @@
   min-height: clamp(440px, 42vw, 650px);
 }
 
+.collection--innovations .innovations-grid.is-single-project {
+  width: min(100%, 72rem);
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  margin-inline: auto;
+}
+
+.collection--innovations .project-card:only-child {
+  width: 100%;
+  margin-top: 0;
+}
+
 .project-card { width: 100%; will-change: transform, opacity; }
 .indoor-card--one { margin-top: clamp(3rem, 5vw, 5.5rem); }
 .indoor-card--two { margin-top: 0; }
@@ -397,6 +409,11 @@
 .collection--innovations .project-card:nth-child(2) .card-visual { height: clamp(350px, 37vw, 530px); }
 .collection--innovations .project-card:nth-child(3) .card-visual { height: clamp(400px, 42vw, 610px); }
 
+.collection--innovations .project-card:only-child .card-visual {
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
 .card-visual::before,
 .card-visual::after {
   content: '';
@@ -418,6 +435,10 @@
   height: 100%;
   object-fit: cover;
   transition: transform .8s cubic-bezier(.2, .7, .2, 1);
+}
+
+.collection--outdoor .project-card:nth-child(2) .card-visual--image img {
+  object-position: 68% center;
 }
 
 .project-card:hover .card-visual--image img { transform: scale(1.035); }

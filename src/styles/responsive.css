@@ -372,6 +372,14 @@
 
   .project-card:nth-child(2) .card-visual { height: min(100vw, 540px); }
 
+  .collection--innovations .project-card:only-child .card-visual,
+  .collection-page--innovations
+    .collection-page__project:only-child
+    .collection-page__visual {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
   .collection-heading__link {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
