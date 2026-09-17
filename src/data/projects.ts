@@ -27,11 +27,21 @@ export const projectCollections: ProjectCollection[] = [
     id: 'indoor',
     label: 'INDOOR',
     projects: [
-      { id: '01', title: 'Indoor 01', image: indoorOne, alt: 'Indoor project 1' },
-      { id: '02', title: 'Indoor 02', image: indoorTwo, alt: 'Indoor project 2' },
+      {
+        id: '01',
+        title: 'LED Ramblas',
+        image: indoorOne,
+        alt: 'Pantalla publicitaria digital dentro de un centro comercial',
+      },
+      {
+        id: '02',
+        title: 'Cilindro Digital Ramblas',
+        image: indoorTwo,
+        alt: 'Cilindro publicitario digital en un centro comercial',
+      },
       {
         id: '03',
-        title: 'Indoor 03',
+        title: 'Cilindro Fijo Ramblas',
         image: indoorThree,
         alt: 'Publicidad indoor de Public Outdoors en un centro comercial',
       },
