@@ -98,7 +98,7 @@ function HomePage() {
 
       <main>
         <IntroScene />
-        <GalleryScene />
+        <GalleryScene onContact={() => setContactOpen(true)} />
         <ImpactScene />
         <PurposeScene />
       </main>

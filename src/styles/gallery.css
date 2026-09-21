@@ -166,13 +166,26 @@
 .collection-heading__intro { width: 100%; }
 
 .collection--outdoor .collection-heading__intro {
+  width: fit-content;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: stretch;
+  margin-left: auto;
 }
 
 .collection--outdoor .collection-heading__title {
+  text-align: center;
+}
+
+.collection--outdoor .collection-heading__details {
+  width: 100%;
+  justify-content: right;
   text-align: right;
+}
+
+.collection--outdoor .collection-heading__details p {
+  max-width: 27rem;
 }
 
 .collection-heading__title-mask {
@@ -275,6 +288,15 @@
   margin-left: clamp(4rem, 9vw, 9rem);
 }
 
+.collection--innovations .collection-carousel__cta-action strong {
+  font-size: clamp(3.25rem, 5vw, 5.5rem);
+}
+
+.collection--innovations .collection-carousel__cta-action svg {
+  width: clamp(3.5rem, 4.5vw, 4.75rem);
+  height: clamp(3.5rem, 4.5vw, 4.75rem);
+}
+
 .collection-carousel__cta-link {
   position: relative;
   width: 100%;
@@ -291,6 +313,8 @@
   color: #f7f5ef;
   text-align: center;
   text-decoration: none;
+  font: inherit;
+  cursor: pointer;
   box-sizing: border-box;
   isolation: isolate;
 }
@@ -326,12 +350,22 @@
   transition: transform .5s cubic-bezier(.2, .8, .2, 1);
 }
 
+.collection--outdoor .collection-carousel__cta-action svg {
+  transform: scaleX(-1);
+}
+
 .collection-carousel__cta-link:hover {
   color: #fff;
 }
 
 .collection-carousel__cta-link:hover .collection-carousel__cta-action svg {
   transform: translateX(.4rem);
+}
+
+.collection--outdoor
+  .collection-carousel__cta-link:hover
+  .collection-carousel__cta-action svg {
+  transform: translateX(-.4rem) scaleX(-1);
 }
 
 .collection-carousel__cta-link:focus-visible {
@@ -424,6 +458,31 @@
 
 .project-card > h3,
 .project-card > p { display: none; }
+
+@media (min-width: 901px) {
+  .collection--innovations .collection-carousel__track.is-single-project {
+    width: min(100%, 90rem);
+    display: grid;
+    grid-template-columns: minmax(28rem, 48rem) max-content;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1.5rem, 3vw, 3rem);
+    margin-inline: auto;
+    padding-inline: clamp(1.5rem, 4vw, 4.5rem);
+    box-sizing: border-box;
+  }
+
+  .collection--innovations
+    .collection-carousel__track.is-single-project
+    .project-card {
+    width: 100%;
+  }
+
+  .collection--innovations .collection-carousel__cta {
+    width: auto;
+    margin-left: 0;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .project-collection { height: auto; min-height: 0; }

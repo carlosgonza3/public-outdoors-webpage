@@ -19,6 +19,7 @@ export interface Project {
 export interface ProjectCollection {
   id: 'indoor' | 'outdoor' | 'innovations'
   label: string
+  description: string
   projects: Project[]
 }
 
@@ -26,6 +27,8 @@ export const projectCollections: ProjectCollection[] = [
   {
     id: 'indoor',
     label: 'INDOOR',
+    description:
+      'Presencia estratégica en espacios donde las personas esperan, compran y se conectan.',
     projects: [
       {
         id: '01',
@@ -50,6 +53,8 @@ export const projectCollections: ProjectCollection[] = [
   {
     id: 'outdoor',
     label: 'OUTDOOR',
+    description:
+      'Impacto de gran formato en puntos clave que acompañan a las personas durante sus recorridos.',
     projects: [
       { id: '04', title: 'Outdoor 01', image: outdoorOne, alt: 'Outdoor project 1' },
       { id: '05', title: 'Outdoor 02', image: outdoorTwo, alt: 'Outdoor project 2' },
@@ -59,6 +64,8 @@ export const projectCollections: ProjectCollection[] = [
   {
     id: 'innovations',
     label: 'INNOVATIONS',
+    description:
+      'Experiencias fuera de lo común que transforman ideas audaces en conexiones memorables.',
     projects: [
       {
         id: '07',

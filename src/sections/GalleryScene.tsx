@@ -7,7 +7,11 @@ import { setPageTone } from '../animation/pageTone'
 import { ProjectCard } from '../components/ProjectCard'
 import { projectCollections } from '../data/projects'
 
-export function GalleryScene() {
+type GallerySceneProps = {
+  onContact: () => void
+}
+
+export function GalleryScene({ onContact }: GallerySceneProps) {
   const section = useRef<HTMLElement>(null)
   const location = useLocation()
   const navigate = useNavigate()
@@ -196,6 +200,62 @@ export function GalleryScene() {
 
         if (mobile) return
 
+        const ctaAction = carouselCta?.querySelector<HTMLElement>(
+          '.collection-carousel__cta-action',
+        )
+        const pulseCta = () => {
+          if (!ctaAction) return
+
+          gsap.killTweensOf(ctaAction)
+          gsap
+            .timeline()
+            .fromTo(
+              ctaAction,
+              { scale: 0.94, autoAlpha: 0.62 },
+              {
+                scale: 1.06,
+                autoAlpha: 1,
+                duration: 0.18,
+                ease: 'back.out(2)',
+              },
+            )
+            .to(ctaAction, {
+              scale: 1,
+              autoAlpha: 1,
+              duration: 0.2,
+              ease: 'power2.out',
+            })
+        }
+
+        if (collection.dataset.sceneId === 'innovations' && cards[0]) {
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: collection,
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 0.46,
+                invalidateOnRefresh: true,
+              },
+            })
+            .fromTo(
+              cards[0],
+              { scale: 0.975 },
+              {
+                scale: 1.015,
+                duration: 0.62,
+                ease: 'power2.inOut',
+              },
+            )
+            .to(cards[0], {
+              scale: 1,
+              duration: 0.38,
+              ease: 'power2.out',
+            })
+
+          return
+        }
+
         const horizontalPosition = (atEnd: boolean) => {
           const overflow = Math.max(0, track.scrollWidth - viewport.clientWidth)
           const edge = Math.min(viewport.clientWidth * 0.035, 48)
@@ -247,9 +307,10 @@ export function GalleryScene() {
               invalidateOnRefresh: true,
               onRefresh: updateCardPresence,
               onUpdate: updateCardPresence,
+              onSnapComplete: pulseCta,
               snap: {
                 snapTo: (value) =>
-                  value > 0.66 && value < 0.88 ? 0.76 : value,
+                  value > 0.58 && value < 0.9 ? 0.76 : value,
                 delay: 0.05,
                 duration: { min: 0.12, max: 0.22 },
                 ease: 'power2.out',
@@ -313,31 +374,62 @@ export function GalleryScene() {
 
   const renderCollectionCta = (
     collection: (typeof projectCollections)[number],
-  ) => (
-    <article className="collection-carousel__cta">
-      <Link
+  ) => {
+    const isContactCta = collection.id === 'innovations'
+    const action = (
+      <span className="collection-carousel__cta-action">
+        {collection.id === 'outdoor' && (
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M10 32h42M36 16l16 16-16 16" />
+          </svg>
+        )}
+        <strong>
+          {isContactCta
+            ? 'Contáctanos'
+            : collection.id === 'outdoor'
+              ? 'Explora'
+              : 'Ver más'}
+        </strong>
+        {collection.id !== 'outdoor' && (
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M10 32h42M36 16l16 16-16 16" />
+          </svg>
+        )}
+      </span>
+    )
+
+    return (
+      <article className="collection-carousel__cta">
+        {isContactCta ? (
+          <button
+            className="collection-carousel__cta-link"
+            type="button"
+            onClick={onContact}
+            aria-label="Contáctanos sobre Innovations"
+          >
+            {action}
+          </button>
+        ) : (
+          <Link
         className="collection-carousel__cta-link"
         to={`/${collection.id}`}
         state={{ backgroundLocation: location }}
         onClick={(event) => openCollection(event, collection.id)}
         aria-label={`Ver más proyectos ${collection.label}`}
       >
-        <span className="collection-carousel__cta-action">
-          <strong>Ver más</strong>
-          <svg viewBox="0 0 64 64" aria-hidden="true">
-            <path d="M10 32h42M36 16l16 16-16 16" />
-          </svg>
-        </span>
-      </Link>
-    </article>
-  )
+            {action}
+          </Link>
+        )}
+      </article>
+    )
+  }
 
   return (
     <section className="project-grid-section" ref={section}>
       <header className="grid-heading" data-scene-id="gallery-intro">
         <h2 aria-label="Donde las ideas se vuelven visibles.">
           <span className="grid-heading__line">
-            <span>Donde las ideas</span>
+            <span>Donde tus ideas</span>
           </span>
           <span className="grid-heading__line grid-heading__line--soft">
             <span>se vuelven visibles.</span>
@@ -371,7 +463,7 @@ export function GalleryScene() {
                     <h2 className="collection-heading__title">{collection.label}</h2>
                   </div>
                   <div className="collection-heading__details">
-                    <p>Presencia estratégica en espacios donde las personas esperan, compran y se conectan.</p>
+                    <p>{collection.description}</p>
                   </div>
                 </div>
               </header>
