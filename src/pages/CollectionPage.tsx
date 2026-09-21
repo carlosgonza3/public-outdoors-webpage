@@ -18,6 +18,7 @@ export function CollectionPage({
   modal = false,
 }: CollectionPageProps) {
   const page = useRef<HTMLElement>(null)
+  const modalPanel = useRef<HTMLDivElement>(null)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -112,6 +113,70 @@ export function CollectionPage({
     { scope: page, dependencies: [collectionId] },
   )
 
+  useGSAP(
+    () => {
+      if (!modal || prefersReducedMotion() || !modalPanel.current) return
+
+      const origin = location.state?.transitionOrigin as
+        | { x: number; y: number; width: number; height: number }
+        | undefined
+
+      if (!origin) return
+
+      const panel = modalPanel.current
+      const panelBounds = panel.getBoundingClientRect()
+      const backdrop = panel.parentElement?.querySelector<HTMLElement>(
+        '.route-modal__backdrop',
+      )
+      const originCenterX = origin.x + origin.width / 2
+      const originCenterY = origin.y + origin.height / 2
+      const panelCenterX = panelBounds.x + panelBounds.width / 2
+      const panelCenterY = panelBounds.y + panelBounds.height / 2
+      const timeline = gsap.timeline({ defaults: { overwrite: 'auto' } })
+
+      if (backdrop) {
+        timeline.fromTo(
+          backdrop,
+          { autoAlpha: 0, backdropFilter: 'blur(0px)' },
+          {
+            autoAlpha: 1,
+            backdropFilter: 'blur(14px)',
+            duration: 0.5,
+            ease: 'power2.out',
+          },
+          0,
+        )
+      }
+
+      timeline.fromTo(
+        panel,
+        {
+          x: originCenterX - panelCenterX,
+          y: originCenterY - panelCenterY,
+          scaleX: gsap.utils.clamp(0.18, 1, origin.width / panelBounds.width),
+          scaleY: gsap.utils.clamp(0.18, 1, origin.height / panelBounds.height),
+          borderRadius: '1rem',
+          autoAlpha: 0.88,
+        },
+        {
+          x: 0,
+          y: 0,
+          scaleX: 1,
+          scaleY: 1,
+          borderRadius: 'clamp(1rem, 2vw, 2rem)',
+          autoAlpha: 1,
+          duration: 0.78,
+          ease: 'expo.inOut',
+          clearProps: 'transform',
+        },
+        0,
+      )
+
+      return () => timeline.kill()
+    },
+    { dependencies: [collectionId, modal] },
+  )
+
   const Root = modal ? 'section' : 'main'
 
   const pageContent = (
@@ -154,7 +219,14 @@ export function CollectionPage({
         aria-label="Cerrar"
         onClick={() => navigate(-1)}
       />
-      <div className="route-modal__panel">{pageContent}</div>
+      <div
+        className={`route-modal__panel${
+          location.state?.transitionOrigin ? ' route-modal__panel--magic' : ''
+        }`}
+        ref={modalPanel}
+      >
+        {pageContent}
+      </div>
     </div>
   )
 }

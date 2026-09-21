@@ -52,6 +52,12 @@
   animation: route-modal-panel-in .5s cubic-bezier(.2, .8, .2, 1) both;
 }
 
+.route-modal__panel--magic {
+  animation: none;
+  transform-origin: center center;
+  will-change: transform, opacity, border-radius;
+}
+
 .route-modal__panel .collection-page {
   min-height: 100%;
 }

@@ -329,65 +329,104 @@
   .grid-heading__signal i {
     width: clamp(2.75rem, 15vw, 4.25rem);
   }
-  .project-collection + .project-collection { margin-top: 4rem; }
-  .indoor-heading,
-  .outdoor-heading,
-  .innovations-heading { margin-bottom: 3rem; }
 
-  .indoor-grid { grid-template-columns: 1fr; gap: 4.5rem; min-height: 0; }
-  .outdoor-grid { grid-template-columns: 1fr; gap: 4.5rem; min-height: 0; }
-  .innovations-grid { grid-template-columns: 1fr; gap: 4.5rem; min-height: 0; }
+  .project-collection {
+    height: auto;
+    min-height: 100svh;
+    padding: 3.5rem 0 5rem;
+  }
 
-  .indoor-card--one,
-  .indoor-card--two,
-  .indoor-card--three,
-  .outdoor-card--one,
-  .outdoor-card--two,
-  .outdoor-card--three,
-  .innovations-card--one,
-  .innovations-card--two,
-  .innovations-card--three { margin-top: 0; }
+  .project-collection__stage {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    display: block;
+    padding: 0;
+    overflow: visible;
+    will-change: opacity, transform;
+  }
 
-  .indoor-card--one { width: 100%; }
-  .indoor-card--two { width: 92%; margin-left: auto; }
-  .indoor-card--three { width: 96%; }
-  .outdoor-card--one { width: 94%; }
-  .outdoor-card--two { width: 100%; }
-  .outdoor-card--three { width: 91%; margin-left: auto; }
-  .innovations-card--one { width: 96%; margin-left: auto; }
-  .innovations-card--two { width: 92%; }
-  .innovations-card--three { width: 100%; }
+  .collection-heading {
+    display: block;
+    padding: 0 1.25rem 1.75rem;
+  }
+
+  .project-collection:nth-child(even) .collection-heading__intro,
+  .project-collection:nth-child(even) .collection-heading__details {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .collection-heading__title {
+    font-size: clamp(3.85rem, 18vw, 7rem);
+    line-height: .78;
+  }
+
+  .collection--innovations .collection-heading__title {
+    font-size: clamp(3.25rem, 15vw, 6rem);
+  }
+
+  .collection-heading__details {
+    margin-top: 1.35rem;
+  }
+
+  .collection-heading__details p { font-size: .72rem; }
+  .collection-carousel {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .collection-carousel::-webkit-scrollbar { display: none; }
+
+  .collection-carousel__track {
+    gap: .8rem;
+    padding: 0 1.25rem;
+    transform: none !important;
+  }
+
+  .project-card,
+  .project-card:nth-child(2),
+  .project-card:nth-child(3),
+  .collection-carousel__track.is-single-project .project-card,
+  .collection-carousel__cta {
+    width: min(82vw, 29rem);
+    scroll-snap-align: center;
+  }
+
+  .collection--innovations .collection-carousel__cta { margin-left: 0; }
+  .collection--outdoor .collection-carousel__cta { order: 2; }
+
+  .collection-carousel__cta {
+    height: min(61svh, 31rem);
+    min-height: 23rem;
+  }
+
+  .collection-carousel__cta-action strong {
+    font-size: clamp(3.25rem, 15vw, 5rem);
+  }
+
+  .collection-carousel__cta-action svg {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
 
   .card-visual,
-  .collection--indoor .project-card:nth-child(2) .card-visual,
-  .collection--indoor .project-card:nth-child(3) .card-visual,
-  .collection--outdoor .project-card:nth-child(1) .card-visual,
-  .collection--outdoor .project-card:nth-child(2) .card-visual,
-  .collection--outdoor .project-card:nth-child(3) .card-visual,
-  .collection--innovations .project-card:nth-child(1) .card-visual,
-  .collection--innovations .project-card:nth-child(2) .card-visual,
-  .collection--innovations .project-card:nth-child(3) .card-visual {
-    height: min(118vw, 620px);
-  }
-
-  .project-card:nth-child(2) .card-visual { height: min(100vw, 540px); }
-
-  .collection--innovations .project-card:only-child .card-visual,
-  .collection-page--innovations
-    .collection-page__project:only-child
-    .collection-page__visual {
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-
-  .collection-heading__link {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  .project-card:nth-child(2) .card-visual,
+  .project-card:nth-child(3) .card-visual,
+  .collection-carousel__track.is-single-project .card-visual {
+    height: min(61svh, 31rem);
+    min-height: 23rem;
+    aspect-ratio: auto;
   }
 
   .grid-heading__signal,
   .grid-heading__signal i,
-  .project-card {
+  .project-card,
+  .collection-carousel__cta {
     will-change: auto;
   }
 }
