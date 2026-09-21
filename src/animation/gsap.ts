@@ -1,8 +1,9 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import { Observer } from 'gsap/Observer'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-gsap.registerPlugin(ScrollTrigger, useGSAP)
+gsap.registerPlugin(Observer, ScrollTrigger, useGSAP)
 ScrollTrigger.config({ ignoreMobileResize: true })
 
-export { gsap, ScrollTrigger, useGSAP }
+export { gsap, Observer, ScrollTrigger, useGSAP }
