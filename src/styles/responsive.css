@@ -1,4 +1,5 @@
 @media (prefers-reduced-motion: reduce) {
+  .logo-play-button { display: none; }
   .ambient-glow,
   .purpose-glow { animation: none; }
   .scroll-cue { display: none; }
@@ -20,6 +21,7 @@
   }
 
   .logo-veil { display: block; }
+  .logo-play-button { display: none; }
 
   .reveal-content,
   .scene-copy,

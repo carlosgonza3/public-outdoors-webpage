@@ -11,6 +11,10 @@ export function IntroScene() {
   const section = useRef<HTMLElement>(null)
   const mark = useRef<SVGGElement>(null)
   const colorMark = useRef<SVGGElement>(null)
+  const markPerspective = useRef<SVGGElement>(null)
+  const colorMarkPerspective = useRef<SVGGElement>(null)
+  const markPress = useRef<SVGGElement>(null)
+  const colorMarkPress = useRef<SVGGElement>(null)
   const markPulse = useRef<SVGGElement>(null)
   const colorMarkPulse = useRef<SVGGElement>(null)
   const veil = useRef<SVGSVGElement>(null)
@@ -19,6 +23,7 @@ export function IntroScene() {
   const sloganGlow = useRef<HTMLDivElement>(null)
   const ambient = useRef<HTMLDivElement>(null)
   const scrollCue = useRef<HTMLDivElement>(null)
+  const logoButton = useRef<HTMLButtonElement>(null)
 
   useGSAP(
     () => {
@@ -278,6 +283,158 @@ export function IntroScene() {
         }
       }
 
+      const perspective = { x: 0, y: 0 }
+      let perspectiveTargetX = 0
+      let perspectiveTargetY = 0
+      let perspectiveActive = true
+      let logoCenterX = window.innerWidth / 2
+      let logoCenterY = window.innerHeight / 2
+      const finePointer = window.matchMedia('(pointer: fine)').matches
+      const press = { y: 0, rotation: 0, scale: 1 }
+      const pressTimeline = gsap.timeline({ paused: true })
+      let logoButtonActive = true
+
+      const measureLogoCenter = () => {
+        const bounds = colorMark.current?.getBoundingClientRect()
+        if (!bounds) return
+        logoCenterX = bounds.left + bounds.width / 2
+        logoCenterY = bounds.top + bounds.height / 2
+      }
+
+      const renderPerspective = () => {
+        const x = perspective.x
+        const y = perspective.y
+        const transform = [
+          `translate(${x * 0.8} ${y * 0.55})`,
+          `rotate(${x * 1.8})`,
+          `skewX(${-y * 2.4})`,
+          `skewY(${x * 3.2})`,
+          `scale(${1 - Math.abs(x) * 0.025} ${1 - Math.abs(y) * 0.02})`,
+        ].join(' ')
+        markPerspective.current?.setAttribute('transform', transform)
+        colorMarkPerspective.current?.setAttribute('transform', transform)
+      }
+
+      const updatePerspective = () => {
+        if (!perspectiveActive) return
+
+        const deltaX = perspectiveTargetX - perspective.x
+        const deltaY = perspectiveTargetY - perspective.y
+        if (Math.abs(deltaX) < 0.0001 && Math.abs(deltaY) < 0.0001) return
+
+        const smoothing = 1 - Math.pow(0.84, gsap.ticker.deltaRatio(60))
+        perspective.x += deltaX * smoothing
+        perspective.y += deltaY * smoothing
+        renderPerspective()
+      }
+
+      const resetPerspectiveTarget = () => {
+        perspectiveTargetX = 0
+        perspectiveTargetY = 0
+      }
+
+      const handlePointerMove = (event: PointerEvent) => {
+        if (!perspectiveActive) return
+        const horizontalRange = Math.max(280, window.innerWidth * 0.36)
+        const verticalRange = Math.max(220, window.innerHeight * 0.38)
+        perspectiveTargetX = gsap.utils.clamp(
+          -1,
+          1,
+          (event.clientX - logoCenterX) / horizontalRange,
+        )
+        perspectiveTargetY = gsap.utils.clamp(
+          -1,
+          1,
+          (event.clientY - logoCenterY) / verticalRange,
+        )
+      }
+
+      const setPerspectiveActive = (active: boolean) => {
+        if (!finePointer || active === perspectiveActive) return
+        perspectiveActive = active
+        resetPerspectiveTarget()
+
+        if (active) {
+          measureLogoCenter()
+          return
+        }
+
+        perspective.x = 0
+        perspective.y = 0
+        renderPerspective()
+      }
+
+      const renderPress = () => {
+        const transform =
+          `translate(0 ${press.y}) rotate(${press.rotation}) scale(${press.scale})`
+        markPress.current?.setAttribute('transform', transform)
+        colorMarkPress.current?.setAttribute('transform', transform)
+      }
+
+      const handleLogoPress = () => {
+        if (!logoButtonActive) return
+        pressTimeline
+          .clear()
+          .to(press, {
+            y: 1.8,
+            rotation: -2.4,
+            scale: 0.88,
+            duration: 0.1,
+            ease: 'power2.in',
+            onUpdate: renderPress,
+          })
+          .to(press, {
+            y: -2.8,
+            rotation: 2.8,
+            scale: 1.16,
+            duration: 0.22,
+            ease: 'back.out(2.6)',
+            onUpdate: renderPress,
+          })
+          .to(press, {
+            y: 0.7,
+            rotation: -1,
+            scale: 0.97,
+            duration: 0.16,
+            ease: 'sine.inOut',
+            onUpdate: renderPress,
+          })
+          .to(press, {
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            duration: 0.34,
+            ease: 'elastic.out(1, 0.5)',
+            onUpdate: renderPress,
+          })
+          .restart()
+      }
+
+      const setLogoButtonActive = (active: boolean) => {
+        if (active === logoButtonActive) return
+        logoButtonActive = active
+        if (logoButton.current) {
+          logoButton.current.disabled = !active
+          logoButton.current.style.pointerEvents = active ? 'auto' : 'none'
+        }
+
+        if (active) return
+        pressTimeline.pause(0).clear()
+        press.y = 0
+        press.rotation = 0
+        press.scale = 1
+        renderPress()
+      }
+
+      if (finePointer) {
+        measureLogoCenter()
+        gsap.ticker.add(updatePerspective)
+        window.addEventListener('pointermove', handlePointerMove, { passive: true })
+        window.addEventListener('resize', measureLogoCenter, { passive: true })
+        document.documentElement.addEventListener('mouseleave', resetPerspectiveTarget)
+        logoButton.current?.addEventListener('click', handleLogoPress)
+      }
+
       let lockedProgress: number | null = null
       let inputReady = true
       let stopAcknowledged = false
@@ -342,6 +499,8 @@ export function IntroScene() {
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             setPulseActive(self.progress <= 0.001)
+            setPerspectiveActive(self.progress <= 0.001)
+            setLogoButtonActive(self.progress <= 0.001)
             const stop = timeline.labels.outside / timeline.duration()
             // Keep Safari's browser edges cream only while the opening mask is
             // completely untouched. As soon as its animation starts, blend the
@@ -517,6 +676,15 @@ export function IntroScene() {
 
       return () => {
         pulseTimeline.kill()
+        pressTimeline.kill()
+        gsap.ticker.remove(updatePerspective)
+        window.removeEventListener('pointermove', handlePointerMove)
+        window.removeEventListener('resize', measureLogoCenter)
+        document.documentElement.removeEventListener(
+          'mouseleave',
+          resetPerspectiveTarget,
+        )
+        logoButton.current?.removeEventListener('click', handleLogoPress)
         window.clearTimeout(quietTimer)
         window.removeEventListener('wheel', stopMomentum)
         window.removeEventListener('touchstart', startTouchGesture)
@@ -557,8 +725,19 @@ export function IntroScene() {
         veilRef={veil}
         markRef={mark}
         colorMarkRef={colorMark}
+        markPerspectiveRef={markPerspective}
+        colorMarkPerspectiveRef={colorMarkPerspective}
+        markPressRef={markPress}
+        colorMarkPressRef={colorMarkPress}
         markPulseRef={markPulse}
         colorMarkPulseRef={colorMarkPulse}
+      />
+
+      <button
+        className="logo-play-button"
+        ref={logoButton}
+        type="button"
+        aria-label="Animar mariposa"
       />
 
       <div className="scroll-cue" ref={scrollCue} aria-hidden="true">

@@ -223,6 +223,26 @@
   will-change: opacity;
 }
 
+.logo-play-button {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  width: clamp(9rem, 14vw, 11rem);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.logo-play-button:focus-visible {
+  outline: 2px solid #7d0007;
+  outline-offset: .35rem;
+}
+
 .scroll-cue {
   position: absolute;
   z-index: 3;
