@@ -11,6 +11,8 @@ export function IntroScene() {
   const section = useRef<HTMLElement>(null)
   const mark = useRef<SVGGElement>(null)
   const colorMark = useRef<SVGGElement>(null)
+  const markPulse = useRef<SVGGElement>(null)
+  const colorMarkPulse = useRef<SVGGElement>(null)
   const veil = useRef<SVGSVGElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const copy = useRef<HTMLDivElement>(null)
@@ -35,6 +37,98 @@ export function IntroScene() {
         })
         setPageTone('#07080b')
         return
+      }
+
+      const pulse = { scale: 1 }
+      const renderPulse = () => {
+        const transform = `scale(${pulse.scale})`
+        markPulse.current?.setAttribute('transform', transform)
+        colorMarkPulse.current?.setAttribute('transform', transform)
+      }
+      let pulseActive = true
+      const pulseTimeline = gsap.timeline({ repeat: -1, delay: 0.8 })
+        .to(pulse, {
+          scale: 1.055,
+          duration: 0.46,
+          ease: 'sine.inOut',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 0.992,
+          duration: 0.52,
+          ease: 'sine.inOut',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 1,
+          duration: 0.34,
+          ease: 'power2.out',
+          onUpdate: renderPulse,
+        })
+        .to({}, { duration: 1.35 })
+        .to(pulse, {
+          scale: 1.11,
+          duration: 0.84,
+          ease: 'sine.inOut',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 0.978,
+          duration: 0.74,
+          ease: 'sine.inOut',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+          onUpdate: renderPulse,
+        })
+        .to({}, { duration: 2.15 })
+        .to(pulse, {
+          scale: 1.085,
+          duration: 0.26,
+          ease: 'power2.out',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 0.982,
+          duration: 0.22,
+          ease: 'sine.inOut',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 1.072,
+          duration: 0.24,
+          ease: 'power2.out',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 0.99,
+          duration: 0.24,
+          ease: 'sine.inOut',
+          onUpdate: renderPulse,
+        })
+        .to(pulse, {
+          scale: 1,
+          duration: 0.32,
+          ease: 'power2.out',
+          onUpdate: renderPulse,
+        })
+        .to({}, { duration: 1.7 })
+
+      const setPulseActive = (active: boolean) => {
+        if (active === pulseActive) return
+        pulseActive = active
+
+        if (active) {
+          pulseTimeline.restart(true)
+          return
+        }
+
+        pulseTimeline.pause(0)
+        pulse.scale = 1
+        renderPulse()
       }
 
       if (mobile) {
@@ -75,6 +169,7 @@ export function IntroScene() {
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
+              setPulseActive(self.progress <= 0.001)
               const shouldUseDarkTone = self.progress > 0.04
               if (shouldUseDarkTone === darkToneActive) return
               darkToneActive = shouldUseDarkTone
@@ -177,7 +272,10 @@ export function IntroScene() {
             '<',
           )
 
-        return () => mobileTimeline.kill()
+        return () => {
+          pulseTimeline.kill()
+          mobileTimeline.kill()
+        }
       }
 
       let lockedProgress: number | null = null
@@ -243,6 +341,7 @@ export function IntroScene() {
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
+            setPulseActive(self.progress <= 0.001)
             const stop = timeline.labels.outside / timeline.duration()
             // Keep Safari's browser edges cream only while the opening mask is
             // completely untouched. As soon as its animation starts, blend the
@@ -417,6 +516,7 @@ export function IntroScene() {
         )
 
       return () => {
+        pulseTimeline.kill()
         window.clearTimeout(quietTimer)
         window.removeEventListener('wheel', stopMomentum)
         window.removeEventListener('touchstart', startTouchGesture)
@@ -453,7 +553,13 @@ export function IntroScene() {
         </div>
       </div>
 
-      <BrandMask veilRef={veil} markRef={mark} colorMarkRef={colorMark} />
+      <BrandMask
+        veilRef={veil}
+        markRef={mark}
+        colorMarkRef={colorMark}
+        markPulseRef={markPulse}
+        colorMarkPulseRef={colorMarkPulse}
+      />
 
       <div className="scroll-cue" ref={scrollCue} aria-hidden="true">
         <span>Desliza para explorar</span>
