@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { gsap, Observer, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { isMobileExperience } from '../animation/mobile'
 import { prefersReducedMotion } from '../animation/motion'
 import { ContactCard } from '../components/ContactCard'
@@ -99,8 +99,8 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
   const formatsSection = useRef<HTMLElement>(null)
   const formatStage = useRef<HTMLDivElement>(null)
   const [activeFormat, setActiveFormat] = useState<IndoorFormat>('digital')
+  const activeFormatRef = useRef<IndoorFormat>('digital')
   const [contactOpen, setContactOpen] = useState(false)
-  const selectedFormat = formats[activeFormat]
 
   useGSAP(
     () => {
@@ -391,169 +391,69 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
         return
       }
 
-      let stage: 0 | 1 = 0
-      let engaged = false
-      let releasing = false
-      let locked = false
-      let lastScrollTop = modalScroller.scrollTop
-      let unlockCall: gsap.core.Tween | undefined
-      let scrollTween: gsap.core.Tween | undefined
+      const selectFormat = (format: IndoorFormat) => {
+        if (activeFormatRef.current === format) return
+        activeFormatRef.current = format
+        setActiveFormat(format)
+      }
 
-      const sectionStart = () =>
-        modalScroller.scrollTop +
-        section.getBoundingClientRect().top -
-        modalScroller.getBoundingClientRect().top
+      const sectionStart = () => section.offsetTop
       const sectionEnd = () =>
         sectionStart() + section.offsetHeight - modalScroller.clientHeight
+      let aligning = false
+      let alignmentTween: gsap.core.Tween | undefined
 
-      const selectFormat = (format: IndoorFormat) => {
-        setActiveFormat((currentFormat) =>
-          currentFormat === format ? currentFormat : format,
-        )
-      }
+      const alignToStart = () => {
+        alignmentTween?.kill()
+        aligning = true
+        selectFormat('digital')
 
-      const unlock = () => {
-        unlockCall?.kill()
-        unlockCall = gsap.delayedCall(0.55, () => {
-          locked = false
-        })
-      }
-
-      const snapScroll = (scrollTop: number, onComplete?: () => void) => {
-        scrollTween?.kill()
-        scrollTween = gsap.to(modalScroller, {
-          scrollTop,
-          duration: 0.5,
-          ease: 'power2.inOut',
-          overwrite: true,
+        alignmentTween = gsap.to(modalScroller, {
+          scrollTop: sectionStart(),
+          duration: 0.28,
+          ease: 'power3.out',
+          overwrite: 'auto',
           onComplete: () => {
-            scrollTween = undefined
-            lastScrollTop = modalScroller.scrollTop
-            onComplete?.()
-          },
-        })
-      }
-
-      const release = (direction: 1 | -1) => {
-        releasing = true
-        engaged = false
-        observer.disable()
-        const exitDistance = modalScroller.clientHeight * 0.72
-        snapScroll(
-          direction > 0
-            ? sectionEnd() + exitDistance
-            : sectionStart() - exitDistance,
-          () => {
-            locked = false
-            releasing = false
-          },
-        )
-      }
-
-      const advance = (direction: 1 | -1) => {
-        if (!engaged) {
-          observer.disable()
-          return
-        }
-
-        if (locked) return
-        locked = true
-
-        if (direction > 0) {
-          if (stage === 0) {
-            stage = 1
-            selectFormat('fijo')
-            unlock()
-          } else {
-            release(1)
-          }
-          return
-        }
-
-        if (stage === 1) {
-          stage = 0
-          selectFormat('digital')
-          unlock()
-        } else {
-          release(-1)
-        }
-      }
-
-      const observer = Observer.create({
-        target: modalScroller,
-        type: 'wheel',
-        preventDefault: true,
-        tolerance: 12,
-        wheelSpeed: 1,
-        onChangeY: (self) => advance(self.deltaY > 0 ? 1 : -1),
-      })
-      observer.disable()
-
-      const engage = (nextStage: 0 | 1) => {
-        if (engaged || releasing) return
-
-        engaged = true
-        stage = nextStage
-        locked = true
-        observer.disable()
-        selectFormat(nextStage === 0 ? 'digital' : 'fijo')
-        snapScroll(nextStage === 0 ? sectionStart() : sectionEnd() - 1, () => {
-          observer.enable()
-          unlock()
-        })
-      }
-
-      const handleScroll = () => {
-        const currentScrollTop = modalScroller.scrollTop
-        const direction = currentScrollTop >= lastScrollTop ? 1 : -1
-        lastScrollTop = currentScrollTop
-
-        if (releasing || scrollTween) return
-
-        const panelRect = modalScroller.getBoundingClientRect()
-        const sectionRect = section.getBoundingClientRect()
-        const relativeTop = sectionRect.top - panelRect.top
-        const relativeBottom = sectionRect.bottom - panelRect.top
-        const insideSection =
-          relativeTop <= 1 && relativeBottom >= modalScroller.clientHeight - 1
-
-        if (!insideSection) {
-          engaged = false
-          observer.disable()
-          if (relativeTop > 1) {
-            stage = 0
+            aligning = false
             selectFormat('digital')
-          }
-          return
-        }
-
-        if (!engaged) engage(direction > 0 ? 0 : 1)
+          },
+        })
       }
 
-      modalScroller.addEventListener('scroll', handleScroll, { passive: true })
-
-      const initialTop =
-        section.getBoundingClientRect().top -
-        modalScroller.getBoundingClientRect().top
-      const initialBottom = initialTop + section.offsetHeight
-      if (
-        initialTop <= 1 &&
-        initialBottom >= modalScroller.clientHeight - 1
-      ) {
-        const midpoint = (sectionStart() + sectionEnd()) / 2
-        engage(modalScroller.scrollTop < midpoint ? 0 : 1)
-      } else {
-        if (initialTop > 1) {
-          stage = 0
+      const formatTrigger = ScrollTrigger.create({
+        trigger: section,
+        scroller: modalScroller,
+        start: sectionStart,
+        end: sectionEnd,
+        invalidateOnRefresh: true,
+        onEnter: alignToStart,
+        onEnterBack: () => {
+          alignmentTween?.kill()
+          aligning = false
+          selectFormat('fijo')
+        },
+        onLeave: () => {
+          alignmentTween?.kill()
+          aligning = false
+          selectFormat('fijo')
+        },
+        onLeaveBack: () => {
+          alignmentTween?.kill()
+          aligning = false
           selectFormat('digital')
-        }
-      }
+        },
+        onUpdate: ({ progress }) => {
+          if (aligning) return
+          selectFormat(progress < 0.5 ? 'digital' : 'fijo')
+        },
+      })
+
+      const refreshCall = gsap.delayedCall(0, () => ScrollTrigger.refresh())
 
       return () => {
-        modalScroller.removeEventListener('scroll', handleScroll)
-        observer.kill()
-        unlockCall?.kill()
-        scrollTween?.kill()
+        refreshCall.kill()
+        alignmentTween?.kill()
+        formatTrigger.kill()
       }
     },
     { scope: formatsSection, dependencies: [modal] },
@@ -563,26 +463,38 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
     () => {
       if (prefersReducedMotion() || !formatStage.current) return
 
-      const transitionTargets = formatStage.current.querySelectorAll(
-        '.indoor-formats__visual, .indoor-formats__copy > h3, .indoor-formats__copy > p',
+      const layers = gsap.utils.toArray<HTMLElement>(
+        '[data-indoor-format-layer]',
+        formatStage.current,
       )
+      const activeLayers = layers.filter(
+        (layer) => layer.dataset.indoorFormatLayer === activeFormat,
+      )
+      const inactiveLayers = layers.filter(
+        (layer) => layer.dataset.indoorFormatLayer !== activeFormat,
+      )
+      const transition = gsap.timeline({
+        defaults: { overwrite: 'auto' },
+      })
 
-      gsap.fromTo(
-        transitionTargets,
-        { autoAlpha: 0, y: 10 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.38,
-          stagger: 0.035,
-          ease: 'power3.out',
-        },
-      )
+      transition
+        .to(
+          inactiveLayers,
+          { autoAlpha: 0, y: -8, duration: 0.28, ease: 'power2.out' },
+          0,
+        )
+        .fromTo(
+          activeLayers,
+          { autoAlpha: 0, y: 10 },
+          { autoAlpha: 1, y: 0, duration: 0.42, ease: 'power3.out' },
+          0.06,
+        )
+
+      return () => transition.kill()
     },
     {
       scope: formatStage,
       dependencies: [activeFormat],
-      revertOnUpdate: true,
     },
   )
 
@@ -692,15 +604,23 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
                 ref={formatStage}
               >
                 <div className="indoor-formats__visual" data-indoor-parallax>
-                  <LightboxImage
-                    key={selectedFormat.image}
-                    src={selectedFormat.image}
-                    alt={selectedFormat.alt}
-                    caption={`Indoor · ${selectedFormat.label}`}
-                    triggerClassName="image-lightbox-trigger--fill"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {(Object.keys(formats) as IndoorFormat[]).map((format) => (
+                    <div
+                      className="indoor-formats__visual-layer"
+                      data-indoor-format-layer={format}
+                      aria-hidden={activeFormat !== format}
+                      key={format}
+                    >
+                      <LightboxImage
+                        src={formats[format].image}
+                        alt={formats[format].alt}
+                        caption={`Indoor · ${formats[format].label}`}
+                        triggerClassName="image-lightbox-trigger--fill"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  ))}
                 </div>
 
                 <div className="indoor-formats__copy">
@@ -720,14 +640,28 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
                         role="tab"
                         aria-controls="indoor-format-panel"
                         aria-selected={activeFormat === format}
-                        onClick={() => setActiveFormat(format)}
+                        onClick={() => {
+                          activeFormatRef.current = format
+                          setActiveFormat(format)
+                        }}
                       >
                         {formats[format].label}
                       </button>
                     ))}
                   </div>
-                  <h3>{selectedFormat.title}</h3>
-                  <p>{selectedFormat.description}</p>
+                  <div className="indoor-formats__copy-layers">
+                    {(Object.keys(formats) as IndoorFormat[]).map((format) => (
+                      <div
+                        className="indoor-formats__copy-layer"
+                        data-indoor-format-layer={format}
+                        aria-hidden={activeFormat !== format}
+                        key={format}
+                      >
+                        <h3>{formats[format].title}</h3>
+                        <p>{formats[format].description}</p>
+                      </div>
+                    ))}
+                  </div>
                   {/*<ul aria-label="Características">*/}
                   {/*  <li>Alta afluencia</li>*/}
                   {/*  <li>Integración contextual</li>*/}
