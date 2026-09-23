@@ -7,7 +7,11 @@ import { AmbientField } from '../components/AmbientField'
 import { BrandMask } from '../components/BrandMask'
 import { isIOSSafari } from '../platform/iosSafari'
 
-export function IntroScene() {
+type IntroSceneProps = {
+  onMaskStateChange?: (complete: boolean) => void
+}
+
+export function IntroScene({ onMaskStateChange }: IntroSceneProps) {
   const section = useRef<HTMLElement>(null)
   const mark = useRef<SVGGElement>(null)
   const colorMark = useRef<SVGGElement>(null)
@@ -27,19 +31,19 @@ export function IntroScene() {
 
   useGSAP(
     () => {
-      const siteNavigation = document.querySelector<HTMLElement>('.site-overlay-nav')
-
       const mobile = isMobileExperience()
+      let maskComplete = false
+      const updateMaskState = (complete: boolean) => {
+        if (maskComplete === complete) return
+        maskComplete = complete
+        onMaskStateChange?.(complete)
+      }
+
+      onMaskStateChange?.(false)
 
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
-        gsap.set(siteNavigation, {
-          autoAlpha: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          color: 'rgb(255 255 255 / 86%)',
-          textShadow: '0 .2rem 1rem rgb(0 0 0 / 22%)',
-        })
+        updateMaskState(true)
         setPageTone('#07080b')
         return
       }
@@ -155,13 +159,6 @@ export function IntroScene() {
         gsap.set(copy.current, { autoAlpha: 0, y: 24 })
         gsap.set(sloganLines, { yPercent: 34 })
         gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.84 })
-        gsap.set(siteNavigation, {
-          autoAlpha: 1,
-          y: 0,
-          color: '#07080b',
-          textShadow: 'none',
-        })
-
         const mobileTimeline = gsap.timeline({
           scrollTrigger: {
             id: 'intro-scene-mobile',
@@ -175,6 +172,8 @@ export function IntroScene() {
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               setPulseActive(self.progress <= 0.001)
+              const duration = mobileTimeline.duration()
+              updateMaskState(duration > 0 && self.progress >= 0.26 / duration)
               const shouldUseDarkTone = self.progress > 0.04
               if (shouldUseDarkTone === darkToneActive) return
               darkToneActive = shouldUseDarkTone
@@ -233,15 +232,6 @@ export function IntroScene() {
             content.current,
             { autoAlpha: 1, scale: 1, duration: 0.24, ease: 'power2.out' },
             0.16,
-          )
-          .to(
-            siteNavigation,
-            {
-              color: 'rgb(255 255 255 / 86%)',
-              textShadow: '0 .2rem 1rem rgb(0 0 0 / 22%)',
-              duration: 0.2,
-            },
-            0.18,
           )
           .to(
             sloganGlow.current,
@@ -501,6 +491,8 @@ export function IntroScene() {
             setPulseActive(self.progress <= 0.001)
             setPerspectiveActive(self.progress <= 0.001)
             setLogoButtonActive(self.progress <= 0.001)
+            const duration = timeline.duration()
+            updateMaskState(duration > 0 && self.progress >= 1.02 / duration)
             const stop = timeline.labels.outside / timeline.duration()
             // Keep Safari's browser edges cream only while the opening mask is
             // completely untouched. As soon as its animation starts, blend the
@@ -549,14 +541,6 @@ export function IntroScene() {
       })
       gsap.set(sloganLines, { yPercent: 42 })
       gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.72 })
-      gsap.set(siteNavigation, {
-        autoAlpha: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        color: '#07080b',
-        textShadow: 'none',
-      })
-
       timeline
         .to(flight, {
           x: -3,
@@ -598,16 +582,6 @@ export function IntroScene() {
         .to(veil.current, { autoAlpha: 0, duration: 0.08 }, 0.94)
         .to(scrollCue.current, { autoAlpha: 0, y: -12, duration: 0.12 }, 0.78)
         .to(content.current, { autoAlpha: 1, scale: 1, duration: 0.2, ease: 'power2.out' }, 0.8)
-        .to(
-          siteNavigation,
-          {
-            color: 'rgb(255 255 255 / 86%)',
-            textShadow: '0 .2rem 1rem rgb(0 0 0 / 22%)',
-            duration: 0.28,
-            ease: 'power3.out',
-          },
-          0.78,
-        )
         .to(
           sloganGlow.current,
           {
@@ -697,7 +671,7 @@ export function IntroScene() {
         timeline.kill()
       }
     },
-    { scope: section },
+    { dependencies: [onMaskStateChange], scope: section },
   )
 
   return (

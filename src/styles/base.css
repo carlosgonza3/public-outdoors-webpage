@@ -7,91 +7,140 @@ main {
   background: var(--page-background, #07080b);
 }
 
-.site-overlay-nav {
+.site-nav {
   position: fixed;
   z-index: 90;
-  top: clamp(1rem, 2vw, 1.75rem);
-  right: clamp(1rem, 2.5vw, 2.5rem);
-  display: inline-flex;
-  align-items: center;
-  color: #07080b;
-  font-size: clamp(.78rem, .95vw, 1rem);
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-shadow: 0 .2rem 1rem rgb(0 0 0 / 22%);
-  text-transform: uppercase;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 0;
+  color: #f7f5ef;
+  visibility: hidden;
   will-change: transform, opacity, filter;
 }
 
-.site-overlay-nav__toggle { display: none; }
+.site-nav__butterfly {
+  position: absolute;
+  top: clamp(1rem, 2.15vw, 2rem);
+  left: clamp(1rem, 2.5vw, 2.6rem);
+  width: clamp(2.7rem, 3.4vw, 3.55rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: .48rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 50%;
+  background: rgb(7 8 11 / 58%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 12%) inset,
+    0 .65rem 2rem rgb(0 0 0 / 20%);
+  cursor: default;
+  perspective: 500px;
+  pointer-events: auto;
+  transform-style: preserve-3d;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  will-change: transform, opacity;
+}
 
-.site-overlay-nav__menu {
+.site-nav__butterfly img {
+  position: relative;
+  z-index: 1;
+  width: 78%;
+  height: 78%;
+  display: block;
+  object-fit: contain;
+  transform-origin: 48% 52%;
+  will-change: transform;
+}
+
+.site-nav__butterfly-ring {
+  position: absolute;
+  inset: -.22rem;
+  border: 1px solid rgb(255 255 255 / 0%);
+  border-radius: inherit;
+  transition: border-color .35s ease, transform .45s cubic-bezier(.2, .8, .2, 1);
+}
+
+.site-nav__butterfly:focus-visible {
+  outline: 2px solid #f7f5ef;
+  outline-offset: .3rem;
+}
+
+.site-nav__menu {
+  position: absolute;
+  top: clamp(1rem, 2.15vw, 2rem);
+  right: clamp(1rem, 2.5vw, 2.6rem);
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .3rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 999px;
+  background: rgb(7 8 11 / 61%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 10%) inset,
+    0 .75rem 2.2rem rgb(0 0 0 / 18%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  pointer-events: auto;
+}
+
+.site-nav__menu > * {
+  position: relative;
+  min-height: 2.45rem;
   display: inline-flex;
   align-items: center;
-  gap: clamp(1.35rem, 2.5vw, 2.5rem);
-}
-
-.site-overlay-nav__menu > * {
-  position: relative;
-  display: block;
-  padding: .4rem 0;
+  justify-content: center;
+  gap: .5rem;
+  padding: .25rem .9rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
   color: inherit;
+  font: inherit;
+  font-size: clamp(.68rem, .75vw, .78rem);
+  font-weight: 700;
+  letter-spacing: .115em;
+  line-height: 1;
   white-space: nowrap;
   text-decoration: none;
-  transition:
-    color .35s ease,
-    transform .45s cubic-bezier(.2, .8, .2, 1),
-    text-shadow .4s ease;
-}
-
-.site-overlay-nav button {
-  margin: 0;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
+  text-transform: uppercase;
   cursor: pointer;
-}
-
-.site-overlay-nav__menu > *::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #fff 18%, #fff 82%, transparent);
-  transform: scaleX(0);
-  transform-origin: right center;
   transition:
-    transform .45s cubic-bezier(.2, .8, .2, 1),
-    opacity .35s ease;
+    color .3s ease,
+    background-color .3s ease,
+    transform .4s cubic-bezier(.2, .8, .2, 1);
 }
 
-.site-overlay-nav__menu > *:focus-visible {
-  color: #fff;
-  outline: none;
+.site-nav__menu > * > span {
+  padding: .26rem .42rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 999px;
+  color: rgb(247 245 239 / 46%);
+  font-size: .48rem;
+  letter-spacing: .08em;
 }
 
-.site-overlay-nav__menu > *:focus-visible::after {
-  transform: scaleX(1);
-  transform-origin: left center;
+.site-nav__menu > *:disabled {
+  color: rgb(247 245 239 / 36%);
+  cursor: not-allowed;
 }
 
-.site-overlay-nav button {
-  color: inherit;
+.site-nav__menu > *:focus-visible {
+  outline: 1px solid rgb(255 255 255 / 72%);
+  outline-offset: 1px;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .site-overlay-nav__menu > *:hover {
-    color: #fff;
-    text-shadow: 0 0 1.4rem rgb(255 255 255 / 32%);
-    transform: translateY(-2px);
+  .site-nav__butterfly:hover .site-nav__butterfly-ring {
+    border-color: rgb(255 255 255 / 32%);
+    transform: scale(1.08);
   }
 
-  .site-overlay-nav__menu > *:hover::after {
-    transform: scaleX(1);
-    transform-origin: left center;
+  .site-nav__menu > *:not(:disabled):hover {
+    background: rgb(255 255 255 / 10%);
+    color: #fff;
+    transform: translateY(-1px);
   }
 }

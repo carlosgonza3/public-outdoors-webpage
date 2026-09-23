@@ -267,6 +267,6 @@
   height: 2.5rem;
   background: currentColor;
   transform-origin: top;
-  color: #7d0007;
+  color: #000000;
   animation: pulse 3.8s ease-in-out infinite;
 }
