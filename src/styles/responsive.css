@@ -398,7 +398,7 @@
   .grid-heading {
     min-height: 100svh;
     min-height: 100dvh;
-    margin-bottom: 3rem;
+    margin-bottom: 5rem;
     padding-block: 1.25rem;
   }
   .grid-heading h2 {
@@ -618,6 +618,60 @@
 @media (max-width: 600px) {
   .project-grid-section {
     margin-top: -45svh;
+  }
+
+  .grid-heading {
+    min-height: 0;
+    justify-content: flex-start;
+    gap: 1.35rem;
+    margin-bottom: 3rem;
+    padding: .75rem 1.25rem calc(2.25rem + env(safe-area-inset-bottom));
+  }
+
+  .grid-heading h2 {
+    margin-top: 0;
+    font-size: clamp(3.35rem, 15vw, 4.5rem);
+    line-height: .88;
+  }
+
+  .grid-heading__signal {
+    min-height: 5.75rem;
+    flex: none;
+    margin-block: 2rem;
+    padding: .45rem 0;
+    gap: .7rem;
+  }
+
+  .grid-heading__signal::before {
+    width: min(17rem, 84vw);
+    height: 6rem;
+  }
+
+  .grid-heading__signal i {
+    width: clamp(2.65rem, 13vw, 3.25rem);
+  }
+
+  .grid-heading__bottom {
+    grid-template-columns: 1fr;
+    gap: .45rem;
+    padding: 0;
+    font-size: .58rem;
+    line-height: 1.35;
+  }
+
+  .grid-heading__bottom p {
+    color: rgb(247 245 239 / 88%);
+    font-size: .64rem;
+    letter-spacing: .1em;
+  }
+
+  .grid-heading__bottom > span {
+    color: rgb(247 245 239 / 52%);
+    text-align: left;
+  }
+
+  .grid-heading__bottom > span::before {
+    content: none;
   }
 
   .site-nav__butterfly {
