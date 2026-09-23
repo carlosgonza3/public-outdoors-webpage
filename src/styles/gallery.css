@@ -226,6 +226,11 @@
   line-height: 1.45;
 }
 
+.collection-heading__cta,
+.collection-carousel__pagination {
+  display: none;
+}
+
 .collection-carousel {
   width: 100%;
   min-height: 0;

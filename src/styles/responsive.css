@@ -433,8 +433,8 @@
 
   .project-collection {
     height: auto;
-    min-height: 100svh;
-    padding: 3.5rem 0 5rem;
+    min-height: 0;
+    padding: 2.75rem 0 2rem;
   }
 
   .project-collection__stage {
@@ -450,7 +450,7 @@
 
   .collection-heading {
     display: block;
-    padding: 0 1.25rem 1.75rem;
+    padding: 0 1.25rem 2.25rem;
   }
 
   .project-collection:nth-child(even) .collection-heading__intro,
@@ -469,16 +469,63 @@
   }
 
   .collection-heading__details {
-    margin-top: 1.35rem;
+    margin-top: 1.75rem;
   }
 
-  .collection-heading__details p { font-size: .72rem; }
+  .collection-heading__details p {
+    font-size: .72rem;
+    line-height: 1.55;
+  }
+
+  .collection-heading__cta {
+    min-height: 2.5rem;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    margin-top: 1.2rem;
+    padding: .62rem .9rem;
+    border: 1px solid rgb(247 245 239 / 22%);
+    border-radius: 999px;
+    background: rgb(247 245 239 / 6%);
+    color: #f7f5ef;
+    font: inherit;
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-decoration: none;
+    text-transform: uppercase;
+    box-sizing: border-box;
+  }
+
+  .collection--outdoor .collection-heading__cta {
+    align-self: flex-end;
+  }
+
+  .collection-heading__cta strong {
+    font-weight: 720;
+  }
+
+  .collection-heading__cta svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+  }
+
   .collection-carousel {
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
+    scroll-padding-inline: 1.25rem;
     scrollbar-width: none;
     scroll-snap-type: x mandatory;
+    touch-action: pan-x pinch-zoom;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .collection-carousel::-webkit-scrollbar { display: none; }
@@ -487,6 +534,10 @@
     gap: .8rem;
     padding: 0 1.25rem;
     transform: none !important;
+  }
+
+  .collection-carousel__cta {
+    display: none;
   }
 
   .project-card,
@@ -500,6 +551,38 @@
 
   .collection--innovations .collection-carousel__cta { margin-left: 0; }
   .collection--outdoor .collection-carousel__cta { order: 2; }
+
+  .collection-carousel__pagination {
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    margin-top: .8rem;
+  }
+
+  .collection-carousel__pagination button {
+    width: .42rem;
+    height: .42rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(247 245 239 / 28%);
+    cursor: pointer;
+    transition:
+      width .28s cubic-bezier(.2, .8, .2, 1),
+      background-color .28s ease;
+  }
+
+  .collection-carousel__pagination button.is-active {
+    width: 1.4rem;
+    background: #f7f5ef;
+  }
+
+  .collection-carousel__pagination button:focus-visible {
+    outline: 2px solid #00b0f4;
+    outline-offset: .25rem;
+  }
 
   .collection-carousel__cta {
     height: min(61svh, 31rem);

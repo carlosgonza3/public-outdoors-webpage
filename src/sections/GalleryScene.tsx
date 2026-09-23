@@ -1,11 +1,14 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
 import { ProjectCard } from '../components/ProjectCard'
-import { projectCollections } from '../data/projects'
+import {
+  projectCollections,
+  type ProjectCollection,
+} from '../data/projects'
 
 type GallerySceneProps = {
   onContact: () => void
@@ -13,6 +16,16 @@ type GallerySceneProps = {
 
 export function GalleryScene({ onContact }: GallerySceneProps) {
   const section = useRef<HTMLElement>(null)
+  const carouselRefs = useRef<
+    Partial<Record<ProjectCollection['id'], HTMLDivElement>>
+  >({})
+  const [activeSlides, setActiveSlides] = useState<
+    Record<ProjectCollection['id'], number>
+  >({
+    indoor: 0,
+    outdoor: 0,
+    innovations: 0,
+  })
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -352,7 +365,7 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
 
     event.preventDefault()
     const source = event.currentTarget.closest<HTMLElement>(
-      '.collection-carousel__cta',
+      '.collection-carousel__cta, .collection-heading__cta',
     )
     const sourceBounds = source?.getBoundingClientRect()
 
@@ -424,6 +437,92 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
     )
   }
 
+  const renderHeadingCta = (
+    collection: (typeof projectCollections)[number],
+  ) => {
+    const isContactCta = collection.id === 'innovations'
+    const label = isContactCta
+      ? 'Contáctanos'
+      : collection.id === 'outdoor'
+        ? 'Explora'
+        : 'Ver más'
+    const content = (
+      <>
+        <strong>{label}</strong>
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M10 32h42M36 16l16 16-16 16" />
+        </svg>
+      </>
+    )
+
+    return isContactCta ? (
+      <button
+        className="collection-heading__cta"
+        type="button"
+        onClick={onContact}
+        aria-label="Contáctanos sobre Innovations"
+      >
+        {content}
+      </button>
+    ) : (
+      <Link
+        className="collection-heading__cta"
+        to={`/${collection.id}`}
+        state={{ backgroundLocation: location }}
+        onClick={(event) => openCollection(event, collection.id)}
+        aria-label={`Ver más proyectos ${collection.label}`}
+      >
+        {content}
+      </Link>
+    )
+  }
+
+  const updateActiveSlide = (
+    collectionId: ProjectCollection['id'],
+    carousel: HTMLDivElement,
+  ) => {
+    const cards = Array.from(
+      carousel.querySelectorAll<HTMLElement>('.project-card'),
+    )
+    if (cards.length < 2) return
+
+    const carouselCenter = carousel.scrollLeft + carousel.clientWidth / 2
+    let closestIndex = 0
+    let closestDistance = Number.POSITIVE_INFINITY
+
+    cards.forEach((card, index) => {
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2
+      const distance = Math.abs(cardCenter - carouselCenter)
+
+      if (distance < closestDistance) {
+        closestIndex = index
+        closestDistance = distance
+      }
+    })
+
+    setActiveSlides((current) =>
+      current[collectionId] === closestIndex
+        ? current
+        : { ...current, [collectionId]: closestIndex },
+    )
+  }
+
+  const goToSlide = (
+    collectionId: ProjectCollection['id'],
+    slideIndex: number,
+  ) => {
+    const carousel = carouselRefs.current[collectionId]
+    const card = carousel?.querySelectorAll<HTMLElement>('.project-card')[
+      slideIndex
+    ]
+    if (!carousel || !card) return
+
+    carousel.scrollTo({
+      left: card.offsetLeft - (carousel.clientWidth - card.offsetWidth) / 2,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    })
+  }
+
   return (
     <section className="project-grid-section" ref={section}>
       <header className="grid-heading" data-scene-id="gallery-intro">
@@ -465,10 +564,19 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
                   <div className="collection-heading__details">
                     <p>{collection.description}</p>
                   </div>
+                  {renderHeadingCta(collection)}
                 </div>
               </header>
 
-              <div className="collection-carousel">
+              <div
+                className="collection-carousel"
+                ref={(node) => {
+                  carouselRefs.current[collection.id] = node ?? undefined
+                }}
+                onScroll={(event) =>
+                  updateActiveSlide(collection.id, event.currentTarget)
+                }
+              >
                 <div
                   className={`collection-carousel__track ${collection.id}-grid${
                     collection.projects.length === 1 ? ' is-single-project' : ''
@@ -486,6 +594,33 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
                   {collection.id !== 'outdoor' && renderCollectionCta(collection)}
                 </div>
               </div>
+
+              {collection.projects.length > 1 && (
+                <div
+                  className="collection-carousel__pagination"
+                  role="group"
+                  aria-label={`Diapositivas de ${collection.label}`}
+                >
+                  {collection.projects.map((project, index) => (
+                    <button
+                      className={
+                        activeSlides[collection.id] === index
+                          ? 'is-active'
+                          : undefined
+                      }
+                      type="button"
+                      aria-label={`Ir a imagen ${index + 1} de ${collection.projects.length}`}
+                      aria-current={
+                        activeSlides[collection.id] === index
+                          ? 'true'
+                          : undefined
+                      }
+                      onClick={() => goToSlide(collection.id, index)}
+                      key={project.id}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         ))}
