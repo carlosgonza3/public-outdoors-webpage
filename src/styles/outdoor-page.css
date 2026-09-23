@@ -1,0 +1,209 @@
+.collection-page--outdoor {
+  background:
+    radial-gradient(circle at 88% 4%, rgb(56 212 48 / 7%), transparent 32rem),
+    #090b0a;
+}
+
+.outdoor-page {
+  --indoor-line: rgb(247 245 239 / 17%);
+  --indoor-muted: rgb(247 245 239 / 58%);
+}
+
+.outdoor-page .indoor-hero__heading {
+  grid-template-columns: minmax(0, 1.28fr) minmax(17rem, .72fr);
+}
+
+.outdoor-page .indoor-hero h1 {
+  grid-column: 1;
+  text-align: left;
+}
+
+.outdoor-page .indoor-hero__statement {
+  grid-column: 2;
+  padding-bottom: .5rem;
+}
+
+.outdoor-page .indoor-hero__media img {
+  object-position: center 58%;
+}
+
+.outdoor-strategy {
+  height: auto;
+  padding-block: clamp(8rem, 15vw, 5rem);
+}
+
+.outdoor-strategy .indoor-strategy__sticky,
+.route-modal__panel .outdoor-strategy .indoor-strategy__sticky {
+  position: static;
+  height: auto;
+  min-height: min(76svh, 58rem);
+  grid-template-columns: minmax(20rem, .7fr) minmax(0, 1.3fr);
+  background: transparent;
+}
+
+.outdoor-strategy .indoor-strategy__lead {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.outdoor-strategy .indoor-strategy__body {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.outdoor-strategy .indoor-strategy__step {
+  opacity: 1;
+}
+
+.outdoor-strategy__number {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(247 245 239 / 28%);
+  border-radius: 50%;
+  color: rgb(247 245 239 / 72%);
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+}
+
+.outdoor-formats .indoor-formats__header {
+  justify-content: flex-start;
+}
+
+.outdoor-formats .indoor-formats__header h2 {
+  text-align: left;
+}
+
+.outdoor-formats .indoor-formats__visual {
+  grid-column: 2;
+}
+
+.outdoor-formats .indoor-formats__copy {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.outdoor-formats .indoor-formats__tabs {
+  gap: clamp(1.1rem, 2vw, 2.25rem);
+}
+
+.outdoor-formats .indoor-formats__tabs button {
+  letter-spacing: .11em;
+}
+
+.outdoor-formats .indoor-formats__visual img {
+  object-position: center;
+}
+
+.outdoor-formats .indoor-formats__visual-layer[data-outdoor-format-layer='digital'] img {
+  object-position: center 66%;
+}
+
+.outdoor-formats__index {
+  display: block;
+  margin-top: .25rem;
+  color: rgb(247 245 239 / 34%);
+  font-size: .64rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+}
+
+.outdoor-formats .indoor-formats__copy-layer ul {
+  padding: 0;
+  margin: 2.5rem 0 0;
+  list-style: none;
+}
+
+.outdoor-formats .indoor-formats__copy-layer li {
+  padding-block: .78rem;
+  border-top: 1px solid var(--indoor-line);
+  color: rgb(247 245 239 / 68%);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.outdoor-formats .indoor-formats__copy-layer li:last-child {
+  border-bottom: 1px solid var(--indoor-line);
+}
+
+@media (max-width: 960px) {
+  .outdoor-page .indoor-hero__heading {
+    grid-template-columns: 1fr;
+  }
+
+  .outdoor-page .indoor-hero h1,
+  .outdoor-page .indoor-hero__statement {
+    grid-column: 1;
+  }
+
+  .outdoor-strategy .indoor-strategy__sticky,
+  .route-modal__panel .outdoor-strategy .indoor-strategy__sticky {
+    grid-template-columns: 1fr;
+  }
+
+  .outdoor-strategy .indoor-strategy__lead,
+  .outdoor-strategy .indoor-strategy__body {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .outdoor-strategy .indoor-strategy__lead {
+    grid-row: 1;
+  }
+
+  .outdoor-strategy .indoor-strategy__body {
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 700px) {
+  .outdoor-page .indoor-hero h1 {
+    font-size: clamp(3.7rem, 20vw, 6rem);
+  }
+
+  .outdoor-page .indoor-hero__media img {
+    object-position: 68% center;
+  }
+
+  .outdoor-strategy {
+    padding-block: 0;
+  }
+
+  .outdoor-strategy .indoor-strategy__sticky,
+  .route-modal__panel .outdoor-strategy .indoor-strategy__sticky {
+    min-height: 0;
+  }
+
+  .outdoor-strategy .indoor-strategy__lead h2 {
+    text-align: left;
+  }
+
+  .outdoor-formats .indoor-formats__tabs {
+    justify-content: flex-start;
+    gap: 1.25rem;
+    overflow-x: auto;
+  }
+
+  .outdoor-formats .indoor-formats__tabs button {
+    flex: 0 0 auto;
+    font-size: .66rem;
+  }
+
+  .outdoor-formats .indoor-formats__visual {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .outdoor-formats .indoor-formats__copy {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .outdoor-formats .indoor-formats__copy-layer {
+    text-align: left;
+  }
+}

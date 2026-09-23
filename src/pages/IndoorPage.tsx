@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { gsap, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { isMobileExperience } from '../animation/mobile'
 import { prefersReducedMotion } from '../animation/motion'
 import { ContactCard } from '../components/ContactCard'
@@ -47,18 +47,60 @@ const formats = {
   }
 >
 
-const projectNames = [
-  'Pantalla estratégica',
-  'Cilindro digital',
-  'Presencia de marca',
-]
+const processSteps = [
+  {
+    title: 'Estrategia',
+    description: 'Definamos tu audiencia, momento y ubicación.',
+    icon: 'strategy',
+  },
+  {
+    title: 'Producción',
+    description: 'Convirtamos tus ideas en piezas que destacan',
+    icon: 'production',
+  },
+  {
+    title: 'Implementación',
+    description: 'Nosotros instalamos, supervisamos y cuidamos la ejecución',
+    icon: 'implementation',
+  },
+] as const
+
+function ProcessIcon({ icon }: { icon: (typeof processSteps)[number]['icon'] }) {
+  if (icon === 'strategy') {
+    return (
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="13" />
+        <circle cx="24" cy="24" r="4" />
+        <path d="M24 4v7M24 37v7M4 24h7M37 24h7" />
+      </svg>
+    )
+  }
+
+  if (icon === 'production') {
+    return (
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path d="m24 5 16 9-16 9L8 14l16-9Z" />
+        <path d="m8 23 16 9 16-9M8 32l16 9 16-9" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M39 21c0 10-15 22-15 22S9 31 9 21a15 15 0 1 1 30 0Z" />
+      <path d="m18 21 4 4 8-9" />
+    </svg>
+  )
+}
 
 export function IndoorPage({ modal = false }: IndoorPageProps) {
   const page = useRef<HTMLDivElement>(null)
+  const strategySection = useRef<HTMLElement>(null)
+  const formatsSection = useRef<HTMLElement>(null)
   const formatStage = useRef<HTMLDivElement>(null)
   const [activeFormat, setActiveFormat] = useState<IndoorFormat>('digital')
+  const activeFormatRef = useRef<IndoorFormat>('digital')
   const [contactOpen, setContactOpen] = useState(false)
-  const selectedFormat = formats[activeFormat]
 
   useGSAP(
     () => {
@@ -172,23 +214,272 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
 
   useGSAP(
     () => {
+      const section = strategySection.current
+      if (!section || prefersReducedMotion()) return
+
+      const mobile = isMobileExperience()
+      const modalScroller = modal
+        ? page.current?.closest<HTMLElement>('.route-modal__panel')
+        : undefined
+      const eyebrow = section.querySelector('.indoor-strategy__eyebrow')
+      const title = section.querySelector('.indoor-strategy__lead h2')
+      const description = section.querySelector('.indoor-strategy__description')
+      const steps = gsap.utils.toArray<HTMLElement>(
+        '.indoor-strategy__step',
+        section,
+      )
+      const stepDescriptions = steps.map((step) =>
+        step.querySelector<HTMLElement>('.indoor-strategy__step-copy small')!,
+      )
+
+      const entrance = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: mobile ? 'top 88%' : 'top 76%',
+          once: true,
+          scroller: modalScroller,
+        },
+        defaults: { ease: 'power4.out' },
+      })
+
+      entrance
+        .from(eyebrow, { autoAlpha: 0, y: 18, duration: 0.5 })
+        .from(title, { autoAlpha: 0, y: mobile ? 32 : 54, duration: 0.8 }, 0.08)
+        .from(
+          description,
+          { autoAlpha: 0, y: 28, duration: 0.65 },
+          0.22,
+        )
+
+      if (mobile) {
+        steps.forEach((step) => step.removeAttribute('aria-current'))
+        gsap.set(steps, { clearProps: 'opacity,visibility,transform' })
+        gsap.set(stepDescriptions, {
+          clearProps: 'opacity,visibility,height,paddingTop,transform',
+        })
+        return () => entrance.kill()
+      }
+
+      gsap.set(steps, { opacity: 0.42 })
+      gsap.set(steps[0], { opacity: 1 })
+      gsap.set(stepDescriptions, {
+        autoAlpha: 0,
+        height: 0,
+        paddingTop: 0,
+        y: 6,
+      })
+      gsap.set(stepDescriptions[0], {
+        autoAlpha: 1,
+        height: 'auto',
+        paddingTop: '0.5rem',
+        y: 0,
+      })
+      steps[0]?.setAttribute('aria-current', 'step')
+      let activeIndex = 0
+      let stepTransition: gsap.core.Timeline | undefined
+
+      const showStep = (nextIndex: number, immediate = false) => {
+        if (!immediate && nextIndex === activeIndex) return
+        activeIndex = nextIndex
+        stepTransition?.kill()
+
+        steps.forEach((step, index) => {
+          if (index === nextIndex) step.setAttribute('aria-current', 'step')
+          else step.removeAttribute('aria-current')
+        })
+
+        if (immediate) {
+          gsap.set(steps, { opacity: 0.42 })
+          gsap.set(steps[nextIndex], { opacity: 1 })
+          gsap.set(stepDescriptions, {
+            autoAlpha: 0,
+            height: 0,
+            paddingTop: 0,
+            y: 6,
+          })
+          gsap.set(stepDescriptions[nextIndex], {
+            autoAlpha: 1,
+            height: 'auto',
+            paddingTop: '0.5rem',
+            y: 0,
+          })
+          return
+        }
+
+        stepTransition = gsap.timeline({ defaults: { overwrite: true } })
+        stepTransition
+          .to(steps, { opacity: 0.42, duration: 0.18, ease: 'power2.out' }, 0)
+          .to(
+            stepDescriptions,
+            {
+              autoAlpha: 0,
+              height: 0,
+              paddingTop: 0,
+              y: 6,
+              duration: 0.22,
+              ease: 'power2.inOut',
+            },
+            0,
+          )
+          .to(
+            steps[nextIndex],
+            { opacity: 1, duration: 0.22, ease: 'power2.out' },
+            0.12,
+          )
+          .to(
+            stepDescriptions[nextIndex],
+            {
+              autoAlpha: 1,
+              height: 'auto',
+              paddingTop: '0.5rem',
+              y: 0,
+              duration: 0.34,
+              ease: 'power2.inOut',
+            },
+            0.1,
+          )
+      }
+
+      showStep(0, true)
+      const scrollSource: HTMLElement | Window = modalScroller ?? window
+      let updateFrame = 0
+      const updateActiveStep = () => {
+        updateFrame = 0
+        const viewportTop = modalScroller?.getBoundingClientRect().top ?? 0
+        const viewportHeight = modalScroller?.clientHeight ?? window.innerHeight
+        const rect = section.getBoundingClientRect()
+        const travel = Math.max(section.offsetHeight - viewportHeight, 1)
+        const progress = gsap.utils.clamp(
+          0,
+          1,
+          (viewportTop - rect.top) / travel,
+        )
+        const nextIndex = progress < 1 / 3 ? 0 : progress < 2 / 3 ? 1 : 2
+        showStep(nextIndex)
+      }
+      const queueStepUpdate = () => {
+        if (updateFrame) return
+        updateFrame = window.requestAnimationFrame(updateActiveStep)
+      }
+
+      scrollSource.addEventListener('scroll', queueStepUpdate, {
+        passive: true,
+      })
+      updateActiveStep()
+
+      return () => {
+        scrollSource.removeEventListener('scroll', queueStepUpdate)
+        if (updateFrame) window.cancelAnimationFrame(updateFrame)
+        stepTransition?.kill()
+        entrance.kill()
+      }
+    },
+    { scope: strategySection, dependencies: [modal] },
+  )
+
+  useGSAP(
+    () => {
+      const section = formatsSection.current
+      const pinnedStage = section?.querySelector<HTMLElement>(
+        '.indoor-formats__sticky',
+      )
+      const modalScroller = page.current?.closest<HTMLElement>(
+        '.route-modal__panel',
+      )
+
+      if (
+        !modal ||
+        !section ||
+        !pinnedStage ||
+        !modalScroller ||
+        prefersReducedMotion()
+      ) {
+        return
+      }
+
+      const selectFormat = (format: IndoorFormat) => {
+        if (activeFormatRef.current === format) return
+        activeFormatRef.current = format
+        setActiveFormat(format)
+      }
+
+      const formatMedia = gsap.matchMedia()
+
+      formatMedia.add('(min-width: 901px)', () => {
+        const sectionStart = () => section.offsetTop
+        const sectionEnd = () =>
+          sectionStart() + section.offsetHeight - modalScroller.clientHeight
+
+        const formatTrigger = ScrollTrigger.create({
+          trigger: section,
+          scroller: modalScroller,
+          start: sectionStart,
+          end: sectionEnd,
+          invalidateOnRefresh: true,
+          snap: {
+            snapTo: [0, 1],
+            delay: 0.08,
+            duration: { min: 0.25, max: 0.45 },
+            ease: 'power2.inOut',
+          },
+          onEnter: () => selectFormat('digital'),
+          onEnterBack: () => selectFormat('fijo'),
+          onLeave: () => selectFormat('fijo'),
+          onLeaveBack: () => selectFormat('digital'),
+          onUpdate: ({ progress }) => {
+            selectFormat(progress < 0.5 ? 'digital' : 'fijo')
+          },
+        })
+
+        const refreshCall = gsap.delayedCall(0, () => ScrollTrigger.refresh())
+
+        return () => {
+          refreshCall.kill()
+          formatTrigger.kill()
+        }
+      })
+
+      return () => formatMedia.revert()
+    },
+    { scope: formatsSection, dependencies: [modal] },
+  )
+
+  useGSAP(
+    () => {
       if (prefersReducedMotion() || !formatStage.current) return
 
-      gsap.fromTo(
+      const layers = gsap.utils.toArray<HTMLElement>(
+        '[data-indoor-format-layer]',
         formatStage.current,
-        { autoAlpha: 0.45, y: 14 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.55,
-          ease: 'power3.out',
-        },
       )
+      const activeLayers = layers.filter(
+        (layer) => layer.dataset.indoorFormatLayer === activeFormat,
+      )
+      const inactiveLayers = layers.filter(
+        (layer) => layer.dataset.indoorFormatLayer !== activeFormat,
+      )
+      const transition = gsap.timeline({
+        defaults: { overwrite: 'auto' },
+      })
+
+      transition
+        .to(
+          inactiveLayers,
+          { autoAlpha: 0, y: -8, duration: 0.28, ease: 'power2.out' },
+          0,
+        )
+        .fromTo(
+          activeLayers,
+          { autoAlpha: 0, y: 10 },
+          { autoAlpha: 1, y: 0, duration: 0.42, ease: 'power3.out' },
+          0.06,
+        )
+
+      return () => transition.kill()
     },
     {
       scope: formatStage,
       dependencies: [activeFormat],
-      revertOnUpdate: true,
     },
   )
 
@@ -201,11 +492,6 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
       >
         <div className="indoor-page" ref={page}>
           <header className="indoor-hero">
-            <div className="indoor-hero__eyebrow" aria-hidden="true">
-              <span>Public / Indoor</span>
-              <span>01</span>
-            </div>
-
             <div className="indoor-hero__heading">
               <h1 aria-label={indoorCollection.label}>
                 <span className="indoor-hero__title-mask">
@@ -237,148 +523,137 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
                 loading="eager"
                 decoding="async"
               />
-              {/*<span className="indoor-hero__media-label" aria-hidden="true">*/}
-              {/*  Centros comerciales / El Salvador*/}
-              {/*</span>*/}
             </div>
           </header>
 
           <section
             className="indoor-strategy"
             aria-labelledby="indoor-strategy-title"
+            ref={strategySection}
           >
-            <div className="indoor-strategy__lead indoor-reveal">
-              <p className="indoor-kicker">Estrategia OOH personalizada</p>
-              <h2 id="indoor-strategy-title">
-                No solo ocupamos espacios.
-                <br />
-                Diseñamos encuentros.
-              </h2>
-            </div>
+            <div className="indoor-strategy__sticky">
+              <div className="indoor-strategy__lead">
+                <p className="indoor-kicker indoor-strategy__eyebrow">
+                  Estrategia OOH personalizada
+                </p>
+                <h2 id="indoor-strategy-title">
+                  No solo ocupamos espacios.
+                  <br />
+                  Diseñamos encuentros.
+                </h2>
+              </div>
 
-            <div className="indoor-strategy__body indoor-reveal">
-              <p>
-                Creamos experiencias de marca dentro de centros comerciales,
-                combinando estrategia, creatividad y producción in-house para
-                que cada campaña se integre naturalmente a su entorno.
-              </p>
+              <div className="indoor-strategy__body">
+                <p className="indoor-strategy__description">
+                  Creamos experiencias de marca dentro de centros comerciales,
+                  combinando estrategia, creatividad y producción in-house para
+                  que cada campaña se integre naturalmente a su entorno.
+                </p>
 
-              <ol aria-label="Nuestro proceso">
-                <li>
-                  <span>01</span>
-                  <strong>Estrategia</strong>
-                </li>
-                <li>
-                  <span>02</span>
-                  <strong>Producción</strong>
-                </li>
-                <li>
-                  <span>03</span>
-                  <strong>Implementación</strong>
-                </li>
-              </ol>
+                <ol aria-label="Nuestro proceso">
+                  {processSteps.map((step) => (
+                    <li className="indoor-strategy__step" key={step.title}>
+                      <span className="indoor-strategy__icon">
+                        <ProcessIcon icon={step.icon} />
+                      </span>
+                      <span className="indoor-strategy__step-copy">
+                        <strong>{step.title}</strong>
+                        <small>{step.description}</small>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
           </section>
 
           <section
             className="indoor-formats"
             aria-labelledby="indoor-formats-title"
+            ref={formatsSection}
           >
-            <header className="indoor-formats__header indoor-reveal">
-              <div>
-                <p className="indoor-kicker">Medios en centros comerciales</p>
-                <h2 id="indoor-formats-title">
-                  Formatos que viven en el espacio.
-                </h2>
-              </div>
-            </header>
+            <div className="indoor-formats__sticky">
+              <header className="indoor-formats__header indoor-reveal">
+                <div>
+                  <h2 id="indoor-formats-title">
+                    Formatos que viven en el espacio.
+                  </h2>
+                </div>
+              </header>
 
-            <div
-              className="indoor-formats__stage"
-              id="indoor-format-panel"
-              role="tabpanel"
-              aria-labelledby={`indoor-format-${activeFormat}`}
-              ref={formatStage}
-            >
-              <div className="indoor-formats__visual" data-indoor-parallax>
-                <LightboxImage
-                  key={selectedFormat.image}
-                  src={selectedFormat.image}
-                  alt={selectedFormat.alt}
-                  caption={`Indoor · ${selectedFormat.label}`}
-                  triggerClassName="image-lightbox-trigger--fill"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span aria-hidden="true">
-                  {selectedFormat.index} / {selectedFormat.label}
-                </span>
-              </div>
-
-              <div className="indoor-formats__copy">
-                <div
-                  className="indoor-formats__tabs"
-                  role="tablist"
-                  aria-label="Formatos Indoor"
-                >
+              <div
+                className="indoor-formats__stage"
+                id="indoor-format-panel"
+                role="tabpanel"
+                aria-labelledby={`indoor-format-${activeFormat}`}
+                ref={formatStage}
+              >
+                <div className="indoor-formats__visual" data-indoor-parallax>
                   {(Object.keys(formats) as IndoorFormat[]).map((format) => (
-                    <button
-                      className={
-                        activeFormat === format ? 'is-active' : undefined
-                      }
-                      id={`indoor-format-${format}`}
+                    <div
+                      className="indoor-formats__visual-layer"
+                      data-indoor-format-layer={format}
+                      aria-hidden={activeFormat !== format}
                       key={format}
-                      type="button"
-                      role="tab"
-                      aria-controls="indoor-format-panel"
-                      aria-selected={activeFormat === format}
-                      onClick={() => setActiveFormat(format)}
                     >
-                      {formats[format].label}
-                    </button>
+                      <LightboxImage
+                        src={formats[format].image}
+                        alt={formats[format].alt}
+                        caption={`Indoor · ${formats[format].label}`}
+                        triggerClassName="image-lightbox-trigger--fill"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
                   ))}
                 </div>
-                <span>{selectedFormat.index}</span>
-                <h3>{selectedFormat.title}</h3>
-                <p>{selectedFormat.description}</p>
-                {/*<ul aria-label="Características">*/}
-                {/*  <li>Alta afluencia</li>*/}
-                {/*  <li>Integración contextual</li>*/}
-                {/*  <li>Producción in-house</li>*/}
-                {/*</ul>*/}
+
+                <div className="indoor-formats__copy">
+                  <div
+                    className="indoor-formats__tabs"
+                    role="tablist"
+                    aria-label="Formatos Indoor"
+                  >
+                    {(Object.keys(formats) as IndoorFormat[]).map((format) => (
+                      <button
+                        className={
+                          activeFormat === format ? 'is-active' : undefined
+                        }
+                        id={`indoor-format-${format}`}
+                        key={format}
+                        type="button"
+                        role="tab"
+                        aria-controls="indoor-format-panel"
+                        aria-selected={activeFormat === format}
+                        onClick={() => {
+                          activeFormatRef.current = format
+                          setActiveFormat(format)
+                        }}
+                      >
+                        {formats[format].label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="indoor-formats__copy-layers">
+                    {(Object.keys(formats) as IndoorFormat[]).map((format) => (
+                      <div
+                        className="indoor-formats__copy-layer"
+                        data-indoor-format-layer={format}
+                        aria-hidden={activeFormat !== format}
+                        key={format}
+                      >
+                        <h3>{formats[format].title}</h3>
+                        <p>{formats[format].description}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {/*<ul aria-label="Características">*/}
+                  {/*  <li>Alta afluencia</li>*/}
+                  {/*  <li>Integración contextual</li>*/}
+                  {/*  <li>Producción in-house</li>*/}
+                  {/*</ul>*/}
+                </div>
               </div>
-            </div>
-          </section>
-
-          <section className="indoor-work" aria-labelledby="indoor-work-title">
-            <header className="indoor-work__header indoor-reveal">
-              <p className="indoor-kicker">Proyectos seleccionados</p>
-              <h2 id="indoor-work-title">Presencia que se siente.</h2>
-            </header>
-
-            <div className="indoor-work__grid">
-              {indoorCollection.projects.map((project, index) => (
-                <article
-                  className="indoor-work__project indoor-reveal"
-                  key={project.id}
-                >
-                  <div className="indoor-work__visual" data-indoor-parallax>
-                    <LightboxImage
-                      src={project.image!}
-                      alt={project.alt ?? project.title}
-                      caption={projectNames[index]}
-                      triggerClassName="image-lightbox-trigger--fill"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                  <div className="indoor-work__meta">
-                    <span>{project.id}</span>
-                    <h3>{projectNames[index]}</h3>
-                    <p>{index === 2 ? 'Formato fijo' : 'Formato digital'}</p>
-                  </div>
-                </article>
-              ))}
             </div>
           </section>
 
@@ -386,7 +661,6 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
             className="indoor-cta indoor-reveal"
             aria-labelledby="indoor-cta-title"
           >
-            {/*<p className="indoor-kicker">Public · El Salvador</p>*/}
             <div>
               <h2 id="indoor-cta-title">
                 Hagamos visible

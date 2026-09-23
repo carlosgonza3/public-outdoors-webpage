@@ -26,7 +26,7 @@ export function PurposeScene() {
 
       const stages = [question.current, statement.current, action.current]
       const siteNavigation = document.querySelector<HTMLElement>(
-        '.site-overlay-nav',
+        '.site-nav',
       )
       const contactContainer = contact.current
       const backdrop = contactBackdrop.current

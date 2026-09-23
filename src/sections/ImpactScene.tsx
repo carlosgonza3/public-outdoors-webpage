@@ -216,10 +216,6 @@ export function ImpactScene() {
       aria-label="Nuestro impacto y clientes"
       data-scene-id="impact"
     >
-      <div className="impact-section__chrome" ref={chrome} aria-hidden="true">
-        <span>Nuestro impacto</span>
-        <span>Desliza para descubrir</span>
-      </div>
 
       <div className="impact-track" ref={track}>
         {metrics.map((metric, index) => (
