@@ -56,9 +56,24 @@ export const projectCollections: ProjectCollection[] = [
     description:
       'Impacto de gran formato en puntos clave que acompañan a las personas durante sus recorridos.',
     projects: [
-      { id: '04', title: 'Outdoor 01', image: outdoorOne, alt: 'Outdoor project 1' },
-      { id: '05', title: 'Outdoor 02', image: outdoorTwo, alt: 'Outdoor project 2' },
-      { id: '06', title: 'Outdoor 03', image: outdoorThree, alt: 'Outdoor project 3' },
+      {
+        id: '04',
+        title: 'Parada de buses',
+        image: outdoorOne,
+        alt: 'Parada de buses con publicidad de Coca-Cola en San Salvador',
+      },
+      {
+        id: '05',
+        title: 'Valla fija',
+        image: outdoorTwo,
+        alt: 'Valla publicitaria de gran formato junto a una vía de San Salvador',
+      },
+      {
+        id: '06',
+        title: 'Pantalla digital',
+        image: outdoorThree,
+        alt: 'Pantalla digital y banderola publicitaria junto a una vía urbana',
+      },
     ],
   },
   {
