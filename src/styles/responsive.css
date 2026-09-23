@@ -610,16 +610,32 @@
 
   .grid-heading {
     min-height: 0;
+    align-items: center;
     justify-content: flex-start;
     gap: 1.35rem;
     margin-bottom: 3rem;
     padding: .75rem 1.25rem calc(2.25rem + env(safe-area-inset-bottom));
+    text-align: center;
   }
 
   .grid-heading h2 {
+    width: 100%;
     margin-top: 0;
     font-size: clamp(3.35rem, 15vw, 4.5rem);
     line-height: .88;
+  }
+
+  .grid-heading__line > span {
+    transform-origin: center bottom;
+  }
+
+  .grid-heading__line {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .grid-heading__line--soft {
+    margin-left: 0;
   }
 
   .grid-heading__signal {
@@ -640,7 +656,9 @@
   }
 
   .grid-heading__bottom {
+    width: 100%;
     grid-template-columns: 1fr;
+    justify-items: center;
     gap: .45rem;
     padding: 0;
     font-size: .58rem;
@@ -655,7 +673,7 @@
 
   .grid-heading__bottom > span {
     color: rgb(247 245 239 / 52%);
-    text-align: left;
+    text-align: center;
   }
 
   .grid-heading__bottom > span::before {
