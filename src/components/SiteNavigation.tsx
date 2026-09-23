@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import butterfly from '../assets/public-butterfly.svg'
 import { gsap, useGSAP } from '../animation/gsap'
@@ -6,6 +6,9 @@ import { prefersReducedMotion } from '../animation/motion'
 
 type SiteNavigationProps = {
   revealed: boolean
+  hideButterfly?: boolean
+  lightSurface?: boolean
+  temporarilyHidden?: boolean
   onContact: () => void
   onMedia: (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -21,6 +24,9 @@ const mediaLinks = [
 
 export function SiteNavigation({
   revealed,
+  hideButterfly = false,
+  lightSurface = false,
+  temporarilyHidden = false,
   onContact,
   onMedia,
 }: SiteNavigationProps) {
@@ -29,6 +35,11 @@ export function SiteNavigation({
   const butterflyImage = useRef<HTMLImageElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [mediaOpen, setMediaOpen] = useState(false)
+  const [suppressMenuTransition, setSuppressMenuTransition] = useState(false)
+  const previousHideButterfly = useRef(hideButterfly)
+  const navigationId = useId().replace(/:/g, '')
+  const menuId = `site-navigation-menu-${navigationId}`
+  const mediaMenuId = `site-media-menu-${navigationId}`
   const [compact, setCompact] = useState(() =>
     window.matchMedia('(max-width: 900px)').matches,
   )
@@ -39,6 +50,31 @@ export function SiteNavigation({
     query.addEventListener('change', syncBreakpoint)
     return () => query.removeEventListener('change', syncBreakpoint)
   }, [])
+
+  useLayoutEffect(() => {
+    const isEnteringCompactLogoMode =
+      compact && previousHideButterfly.current && !hideButterfly
+
+    previousHideButterfly.current = hideButterfly
+
+    if (!isEnteringCompactLogoMode) return
+
+    setMenuOpen(false)
+    setMediaOpen(false)
+    setSuppressMenuTransition(true)
+
+    let releaseFrame = 0
+    const settleFrame = window.requestAnimationFrame(() => {
+      releaseFrame = window.requestAnimationFrame(() => {
+        setSuppressMenuTransition(false)
+      })
+    })
+
+    return () => {
+      window.cancelAnimationFrame(settleFrame)
+      if (releaseFrame) window.cancelAnimationFrame(releaseFrame)
+    }
+  }, [compact, hideButterfly])
 
   useEffect(() => {
     if (!menuOpen && !mediaOpen) return
@@ -219,11 +255,15 @@ export function SiteNavigation({
 
   return (
     <nav
-      className={`site-nav${revealed && compact && menuOpen ? ' is-open' : ''}${
+      className={`site-nav${hideButterfly ? ' site-nav--without-butterfly' : ''}${
+        lightSurface ? ' site-nav--light-surface' : ''
+      }${temporarilyHidden ? ' site-nav--temporarily-hidden' : ''}${
+        suppressMenuTransition ? ' site-nav--instant-menu' : ''
+      }${revealed && compact && (menuOpen || hideButterfly) ? ' is-open' : ''}${
         mediaOpen ? ' is-media-open' : ''
       }`}
       aria-label="Navegación principal"
-      aria-hidden={!revealed}
+      aria-hidden={!revealed || temporarilyHidden}
       ref={navigation}
     >
       <button
@@ -238,8 +278,9 @@ export function SiteNavigation({
             : 'Volver al inicio'
         }
         aria-expanded={compact ? revealed && menuOpen : undefined}
-        aria-controls={compact ? 'site-navigation-menu' : undefined}
-        tabIndex={revealed ? 0 : -1}
+        aria-controls={compact ? menuId : undefined}
+        tabIndex={revealed && !temporarilyHidden && !hideButterfly ? 0 : -1}
+        hidden={hideButterfly}
         onClick={() => {
           if (compact) {
             if (menuOpen) setMediaOpen(false)
@@ -257,10 +298,10 @@ export function SiteNavigation({
         <span className="site-nav__butterfly-ring" aria-hidden="true" />
       </button>
 
-      <div className="site-nav__menu" id="site-navigation-menu">
+      <div className="site-nav__menu" id={menuId}>
         <button
           type="button"
-          tabIndex={revealed ? 0 : -1}
+          tabIndex={revealed && !temporarilyHidden ? 0 : -1}
           onClick={() => {
             setMenuOpen(false)
             setMediaOpen(false)
@@ -289,8 +330,8 @@ export function SiteNavigation({
           <button
             type="button"
             aria-expanded={mediaOpen}
-            aria-controls="site-media-menu"
-            tabIndex={revealed ? 0 : -1}
+            aria-controls={mediaMenuId}
+            tabIndex={revealed && !temporarilyHidden ? 0 : -1}
             onFocus={() => {
               if (!compact) setMediaOpen(true)
             }}
@@ -309,13 +350,13 @@ export function SiteNavigation({
 
           <div
             className="site-nav__media-menu"
-            id="site-media-menu"
+            id={mediaMenuId}
             aria-hidden={!mediaOpen}
           >
             {mediaLinks.map(({ id, label }) => (
               <a
                 href={`#${id}-gallery`}
-                tabIndex={revealed && mediaOpen ? 0 : -1}
+                tabIndex={revealed && !temporarilyHidden && mediaOpen ? 0 : -1}
                 onClick={(event) => {
                   setMenuOpen(false)
                   setMediaOpen(false)
@@ -331,7 +372,7 @@ export function SiteNavigation({
         </div>
         <Link
           to="/disponibilidad"
-          tabIndex={revealed ? 0 : -1}
+          tabIndex={revealed && !temporarilyHidden ? 0 : -1}
           onClick={() => {
             setMenuOpen(false)
             setMediaOpen(false)

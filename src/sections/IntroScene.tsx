@@ -9,9 +9,13 @@ import { isIOSSafari } from '../platform/iosSafari'
 
 type IntroSceneProps = {
   onMaskStateChange?: (complete: boolean) => void
+  onMobileNavigationGapChange?: (hidden: boolean) => void
 }
 
-export function IntroScene({ onMaskStateChange }: IntroSceneProps) {
+export function IntroScene({
+  onMaskStateChange,
+  onMobileNavigationGapChange,
+}: IntroSceneProps) {
   const section = useRef<HTMLElement>(null)
   const mark = useRef<SVGGElement>(null)
   const colorMark = useRef<SVGGElement>(null)
@@ -33,13 +37,20 @@ export function IntroScene({ onMaskStateChange }: IntroSceneProps) {
     () => {
       const mobile = isMobileExperience()
       let maskComplete = false
+      let mobileNavigationHidden = false
       const updateMaskState = (complete: boolean) => {
         if (maskComplete === complete) return
         maskComplete = complete
         onMaskStateChange?.(complete)
       }
+      const updateMobileNavigationGap = (hidden: boolean) => {
+        if (mobileNavigationHidden === hidden) return
+        mobileNavigationHidden = hidden
+        onMobileNavigationGapChange?.(hidden)
+      }
 
       onMaskStateChange?.(false)
+      onMobileNavigationGapChange?.(false)
 
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
@@ -173,7 +184,11 @@ export function IntroScene({ onMaskStateChange }: IntroSceneProps) {
             onUpdate: (self) => {
               setPulseActive(self.progress <= 0.001)
               const duration = mobileTimeline.duration()
-              updateMaskState(duration > 0 && self.progress >= 0.26 / duration)
+              const timelineTime = self.progress * duration
+              updateMobileNavigationGap(
+                timelineTime >= 0.2 && timelineTime < 0.26,
+              )
+              updateMaskState(duration > 0 && timelineTime >= 0.26)
               const shouldUseDarkTone = self.progress > 0.04
               if (shouldUseDarkTone === darkToneActive) return
               darkToneActive = shouldUseDarkTone
@@ -671,7 +686,10 @@ export function IntroScene({ onMaskStateChange }: IntroSceneProps) {
         timeline.kill()
       }
     },
-    { dependencies: [onMaskStateChange], scope: section },
+    {
+      dependencies: [onMaskStateChange, onMobileNavigationGapChange],
+      scope: section,
+    },
   )
 
   return (

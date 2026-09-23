@@ -8,13 +8,14 @@ main {
 }
 
 .site-nav {
+  --site-nav-ink: #f7f5ef;
   position: fixed;
   z-index: 90;
   top: 0;
   right: 0;
   left: 0;
   height: 0;
-  color: #f7f5ef;
+  color: var(--site-nav-ink);
   visibility: hidden;
   will-change: transform, opacity, filter;
 }
@@ -41,6 +42,16 @@ main {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   will-change: transform, opacity;
+}
+
+.site-nav--without-butterfly .site-nav__butterfly {
+  display: none;
+}
+
+.site-nav--temporarily-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .site-nav__butterfly img {
@@ -84,6 +95,34 @@ main {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   pointer-events: auto;
+  transition:
+    border-color .35s ease,
+    background-color .35s ease,
+    box-shadow .35s ease;
+}
+
+.site-nav--light-surface {
+  --site-nav-ink: #173d35;
+}
+
+.site-nav--light-surface .site-nav__menu {
+  border-color: rgb(23 61 53 / 18%);
+  background: rgb(247 245 239 / 74%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 55%) inset,
+    0 .75rem 2.2rem rgb(23 61 53 / 8%);
+}
+
+.site-nav--light-surface .site-nav__media-menu {
+  border-color: rgb(23 61 53 / 18%);
+  background: rgb(247 245 239 / 92%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 60%) inset,
+    0 1.2rem 3rem rgb(23 61 53 / 12%);
+}
+
+.site-nav--light-surface .site-nav__media-menu a {
+  color: rgb(23 61 53 / 68%);
 }
 
 .site-nav__menu > button,
@@ -99,7 +138,7 @@ main {
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: inherit;
+  color: var(--site-nav-ink);
   font: inherit;
   font-size: clamp(.68rem, .75vw, .78rem);
   font-weight: 700;
@@ -242,6 +281,18 @@ main {
   .site-nav__media-menu a:hover > span {
     background: var(--media-accent);
     box-shadow: 0 0 .9rem color-mix(in srgb, var(--media-accent) 78%, transparent);
+  }
+
+  .site-nav--light-surface .site-nav__menu > button:hover,
+  .site-nav--light-surface .site-nav__menu > a:hover,
+  .site-nav--light-surface .site-nav__media > button:hover {
+    background: rgb(23 61 53 / 8%);
+    color: #173d35;
+  }
+
+  .site-nav--light-surface .site-nav__media-menu a:hover {
+    background: rgb(23 61 53 / 7%);
+    color: #173d35;
   }
 }
 
