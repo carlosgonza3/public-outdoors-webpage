@@ -10,11 +10,7 @@ import {
   type ProjectCollection,
 } from '../data/projects'
 
-type GallerySceneProps = {
-  onContact: () => void
-}
-
-export function GalleryScene({ onContact }: GallerySceneProps) {
+export function GalleryScene() {
   const section = useRef<HTMLElement>(null)
   const carouselRefs = useRef<
     Partial<Record<ProjectCollection['id'], HTMLDivElement>>
@@ -121,62 +117,15 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
           }, 0.16)
       }
 
-      collections.forEach((collection, collectionIndex) => {
-        const stage = collection.querySelector<HTMLElement>('.project-collection__stage')
+      collections.forEach((collection) => {
         const label = collection.querySelector<HTMLElement>('[data-collection-label]')
         const title = label?.querySelector<HTMLElement>('.collection-heading__title')
         const details = label?.querySelector<HTMLElement>('.collection-heading__details')
-        const viewport = collection.querySelector<HTMLElement>('.collection-carousel')
-        const track = collection.querySelector<HTMLElement>('.collection-carousel__track')
-        const cards = gsap.utils.toArray<HTMLElement>('.project-card', collection)
-        const carouselCta = collection.querySelector<HTMLElement>(
-          '.collection-carousel__cta',
+        const actions = label?.querySelector<HTMLElement>(
+          '.collection-heading__actions',
         )
-        const carouselItems = carouselCta ? [...cards, carouselCta] : cards
-        const visuals = cards
-          .map((card) => card.querySelector<HTMLElement>('.card-visual'))
-          .filter((visual): visual is HTMLElement => Boolean(visual))
 
-        if (!stage || !title || !details || !viewport || !track) return
-
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: collection,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: mobile ? 0.3 : 0.48,
-              invalidateOnRefresh: true,
-            },
-          })
-          .fromTo(
-            stage,
-            {
-              autoAlpha: 0,
-              y: mobile ? 20 : 34,
-              scale: mobile ? 1 : 0.992,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.24,
-              ease: 'power2.out',
-            },
-          )
-          .to(stage, {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.5,
-          })
-          .to(stage, {
-            autoAlpha: 0,
-            y: mobile ? -16 : -28,
-            scale: mobile ? 1 : 0.994,
-            duration: 0.26,
-            ease: 'power2.inOut',
-          })
+        if (!title || !details || !actions) return
 
         gsap
           .timeline({
@@ -202,148 +151,12 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
             duration: 0.36,
             ease: 'power3.out',
           }, 0.18)
-          .from(visuals, {
-            y: 32,
-            scale: 0.985,
+          .from(actions, {
+            y: 8,
             autoAlpha: 0,
-            duration: 0.52,
-            stagger: 0.05,
-            ease: 'power4.out',
-          }, 0.1)
-
-        if (mobile) return
-
-        const ctaAction = carouselCta?.querySelector<HTMLElement>(
-          '.collection-carousel__cta-action',
-        )
-        const pulseCta = () => {
-          if (!ctaAction) return
-
-          gsap.killTweensOf(ctaAction)
-          gsap
-            .timeline()
-            .fromTo(
-              ctaAction,
-              { scale: 0.94, autoAlpha: 0.62 },
-              {
-                scale: 1.06,
-                autoAlpha: 1,
-                duration: 0.18,
-                ease: 'back.out(2)',
-              },
-            )
-            .to(ctaAction, {
-              scale: 1,
-              autoAlpha: 1,
-              duration: 0.2,
-              ease: 'power2.out',
-            })
-        }
-
-        if (collection.dataset.sceneId === 'innovations' && cards[0]) {
-          gsap
-            .timeline({
-              scrollTrigger: {
-                trigger: collection,
-                start: 'top top',
-                end: 'bottom bottom',
-                scrub: 0.46,
-                invalidateOnRefresh: true,
-              },
-            })
-            .fromTo(
-              cards[0],
-              { scale: 0.975 },
-              {
-                scale: 1.015,
-                duration: 0.62,
-                ease: 'power2.inOut',
-              },
-            )
-            .to(cards[0], {
-              scale: 1,
-              duration: 0.38,
-              ease: 'power2.out',
-            })
-
-          return
-        }
-
-        const horizontalPosition = (atEnd: boolean) => {
-          const overflow = Math.max(0, track.scrollWidth - viewport.clientWidth)
-          const edge = Math.min(viewport.clientWidth * 0.035, 48)
-          const forward = collectionIndex % 2 === 0
-
-          if (forward) return atEnd ? -(overflow + edge) : edge
-          return atEnd ? edge : -(overflow + edge)
-        }
-
-        const edgeFadeEase = gsap.parseEase('power2.inOut')
-
-        const updateCardPresence = () => {
-          const viewportBounds = viewport.getBoundingClientRect()
-          const fadeZone = Math.min(viewportBounds.width * 0.22, 260)
-
-          carouselItems.forEach((card) => {
-            const cardBounds = card.getBoundingClientRect()
-            const leftEdgePresence = gsap.utils.clamp(
-              0,
-              1,
-              (cardBounds.right - viewportBounds.left) / fadeZone,
-            )
-            const rightEdgePresence = gsap.utils.clamp(
-              0,
-              1,
-              (viewportBounds.right - cardBounds.left) / fadeZone,
-            )
-            const edgePresence = Math.min(
-              leftEdgePresence,
-              rightEdgePresence,
-            )
-            const opacity = edgeFadeEase(edgePresence)
-
-            gsap.set(card, {
-              opacity,
-              scale: 0.96 + opacity * 0.04,
-              transformOrigin: 'center center',
-            })
-          })
-        }
-
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: collection,
-              start: 'top top',
-              end: 'bottom bottom',
-              scrub: 0.46,
-              invalidateOnRefresh: true,
-              onRefresh: updateCardPresence,
-              onUpdate: updateCardPresence,
-              onSnapComplete: pulseCta,
-              snap: {
-                snapTo: (value) =>
-                  value > 0.58 && value < 0.9 ? 0.76 : value,
-                delay: 0.05,
-                duration: { min: 0.12, max: 0.22 },
-                ease: 'power2.out',
-              },
-            },
-          })
-          .fromTo(
-            track,
-            { x: () => horizontalPosition(false) },
-            {
-              x: () => horizontalPosition(true),
-              duration: 0.76,
-              ease: 'power1.inOut',
-            },
-          )
-          .to(track, {
-            x: () => horizontalPosition(true),
-            duration: 0.24,
-            ease: 'none',
-          })
+            duration: 0.3,
+            ease: 'power3.out',
+          }, 0.28)
       })
     },
     { scope: section },
@@ -365,7 +178,7 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
 
     event.preventDefault()
     const source = event.currentTarget.closest<HTMLElement>(
-      '.collection-carousel__cta, .collection-heading__cta',
+      '.collection-heading__cta',
     )
     const sourceBounds = source?.getBoundingClientRect()
 
@@ -385,95 +198,34 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
     })
   }
 
-  const renderCollectionCta = (
+  const renderHeadingActions = (
     collection: (typeof projectCollections)[number],
   ) => {
-    const isContactCta = collection.id === 'innovations'
-    const action = (
-      <span className="collection-carousel__cta-action">
-        {collection.id === 'outdoor' && (
-          <svg viewBox="0 0 64 64" aria-hidden="true">
-            <path d="M10 32h42M36 16l16 16-16 16" />
-          </svg>
-        )}
-        <strong>
-          {isContactCta
-            ? 'Contáctanos'
-            : collection.id === 'outdoor'
-              ? 'Explora'
-              : 'Ver más'}
-        </strong>
-        {collection.id !== 'outdoor' && (
-          <svg viewBox="0 0 64 64" aria-hidden="true">
-            <path d="M10 32h42M36 16l16 16-16 16" />
-          </svg>
-        )}
-      </span>
-    )
-
     return (
-      <article className="collection-carousel__cta">
-        {isContactCta ? (
-          <button
-            className="collection-carousel__cta-link"
-            type="button"
-            onClick={onContact}
-            aria-label="Contáctanos sobre Innovations"
-          >
-            {action}
-          </button>
-        ) : (
+      <div className="collection-heading__actions">
+        <Link
+          className="collection-heading__cta"
+          to={`/${collection.id}`}
+          state={{ backgroundLocation: location }}
+          onClick={(event) => openCollection(event, collection.id)}
+          aria-label={`Ver más proyectos ${collection.label}`}
+        >
+          <strong>Ver más</strong>
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M10 32h42M36 16l16 16-16 16" />
+          </svg>
+        </Link>
+
+        {collection.id !== 'innovations' && (
           <Link
-        className="collection-carousel__cta-link"
-        to={`/${collection.id}`}
-        state={{ backgroundLocation: location }}
-        onClick={(event) => openCollection(event, collection.id)}
-        aria-label={`Ver más proyectos ${collection.label}`}
-      >
-            {action}
+            className="collection-heading__availability"
+            to="/disponibilidad"
+            aria-label={`Ver disponibilidad de medios ${collection.label}`}
+          >
+            Ver disponibilidad
           </Link>
         )}
-      </article>
-    )
-  }
-
-  const renderHeadingCta = (
-    collection: (typeof projectCollections)[number],
-  ) => {
-    const isContactCta = collection.id === 'innovations'
-    const label = isContactCta
-      ? 'Contáctanos'
-      : collection.id === 'outdoor'
-        ? 'Explora'
-        : 'Ver más'
-    const content = (
-      <>
-        <strong>{label}</strong>
-        <svg viewBox="0 0 64 64" aria-hidden="true">
-          <path d="M10 32h42M36 16l16 16-16 16" />
-        </svg>
-      </>
-    )
-
-    return isContactCta ? (
-      <button
-        className="collection-heading__cta"
-        type="button"
-        onClick={onContact}
-        aria-label="Contáctanos sobre Innovations"
-      >
-        {content}
-      </button>
-    ) : (
-      <Link
-        className="collection-heading__cta"
-        to={`/${collection.id}`}
-        state={{ backgroundLocation: location }}
-        onClick={(event) => openCollection(event, collection.id)}
-        aria-label={`Ver más proyectos ${collection.label}`}
-      >
-        {content}
-      </Link>
+      </div>
     )
   }
 
@@ -543,7 +295,7 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
 
         <div className="grid-heading__bottom">
           <p>Indoor · Outdoor · Innovations</p>
-          <span>Desliza para explorar</span>
+          <span>Desliza y explora nuestros medios</span>
         </div>
       </header>
 
@@ -564,7 +316,7 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
                   <div className="collection-heading__details">
                     <p>{collection.description}</p>
                   </div>
-                  {renderHeadingCta(collection)}
+                  {renderHeadingActions(collection)}
                 </div>
               </header>
 
@@ -582,7 +334,6 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
                     collection.projects.length === 1 ? ' is-single-project' : ''
                   }`}
                 >
-                  {collection.id === 'outdoor' && renderCollectionCta(collection)}
                   {collection.projects.map((project, index) => (
                     <ProjectCard
                       project={project}
@@ -591,7 +342,6 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
                       key={project.id}
                     />
                   ))}
-                  {collection.id !== 'outdoor' && renderCollectionCta(collection)}
                 </div>
               </div>
 

@@ -477,29 +477,28 @@
     line-height: 1.55;
   }
 
-  .collection-heading__cta {
-    min-height: 2.5rem;
-    width: fit-content;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .collection-heading__actions {
     gap: .55rem;
     margin-top: 1.2rem;
-    padding: .62rem .9rem;
-    border: 1px solid rgb(247 245 239 / 22%);
-    border-radius: 999px;
-    background: rgb(247 245 239 / 6%);
-    color: #f7f5ef;
-    font: inherit;
-    font-size: .68rem;
-    letter-spacing: .08em;
-    text-decoration: none;
-    text-transform: uppercase;
-    box-sizing: border-box;
   }
 
-  .collection--outdoor .collection-heading__cta {
+  .collection-heading__cta,
+  .collection-heading__availability {
+    min-height: 2.75rem;
+    font-size: .68rem;
+  }
+
+  .collection-heading__cta {
+    gap: .65rem;
+    padding: .66rem .85rem .66rem 1.05rem;
+  }
+
+  .collection--outdoor .collection-heading__actions {
     align-self: flex-end;
+  }
+
+  .collection-heading__availability {
+    padding: .66rem 1rem;
   }
 
   .collection-heading__cta strong {
@@ -522,7 +521,6 @@
     overscroll-behavior-x: contain;
     scroll-padding-inline: 1.25rem;
     scrollbar-width: none;
-    scroll-snap-type: x mandatory;
     touch-action: pan-x pinch-zoom;
     -webkit-mask-image: none;
     mask-image: none;
@@ -531,26 +529,31 @@
   .collection-carousel::-webkit-scrollbar { display: none; }
 
   .collection-carousel__track {
+    width: max-content;
+    display: flex;
+    align-items: center;
     gap: .8rem;
     padding: 0 1.25rem;
     transform: none !important;
   }
 
-  .collection-carousel__cta {
-    display: none;
-  }
-
   .project-card,
   .project-card:nth-child(2),
   .project-card:nth-child(3),
-  .collection-carousel__track.is-single-project .project-card,
-  .collection-carousel__cta {
+  .collection-carousel__track.is-single-project .project-card {
     width: min(82vw, 29rem);
-    scroll-snap-align: center;
+    margin: 0;
   }
 
-  .collection--innovations .collection-carousel__cta { margin-left: 0; }
-  .collection--outdoor .collection-carousel__cta { order: 2; }
+  .collection--innovations .collection-carousel__track.is-single-project {
+    width: 100%;
+  }
+
+  .collection--innovations
+    .collection-carousel__track.is-single-project
+    .project-card {
+    width: 100%;
+  }
 
   .collection-carousel__pagination {
     min-height: 2rem;
@@ -584,20 +587,6 @@
     outline-offset: .25rem;
   }
 
-  .collection-carousel__cta {
-    height: min(61svh, 31rem);
-    min-height: 23rem;
-  }
-
-  .collection-carousel__cta-action strong {
-    font-size: clamp(3.25rem, 15vw, 5rem);
-  }
-
-  .collection-carousel__cta-action svg {
-    width: 3.75rem;
-    height: 3.75rem;
-  }
-
   .card-visual,
   .project-card:nth-child(2) .card-visual,
   .project-card:nth-child(3) .card-visual,
@@ -609,8 +598,7 @@
 
   .grid-heading__signal,
   .grid-heading__signal i,
-  .project-card,
-  .collection-carousel__cta {
+  .project-card {
     will-change: auto;
   }
 }

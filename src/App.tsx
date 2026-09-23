@@ -62,7 +62,7 @@ function HomePage() {
           onMaskStateChange={handleMaskStateChange}
           onMobileNavigationGapChange={setMobileNavigationGap}
         />
-        <GalleryScene onContact={() => setContactOpen(true)} />
+        <GalleryScene />
         <ImpactScene />
         <PurposeScene />
       </main>
