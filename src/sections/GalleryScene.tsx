@@ -444,7 +444,7 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
 
         <div className="grid-heading__bottom">
           <p>Indoor · Outdoor · Innovations</p>
-          <span>Scroll to explore</span>
+          <span>Desliza para explorar</span>
         </div>
       </header>
 
