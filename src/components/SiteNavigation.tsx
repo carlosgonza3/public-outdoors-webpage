@@ -7,8 +7,17 @@ import { prefersReducedMotion } from '../animation/motion'
 type SiteNavigationProps = {
   revealed: boolean
   onContact: () => void
-  onMedia: (event: React.MouseEvent<HTMLAnchorElement>) => void
+  onMedia: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    collectionId: 'indoor' | 'outdoor' | 'innovations',
+  ) => void
 }
+
+const mediaLinks = [
+  { id: 'indoor', label: 'Indoor' },
+  { id: 'outdoor', label: 'Outdoor' },
+  { id: 'innovations', label: 'Innovations' },
+] as const
 
 export function SiteNavigation({
   revealed,
@@ -19,6 +28,7 @@ export function SiteNavigation({
   const butterflyButton = useRef<HTMLButtonElement>(null)
   const butterflyImage = useRef<HTMLImageElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mediaOpen, setMediaOpen] = useState(false)
   const [compact, setCompact] = useState(() =>
     window.matchMedia('(max-width: 900px)').matches,
   )
@@ -31,13 +41,19 @@ export function SiteNavigation({
   }, [])
 
   useEffect(() => {
-    if (!menuOpen) return
+    if (!menuOpen && !mediaOpen) return
 
     const closeOnOutsidePress = (event: PointerEvent) => {
-      if (!navigation.current?.contains(event.target as Node)) setMenuOpen(false)
+      if (!navigation.current?.contains(event.target as Node)) {
+        setMenuOpen(false)
+        setMediaOpen(false)
+      }
     }
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false)
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+        setMediaOpen(false)
+      }
     }
 
     window.addEventListener('pointerdown', closeOnOutsidePress)
@@ -47,7 +63,7 @@ export function SiteNavigation({
       window.removeEventListener('pointerdown', closeOnOutsidePress)
       window.removeEventListener('keydown', closeOnEscape)
     }
-  }, [menuOpen])
+  }, [menuOpen, mediaOpen])
 
   useGSAP(
     () => {
@@ -203,7 +219,9 @@ export function SiteNavigation({
 
   return (
     <nav
-      className={`site-nav${revealed && compact && menuOpen ? ' is-open' : ''}`}
+      className={`site-nav${revealed && compact && menuOpen ? ' is-open' : ''}${
+        mediaOpen ? ' is-media-open' : ''
+      }`}
       aria-label="Navegación principal"
       aria-hidden={!revealed}
       ref={navigation}
@@ -224,7 +242,8 @@ export function SiteNavigation({
         tabIndex={revealed ? 0 : -1}
         onClick={() => {
           if (compact) {
-            setMenuOpen((open) => !open)
+            if (menuOpen) setMediaOpen(false)
+            setMenuOpen(!menuOpen)
             return
           }
 
@@ -244,25 +263,79 @@ export function SiteNavigation({
           tabIndex={revealed ? 0 : -1}
           onClick={() => {
             setMenuOpen(false)
+            setMediaOpen(false)
             onContact()
           }}
         >
           Contáctanos
         </button>
-        <a
-          href="#indoor-gallery"
-          tabIndex={revealed ? 0 : -1}
-          onClick={(event) => {
-            setMenuOpen(false)
-            onMedia(event)
+        <div
+          className="site-nav__media"
+          onMouseEnter={() => {
+            if (!compact) setMediaOpen(true)
+          }}
+          onMouseLeave={() => {
+            if (!compact) setMediaOpen(false)
+          }}
+          onBlur={(event) => {
+            if (
+              !compact &&
+              !event.currentTarget.contains(event.relatedTarget as Node)
+            ) {
+              setMediaOpen(false)
+            }
           }}
         >
-          Nuestros medios
-        </a>
+          <button
+            type="button"
+            aria-expanded={mediaOpen}
+            aria-controls="site-media-menu"
+            tabIndex={revealed ? 0 : -1}
+            onFocus={() => {
+              if (!compact) setMediaOpen(true)
+            }}
+            onClick={() => {
+              if (compact) {
+                setMediaOpen((open) => !open)
+                return
+              }
+
+              setMediaOpen(true)
+            }}
+          >
+            Nuestros medios
+            <span className="site-nav__media-chevron" aria-hidden="true" />
+          </button>
+
+          <div
+            className="site-nav__media-menu"
+            id="site-media-menu"
+            aria-hidden={!mediaOpen}
+          >
+            {mediaLinks.map(({ id, label }) => (
+              <a
+                href={`#${id}-gallery`}
+                tabIndex={revealed && mediaOpen ? 0 : -1}
+                onClick={(event) => {
+                  setMenuOpen(false)
+                  setMediaOpen(false)
+                  onMedia(event, id)
+                }}
+                key={id}
+              >
+                <span aria-hidden="true" />
+                {label}
+              </a>
+            ))}
+          </div>
+        </div>
         <Link
           to="/disponibilidad"
           tabIndex={revealed ? 0 : -1}
-          onClick={() => setMenuOpen(false)}
+          onClick={() => {
+            setMenuOpen(false)
+            setMediaOpen(false)
+          }}
         >
           Disponibilidad
         </Link>

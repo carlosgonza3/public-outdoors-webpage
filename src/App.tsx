@@ -25,15 +25,18 @@ function HomePage() {
     setNavigationRevealed(complete)
   }, [])
 
-  const scrollToIndoor = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    const indoorCollection = document.getElementById('indoor-gallery')
+  const scrollToMedia = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    collectionId: 'indoor' | 'outdoor' | 'innovations',
+  ) => {
+    const collection = document.getElementById(`${collectionId}-gallery`)
 
-    if (!indoorCollection) return
+    if (!collection) return
 
     event.preventDefault()
     window.dispatchEvent(new Event('public:navigate-to-media'))
     window.requestAnimationFrame(() => {
-      indoorCollection.scrollIntoView({
+      collection.scrollIntoView({
         behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
           ? 'auto'
           : 'smooth',
@@ -47,7 +50,7 @@ function HomePage() {
       <SiteNavigation
         revealed={navigationRevealed}
         onContact={() => setContactOpen(true)}
-        onMedia={scrollToIndoor}
+        onMedia={scrollToMedia}
       />
 
       <main>

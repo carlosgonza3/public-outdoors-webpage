@@ -453,7 +453,7 @@ export function GalleryScene({ onContact }: GallerySceneProps) {
           <section
             className={`project-collection collection--${collection.id}`}
             data-scene-id={collection.id}
-            id={collection.id === 'indoor' ? 'indoor-gallery' : undefined}
+            id={`${collection.id}-gallery`}
             key={collection.id}
           >
             <div className="project-collection__stage">
