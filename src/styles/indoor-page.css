@@ -189,13 +189,14 @@
   grid-template-columns: 2.25rem minmax(0, 1fr);
   align-items: start;
   gap: .9rem;
+  overflow: hidden;
   padding: 1rem 1.1rem;
   border: 1px solid rgb(247 245 239 / 16%);
   border-radius: 1rem;
   color: #f7f5ef;
   box-sizing: border-box;
-  min-height: 6.65rem;
-  will-change: opacity;
+  min-height: 4.25rem;
+  will-change: opacity, height;
 }
 
 .indoor-strategy li[aria-current='step'] {
@@ -232,11 +233,12 @@
 .indoor-strategy__step-copy small {
   max-width: 27rem;
   display: block;
+  overflow: hidden;
   color: rgb(247 245 239 / 48%);
   font-size: 0.95rem;
   line-height: 1.45;
   padding-top: 0.5rem;
-  will-change: opacity, transform;
+  will-change: height, opacity, transform;
 }
 
 .indoor-formats {
@@ -267,7 +269,7 @@
 .indoor-formats__header {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: clamp(3rem, 6vw, 6rem);
+  margin-bottom: clamp(3rem, 6vw, 2.5rem);
 }
 
 .indoor-formats__header h2 {
@@ -507,6 +509,31 @@
 
 }
 
+@media (max-width: 900px) {
+  .indoor-strategy { height: auto; }
+
+  .indoor-strategy__sticky,
+  .route-modal__panel .indoor-strategy__sticky {
+    position: static;
+    height: auto;
+  }
+
+  .indoor-strategy__step,
+  .indoor-strategy__icon {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+
+  .indoor-strategy__step-copy small {
+    height: auto !important;
+    padding-top: .5rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}
+
 @media (max-width: 700px) {
   .collection-page--indoor { padding-inline: 1rem; }
 
@@ -578,7 +605,16 @@
     text-align: right;
   }
 
-  .indoor-formats__header h2 { white-space: normal; }
+  .indoor-formats__header {
+    justify-content: flex-start;
+  }
+
+  .indoor-formats__header > div { width: 100%; }
+
+  .indoor-formats__header h2 {
+    text-align: left;
+    white-space: normal;
+  }
 
   .indoor-strategy__body {
     width: 100%;
@@ -601,7 +637,7 @@
 
   .indoor-strategy__step-copy small { font-size: .72rem; }
 
-  .indoor-formats { padding-block: 7.5rem 0; }
+  .indoor-formats { padding-block: 0; }
 
   .indoor-formats__header {
     margin-bottom: 3rem;
@@ -609,7 +645,7 @@
 
   .indoor-formats__tabs {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 2rem;
     margin-bottom: 2rem;
   }
@@ -630,6 +666,10 @@
 
   .indoor-formats__copy-layer h3 {
     font-size: clamp(2.4rem, 11vw, 3.25rem);
+  }
+
+  .indoor-formats__copy-layer[data-indoor-format-layer='fijo'] {
+    text-align: right;
   }
 
   .indoor-cta { padding-block: 7.5rem 2.5rem; }

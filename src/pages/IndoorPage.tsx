@@ -252,16 +252,11 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
         )
 
       if (mobile) {
-        entrance.from(
-          steps,
-          {
-            autoAlpha: 0,
-            x: 24,
-            duration: 0.55,
-            stagger: 0.12,
-          },
-          0.3,
-        )
+        steps.forEach((step) => step.removeAttribute('aria-current'))
+        gsap.set(steps, { clearProps: 'opacity,visibility,transform' })
+        gsap.set(stepDescriptions, {
+          clearProps: 'opacity,visibility,height,paddingTop,transform',
+        })
         return () => entrance.kill()
       }
 
@@ -269,10 +264,14 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
       gsap.set(steps[0], { opacity: 1 })
       gsap.set(stepDescriptions, {
         autoAlpha: 0,
+        height: 0,
+        paddingTop: 0,
         y: 6,
       })
       gsap.set(stepDescriptions[0], {
         autoAlpha: 1,
+        height: 'auto',
+        paddingTop: '0.5rem',
         y: 0,
       })
       steps[0]?.setAttribute('aria-current', 'step')
@@ -294,10 +293,14 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
           gsap.set(steps[nextIndex], { opacity: 1 })
           gsap.set(stepDescriptions, {
             autoAlpha: 0,
+            height: 0,
+            paddingTop: 0,
             y: 6,
           })
           gsap.set(stepDescriptions[nextIndex], {
             autoAlpha: 1,
+            height: 'auto',
+            paddingTop: '0.5rem',
             y: 0,
           })
           return
@@ -310,9 +313,11 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
             stepDescriptions,
             {
               autoAlpha: 0,
+              height: 0,
+              paddingTop: 0,
               y: 6,
-              duration: 0.16,
-              ease: 'power2.out',
+              duration: 0.22,
+              ease: 'power2.inOut',
             },
             0,
           )
@@ -325,11 +330,13 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
             stepDescriptions[nextIndex],
             {
               autoAlpha: 1,
+              height: 'auto',
+              paddingTop: '0.5rem',
               y: 0,
-              duration: 0.22,
-              ease: 'power2.out',
+              duration: 0.34,
+              ease: 'power2.inOut',
             },
-            0.12,
+            0.1,
           )
       }
 
@@ -385,8 +392,7 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
         !section ||
         !pinnedStage ||
         !modalScroller ||
-        prefersReducedMotion() ||
-        isMobileExperience()
+        prefersReducedMotion()
       ) {
         return
       }
@@ -397,64 +403,43 @@ export function IndoorPage({ modal = false }: IndoorPageProps) {
         setActiveFormat(format)
       }
 
-      const sectionStart = () => section.offsetTop
-      const sectionEnd = () =>
-        sectionStart() + section.offsetHeight - modalScroller.clientHeight
-      let aligning = false
-      let alignmentTween: gsap.core.Tween | undefined
+      const formatMedia = gsap.matchMedia()
 
-      const alignToStart = () => {
-        alignmentTween?.kill()
-        aligning = true
-        selectFormat('digital')
+      formatMedia.add('(min-width: 901px)', () => {
+        const sectionStart = () => section.offsetTop
+        const sectionEnd = () =>
+          sectionStart() + section.offsetHeight - modalScroller.clientHeight
 
-        alignmentTween = gsap.to(modalScroller, {
-          scrollTop: sectionStart(),
-          duration: 0.28,
-          ease: 'power3.out',
-          overwrite: 'auto',
-          onComplete: () => {
-            aligning = false
-            selectFormat('digital')
+        const formatTrigger = ScrollTrigger.create({
+          trigger: section,
+          scroller: modalScroller,
+          start: sectionStart,
+          end: sectionEnd,
+          invalidateOnRefresh: true,
+          snap: {
+            snapTo: [0, 1],
+            delay: 0.08,
+            duration: { min: 0.25, max: 0.45 },
+            ease: 'power2.inOut',
+          },
+          onEnter: () => selectFormat('digital'),
+          onEnterBack: () => selectFormat('fijo'),
+          onLeave: () => selectFormat('fijo'),
+          onLeaveBack: () => selectFormat('digital'),
+          onUpdate: ({ progress }) => {
+            selectFormat(progress < 0.5 ? 'digital' : 'fijo')
           },
         })
-      }
 
-      const formatTrigger = ScrollTrigger.create({
-        trigger: section,
-        scroller: modalScroller,
-        start: sectionStart,
-        end: sectionEnd,
-        invalidateOnRefresh: true,
-        onEnter: alignToStart,
-        onEnterBack: () => {
-          alignmentTween?.kill()
-          aligning = false
-          selectFormat('fijo')
-        },
-        onLeave: () => {
-          alignmentTween?.kill()
-          aligning = false
-          selectFormat('fijo')
-        },
-        onLeaveBack: () => {
-          alignmentTween?.kill()
-          aligning = false
-          selectFormat('digital')
-        },
-        onUpdate: ({ progress }) => {
-          if (aligning) return
-          selectFormat(progress < 0.5 ? 'digital' : 'fijo')
-        },
+        const refreshCall = gsap.delayedCall(0, () => ScrollTrigger.refresh())
+
+        return () => {
+          refreshCall.kill()
+          formatTrigger.kill()
+        }
       })
 
-      const refreshCall = gsap.delayedCall(0, () => ScrollTrigger.refresh())
-
-      return () => {
-        refreshCall.kill()
-        alignmentTween?.kill()
-        formatTrigger.kill()
-      }
+      return () => formatMedia.revert()
     },
     { scope: formatsSection, dependencies: [modal] },
   )
