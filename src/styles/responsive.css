@@ -101,10 +101,10 @@
   .ambient-glow { filter: blur(18px) saturate(108%); }
 
   .site-nav__butterfly {
+    --site-nav-butterfly-size: 3.15rem;
     top: .9rem;
     right: 1rem;
     left: auto;
-    width: 3.15rem;
     padding: .55rem;
     cursor: pointer;
     backdrop-filter: none;
@@ -601,7 +601,7 @@
     overscroll-behavior-x: contain;
     scroll-padding-inline: 1.25rem;
     scrollbar-width: none;
-    touch-action: pan-x pinch-zoom;
+    touch-action: pan-x pan-y pinch-zoom;
     -webkit-mask-image: none;
     mask-image: none;
   }
