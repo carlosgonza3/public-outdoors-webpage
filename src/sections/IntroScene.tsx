@@ -155,15 +155,16 @@ export function IntroScene({
         const sloganLines = gsap.utils.toArray<HTMLElement>(
           '.slogan-line > span',
         )
-        const mobileMarks = [mark.current, colorMark.current]
         let darkToneActive = false
+        const maskFlight = { scale: 3.2, rotation: 0 }
+        const renderMobileMask = () => {
+          const transform =
+            `rotate(${maskFlight.rotation}) scale(${maskFlight.scale})`
+          mark.current?.setAttribute('transform', transform)
+          colorMark.current?.setAttribute('transform', transform)
+        }
 
-        gsap.set(mobileMarks, {
-          scale: 3.2,
-          rotation: 0,
-          svgOrigin: '0 0',
-          willChange: 'transform',
-        })
+        renderMobileMask()
         gsap.set(colorMark.current, { autoAlpha: 1 })
         gsap.set(content.current, { autoAlpha: 1 })
         gsap.set(copy.current, { autoAlpha: 0, y: 24 })
@@ -176,8 +177,8 @@ export function IntroScene({
             start: 'top top',
             end: '+=125%',
             pin: true,
-            pinType: isIOSSafari() ? 'transform' : 'fixed',
-            scrub: 0.12,
+            pinType: 'fixed',
+            scrub: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
@@ -198,24 +199,15 @@ export function IntroScene({
 
         mobileTimeline
           .to(
-            mobileMarks,
+            maskFlight,
             {
-              scale: 5.2,
-              rotation: -1.25,
-              duration: 0.12,
-              ease: 'power2.out',
+              scale: 34,
+              rotation: 0,
+              duration: 0.28,
+              ease: 'power3.inOut',
+              onUpdate: renderMobileMask,
             },
             0,
-          )
-          .to(
-            mobileMarks,
-            {
-              scale: 45,
-              rotation: -3,
-              duration: 0.24,
-              ease: 'power3.inOut',
-            },
-            0.12,
           )
           .to(
             colorMark.current,
@@ -224,13 +216,13 @@ export function IntroScene({
               duration: 0.16,
               ease: 'power2.inOut',
             },
-            0.1,
+            0.08,
           )
           .to(
             veil.current,
             {
               autoAlpha: 0,
-              duration: 0.16,
+              duration: 0.08,
               ease: 'power2.inOut',
             },
             0.1,
@@ -275,10 +267,9 @@ export function IntroScene({
           )
           .to(
             ambient.current,
-            { autoAlpha: 0, scale: 1.06, duration: 0.22, ease: 'power2.inOut' },
+            { autoAlpha: 0, duration: 0.22, ease: 'power2.inOut' },
             '<',
           )
-          .set(mobileMarks, { willChange: 'auto' })
 
         return () => {
           pulseTimeline.kill()

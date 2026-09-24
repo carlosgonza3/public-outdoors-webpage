@@ -223,11 +223,6 @@
   will-change: opacity;
 }
 
-.brand-mark {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
 .logo-play-button {
   position: absolute;
   z-index: 3;

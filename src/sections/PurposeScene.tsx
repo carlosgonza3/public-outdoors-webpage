@@ -46,25 +46,8 @@ export function PurposeScene() {
       }
 
       if (mobile) {
-        const questionWords = gsap.utils.toArray<HTMLElement>(
-          '.purpose-stage__word > span',
-        )
-        const statementWords = gsap.utils.toArray<HTMLElement>(
-          '.purpose-statement__word',
-        )
-        const actionLead = gsap.utils.toArray<HTMLElement>(
-          '.purpose-action__word--lead > span',
-        )
-        const actionSupport = gsap.utils.toArray<HTMLElement>(
-          '.purpose-action__word--support > span',
-        )
-
-        gsap.set(statement.current, { autoAlpha: 0 })
-        gsap.set(action.current, { autoAlpha: 0 })
-        gsap.set(questionWords, { yPercent: 90, autoAlpha: 0 })
-        gsap.set(statementWords, { yPercent: 64, autoAlpha: 0 })
-        gsap.set(actionLead, { yPercent: 52, scale: 0.9, autoAlpha: 0 })
-        gsap.set(actionSupport, { xPercent: 18, autoAlpha: 0 })
+        gsap.set(stages, { autoAlpha: 0, y: 24 })
+        gsap.set(question.current, { autoAlpha: 1 })
         gsap.set(contactContainer, { autoAlpha: 1, pointerEvents: 'none' })
         gsap.set(backdrop, { autoAlpha: 0 })
         gsap.set(contactMotion, {
@@ -87,8 +70,8 @@ export function PurposeScene() {
             start: 'top top',
             end: '+=390%',
             pin: true,
-            pinType: iosSafari ? 'transform' : 'fixed',
-            scrub: 0.18,
+            pinType: 'fixed',
+            scrub: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onEnter: () => setPageTone('#07110f', true),
@@ -98,59 +81,41 @@ export function PurposeScene() {
         })
 
         mobileTimeline
-          .to(questionWords, {
-            yPercent: 0,
+          .to(question.current, {
+            y: 0,
             autoAlpha: 1,
-            duration: 0.55,
-            stagger: 0.045,
+            duration: 0.42,
             ease: 'power3.out',
           })
           .to({}, { duration: 0.32 })
           .to(question.current, {
             autoAlpha: 0,
-            yPercent: -8,
-            scale: 0.985,
-            duration: 0.38,
+            y: -20,
+            duration: 0.32,
           })
-          .set(statement.current, { autoAlpha: 1 })
-          .to(statementWords, {
-            yPercent: 0,
+          .to(statement.current, {
+            y: 0,
             autoAlpha: 1,
-            duration: 0.52,
-            stagger: 0.035,
+            duration: 0.42,
             ease: 'power3.out',
           })
           .to({}, { duration: 0.34 })
           .to(statement.current, {
             autoAlpha: 0,
-            yPercent: -8,
-            duration: 0.38,
+            y: -20,
+            duration: 0.32,
           })
-          .set(action.current, { autoAlpha: 1 })
-          .to(actionLead, {
-            yPercent: 0,
-            scale: 1,
+          .to(action.current, {
+            y: 0,
             autoAlpha: 1,
-            duration: 0.5,
+            duration: 0.42,
             ease: 'power3.out',
           })
-          .to(
-            actionSupport,
-            {
-              xPercent: 0,
-              autoAlpha: 1,
-              duration: 0.42,
-              stagger: 0.055,
-              ease: 'power3.out',
-            },
-            '-=.28',
-          )
           .to({}, { duration: 0.42 })
           .to(action.current, {
             autoAlpha: 0,
-            yPercent: -7,
-            scale: 1.025,
-            duration: 0.38,
+            y: -20,
+            duration: 0.32,
           })
           .set(contactContainer, { pointerEvents: 'auto' })
           .to(
