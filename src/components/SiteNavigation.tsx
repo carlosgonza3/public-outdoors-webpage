@@ -118,7 +118,13 @@ export function SiteNavigation({
 
       if (reducedMotion) {
         gsap.set(root, { autoAlpha: 1, y: 0, pointerEvents: 'none' })
-        gsap.set([button, ...menuItems], { autoAlpha: 1, y: 0, scale: 1 })
+        gsap.set(menuItems, { autoAlpha: 1, y: 0 })
+        gsap.set(
+          button,
+          compact
+            ? { autoAlpha: 1, clearProps: 'transform' }
+            : { autoAlpha: 1, y: 0, scale: 1 },
+        )
         return
       }
 
@@ -130,7 +136,28 @@ export function SiteNavigation({
           { autoAlpha: 0, y: -14 },
           { autoAlpha: 1, y: 0, duration: 0.55, ease: 'power3.out' },
         )
-        .fromTo(
+
+      if (compact) {
+        entrance
+          .fromTo(
+            button,
+            { autoAlpha: 0 },
+            { autoAlpha: 1, duration: 0.4, ease: 'power2.out' },
+            0.05,
+          )
+          .fromTo(
+            image,
+            { scale: 0.65, rotation: -18 },
+            {
+              scale: 1,
+              rotation: 0,
+              duration: 0.7,
+              ease: 'back.out(2.4)',
+            },
+            0.05,
+          )
+      } else {
+        entrance.fromTo(
           button,
           { autoAlpha: 0, scale: 0.65, rotation: -18 },
           {
@@ -142,18 +169,20 @@ export function SiteNavigation({
           },
           0.05,
         )
-        .fromTo(
-          menuItems,
-          { autoAlpha: 0, y: -8 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.45,
-            stagger: 0.07,
-            ease: 'power3.out',
-          },
-          0.18,
-        )
+      }
+
+      entrance.fromTo(
+        menuItems,
+        { autoAlpha: 0, y: -8 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.45,
+          stagger: 0.07,
+          ease: 'power3.out',
+        },
+        0.18,
+      )
 
       const idle = gsap
         .timeline({ repeat: -1, delay: 2.4, repeatDelay: 3.8 })
@@ -250,7 +279,7 @@ export function SiteNavigation({
         gsap.killTweensOf([button, image])
       }
     },
-    { dependencies: [revealed], scope: navigation, revertOnUpdate: true },
+    { dependencies: [compact, revealed], scope: navigation, revertOnUpdate: true },
   )
 
   return (
