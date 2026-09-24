@@ -38,9 +38,9 @@
 }
 
 .innovations-hero__statement {
-  width: min(100%, 49rem);
+  width: min(100%, 53rem);
   margin-top: clamp(4rem, 8vw, 8rem);
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .innovations-hero__statement > span,

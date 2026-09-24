@@ -83,9 +83,6 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
                 loading="eager"
                 decoding="async"
               />
-              <span className="innovations-proof__signal" aria-hidden="true">
-                01 / Posibilidad real
-              </span>
             </div>
 
             <div className="innovations-proof__caption">
@@ -105,7 +102,6 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
               <h2 id="innovations-invite-title">
                 Cuéntanos lo que tienes en mente.
               </h2>
-              <p>No necesitas un brief terminado. Una frase es suficiente.</p>
             </div>
 
             <form className="innovations-idea" onSubmit={prepareIdeaEmail}>

@@ -584,9 +584,6 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
                       />
                     </div>
                   ))}
-                  <span className="outdoor-formats__media-action" aria-hidden="true">
-                    Ver imagen <span>↗</span>
-                  </span>
                 </div>
 
                 <div className="indoor-formats__copy">
