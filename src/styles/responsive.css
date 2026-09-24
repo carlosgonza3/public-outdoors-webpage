@@ -101,14 +101,23 @@
   .ambient-glow { filter: blur(18px) saturate(108%); }
 
   .site-nav__butterfly {
-    --site-nav-butterfly-size: 3.15rem;
+    --site-nav-butterfly-size: 4.375rem;
     top: .9rem;
     right: 1rem;
     left: auto;
     padding: .55rem;
+    min-width: var(--site-nav-butterfly-size);
+    min-height: var(--site-nav-butterfly-size);
+    max-width: var(--site-nav-butterfly-size);
+    max-height: var(--site-nav-butterfly-size);
+    box-sizing: border-box;
+    border-radius: 9999px;
     cursor: pointer;
+    perspective: none;
+    transform-style: flat;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    will-change: opacity;
   }
 
   .site-nav__butterfly::after {
@@ -117,7 +126,8 @@
     right: .18rem;
     bottom: .18rem;
     width: .42rem;
-    aspect-ratio: 1;
+    height: .42rem;
+    box-sizing: border-box;
     border: 2px solid #07080b;
     border-radius: 50%;
     background: #38d430;
@@ -601,7 +611,8 @@
     overscroll-behavior-x: contain;
     scroll-padding-inline: 1.25rem;
     scrollbar-width: none;
-    touch-action: pan-x pan-y pinch-zoom;
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
     -webkit-mask-image: none;
     mask-image: none;
   }
