@@ -28,17 +28,21 @@
 }
 
 .outdoor-strategy {
-  height: auto;
-  padding-block: clamp(8rem, 15vw, 5rem);
+  height: 400svh;
+  padding-block: 0;
 }
 
-.outdoor-strategy .indoor-strategy__sticky,
-.route-modal__panel .outdoor-strategy .indoor-strategy__sticky {
-  position: static;
-  height: auto;
-  min-height: min(76svh, 58rem);
+.outdoor-strategy .indoor-strategy__sticky {
+  position: sticky;
+  top: 0;
+  height: min(100svh, 72rem);
+  min-height: 0;
   grid-template-columns: minmax(20rem, .7fr) minmax(0, 1.3fr);
   background: transparent;
+}
+
+.route-modal__panel .outdoor-strategy .indoor-strategy__sticky {
+  height: min(94dvh, 70rem);
 }
 
 .outdoor-strategy .indoor-strategy__lead {
@@ -76,13 +80,31 @@
   text-align: left;
 }
 
+.outdoor-formats .indoor-formats__stage {
+  grid-template-columns: minmax(21rem, .78fr) minmax(32rem, 1.22fr);
+  align-items: end;
+  gap: clamp(3rem, 5.5vw, 7rem);
+}
+
 .outdoor-formats .indoor-formats__visual {
   grid-column: 2;
+  min-height: 0;
+  aspect-ratio: 16 / 10;
+  border-radius: clamp(1.25rem, 2vw, 2rem);
+}
+
+@media (min-width: 701px) {
+  .route-modal__panel .outdoor-formats .indoor-formats__visual {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: auto;
+  }
 }
 
 .outdoor-formats .indoor-formats__copy {
   grid-column: 1;
   grid-row: 1;
+  align-self: end;
 }
 
 .outdoor-formats .indoor-formats__tabs {
@@ -93,41 +115,97 @@
   letter-spacing: .11em;
 }
 
-.outdoor-formats .indoor-formats__visual img {
-  object-position: center;
+/* Image focal points: first value is horizontal, second is vertical. */
+.outdoor-formats .indoor-formats__visual-layer[data-outdoor-format-layer='gran-formato'] img {
+  object-position: 60% 50%;
 }
 
 .outdoor-formats .indoor-formats__visual-layer[data-outdoor-format-layer='digital'] img {
-  object-position: center 66%;
+  object-position: 60% 66%;
 }
 
-.outdoor-formats__index {
-  display: block;
-  margin-top: .25rem;
-  color: rgb(247 245 239 / 34%);
-  font-size: .64rem;
-  font-weight: 700;
-  letter-spacing: .18em;
+.outdoor-formats .indoor-formats__visual-layer[data-outdoor-format-layer='proximidad'] img {
+  object-position: 57% 50%;
+}
+
+.outdoor-formats .indoor-formats__copy-layer h3 {
+  max-width: 12ch;
+  margin: 0 0 1.5rem;
+  font-size: clamp(3rem, 4.5vw, 5.4rem);
+  line-height: .92;
 }
 
 .outdoor-formats .indoor-formats__copy-layer ul {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .55rem;
   padding: 0;
-  margin: 2.5rem 0 0;
+  margin: clamp(2.5rem, 4.5vw, 5rem) 0 0;
   list-style: none;
 }
 
 .outdoor-formats .indoor-formats__copy-layer li {
-  padding-block: .78rem;
-  border-top: 1px solid var(--indoor-line);
-  color: rgb(247 245 239 / 68%);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 0;
+  border: 0;
+  color: rgb(247 245 239 / 82%);
+  font-size: clamp(1.45rem, 2.2vw, 2.5rem);
+  font-weight: 480;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+  text-transform: none;
+  transition: color .3s ease, transform .35s cubic-bezier(.2, .8, .2, 1);
 }
 
-.outdoor-formats .indoor-formats__copy-layer li:last-child {
-  border-bottom: 1px solid var(--indoor-line);
+.outdoor-formats .indoor-formats__copy-layer li > span {
+  width: .4rem;
+  height: .4rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #31d143;
+  box-shadow: 0 0 0 .25rem rgb(49 209 67 / 0%);
+  transition: box-shadow .35s ease, transform .35s ease;
+}
+
+.outdoor-formats .outdoor-formats__media-action {
+  z-index: 2;
+  top: auto;
+  right: clamp(1rem, 2vw, 1.75rem);
+  bottom: clamp(1rem, 2vw, 1.75rem);
+  left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .7rem .9rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  background: rgb(5 8 7 / 48%);
+  color: rgb(255 255 255 / 86%);
+  backdrop-filter: blur(14px);
+  transition: gap .35s cubic-bezier(.2, .8, .2, 1), background .3s ease;
+}
+
+.outdoor-formats .outdoor-formats__media-action span {
+  font-size: .85rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .outdoor-formats .indoor-formats__copy-layer li:hover {
+    color: #f7f5ef;
+    transform: translateX(.4rem);
+  }
+
+  .outdoor-formats .indoor-formats__copy-layer li:hover > span {
+    box-shadow: 0 0 0 .25rem rgb(49 209 67 / 15%);
+    transform: scale(1.12);
+  }
+
+  .outdoor-formats .indoor-formats__visual:hover .outdoor-formats__media-action {
+    gap: .9rem;
+    background: rgb(5 8 7 / 68%);
+  }
 }
 
 @media (max-width: 960px) {
@@ -158,6 +236,23 @@
   .outdoor-strategy .indoor-strategy__body {
     grid-row: 2;
   }
+
+  .outdoor-formats .indoor-formats__stage {
+    grid-template-columns: minmax(17rem, .8fr) minmax(0, 1.2fr);
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .outdoor-strategy {
+    height: auto;
+  }
+
+  .outdoor-strategy .indoor-strategy__sticky,
+  .route-modal__panel .outdoor-strategy .indoor-strategy__sticky {
+    position: static;
+    height: auto;
+  }
 }
 
 @media (max-width: 700px) {
@@ -183,19 +278,34 @@
   }
 
   .outdoor-formats .indoor-formats__tabs {
-    justify-content: flex-start;
-    gap: 1.25rem;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: clamp(.4rem, 2vw, .75rem);
+    overflow: visible;
   }
 
   .outdoor-formats .indoor-formats__tabs button {
-    flex: 0 0 auto;
-    font-size: .66rem;
+    min-width: 0;
+    font-size: clamp(.58rem, 2.7vw, .66rem);
+    letter-spacing: .07em;
+  }
+
+  .outdoor-formats .indoor-formats__tabs button:first-child {
+    justify-self: start;
+  }
+
+  .outdoor-formats .indoor-formats__tabs button:nth-child(2) {
+    justify-self: center;
+  }
+
+  .outdoor-formats .indoor-formats__tabs button:last-child {
+    justify-self: end;
   }
 
   .outdoor-formats .indoor-formats__visual {
     grid-column: 1;
     grid-row: 2;
+    aspect-ratio: 16 / 10;
   }
 
   .outdoor-formats .indoor-formats__copy {
@@ -205,5 +315,24 @@
 
   .outdoor-formats .indoor-formats__copy-layer {
     text-align: left;
+  }
+
+  .outdoor-formats .indoor-formats__copy-layer h3 {
+    max-width: 11ch;
+    font-size: clamp(2.8rem, 13vw, 4.1rem);
+  }
+
+  .outdoor-formats .indoor-formats__copy-layer ul {
+    gap: .45rem;
+    margin-top: 2.5rem;
+  }
+
+  .outdoor-formats .indoor-formats__copy-layer li {
+    font-size: clamp(1.4rem, 6.5vw, 2rem);
+  }
+
+  .outdoor-formats .outdoor-formats__media-action {
+    right: .9rem;
+    bottom: .9rem;
   }
 }

@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react'
-import { gsap, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { isMobileExperience } from '../animation/mobile'
 import { prefersReducedMotion } from '../animation/motion'
 import { ContactCard } from '../components/ContactCard'
 import { LightboxImage } from '../components/ImageLightbox'
 import { projectCollections } from '../data/projects'
+import outdoorDigitalCorridor from '../assets/images/outdoor-digital-corridor.webp'
+import outdoorGranFormato from '../assets/images/outdoor-gran-formato.webp'
 import { CollectionPage } from './CollectionPage'
 
 interface OutdoorPageProps {
@@ -14,31 +16,28 @@ interface OutdoorPageProps {
 type OutdoorFormat = 'gran-formato' | 'digital' | 'proximidad'
 
 const outdoorCollection = projectCollections.find(({ id }) => id === 'outdoor')!
-const [streetFurniture, billboard, verticalDigital] = outdoorCollection.projects
+const [streetFurniture, billboard] = outdoorCollection.projects
 
 const formats = {
   'gran-formato': {
-    index: '01',
     label: 'Gran formato',
     title: 'Presencia que domina el recorrido.',
     description:
       'Pasarelas y vallas fijas ubicadas en vías estratégicas para construir alcance, frecuencia y recordación.',
     products: ['Pasarela fija', 'Vallas fijas'],
-    image: billboard.image!,
-    alt: billboard.alt ?? billboard.title,
+    image: outdoorGranFormato,
+    alt: 'Pasarela publicitaria y vallas de gran formato sobre una vía de San Salvador',
   },
   digital: {
-    index: '02',
     label: 'Digital',
     title: 'Historias que avanzan con la ciudad.',
     description:
       'Pasarelas digitales y pantallas triples que combinan movimiento, secuencia y escala para multiplicar el impacto.',
     products: ['Pasarela digital', 'Pantalla digital triple'],
-    image: verticalDigital.image!,
-    alt: verticalDigital.alt ?? verticalDigital.title,
+    image: outdoorDigitalCorridor,
+    alt: 'Corredor urbano con una red de pantallas digitales publicitarias',
   },
   proximidad: {
-    index: '03',
     label: 'Proximidad',
     title: 'Mensajes que acompañan el trayecto.',
     description:
@@ -50,7 +49,6 @@ const formats = {
 } satisfies Record<
   OutdoorFormat,
   {
-    index: string
     label: string
     title: string
     description: string
@@ -80,9 +78,12 @@ const coverageSteps = [
 
 export function OutdoorPage({ modal = false }: OutdoorPageProps) {
   const page = useRef<HTMLDivElement>(null)
+  const strategySection = useRef<HTMLElement>(null)
+  const formatsSection = useRef<HTMLElement>(null)
   const formatStage = useRef<HTMLDivElement>(null)
   const [activeFormat, setActiveFormat] =
     useState<OutdoorFormat>('gran-formato')
+  const activeFormatRef = useRef<OutdoorFormat>('gran-formato')
   const [contactOpen, setContactOpen] = useState(false)
 
   useGSAP(
@@ -191,6 +192,240 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
 
   useGSAP(
     () => {
+      const section = strategySection.current
+      if (!section || prefersReducedMotion()) return
+
+      const mobile = isMobileExperience()
+      const modalScroller = modal
+        ? page.current?.closest<HTMLElement>('.route-modal__panel')
+        : undefined
+      const eyebrow = section.querySelector('.indoor-strategy__eyebrow')
+      const title = section.querySelector('.indoor-strategy__lead h2')
+      const description = section.querySelector('.indoor-strategy__description')
+      const steps = gsap.utils.toArray<HTMLElement>(
+        '.indoor-strategy__step',
+        section,
+      )
+      const stepDescriptions = steps.map((step) =>
+        step.querySelector<HTMLElement>('.indoor-strategy__step-copy small')!,
+      )
+
+      const entrance = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: mobile ? 'top 88%' : 'top 76%',
+          once: true,
+          scroller: modalScroller,
+        },
+        defaults: { ease: 'power4.out' },
+      })
+
+      entrance
+        .from(eyebrow, { autoAlpha: 0, y: 18, duration: 0.5 })
+        .from(title, { autoAlpha: 0, y: mobile ? 32 : 54, duration: 0.8 }, 0.08)
+        .from(description, { autoAlpha: 0, y: 28, duration: 0.65 }, 0.22)
+
+      if (mobile) {
+        steps.forEach((step) => step.removeAttribute('aria-current'))
+        gsap.set(steps, { clearProps: 'opacity,visibility,transform' })
+        gsap.set(stepDescriptions, {
+          clearProps: 'opacity,visibility,height,paddingTop,transform',
+        })
+        return () => entrance.kill()
+      }
+
+      gsap.set(steps, { opacity: 0.42 })
+      gsap.set(steps[0], { opacity: 1 })
+      gsap.set(stepDescriptions, {
+        autoAlpha: 0,
+        height: 0,
+        paddingTop: 0,
+        y: 6,
+      })
+      gsap.set(stepDescriptions[0], {
+        autoAlpha: 1,
+        height: 'auto',
+        paddingTop: '0.5rem',
+        y: 0,
+      })
+      steps[0]?.setAttribute('aria-current', 'step')
+      let activeIndex = 0
+      let stepTransition: gsap.core.Timeline | undefined
+
+      const showStep = (nextIndex: number, immediate = false) => {
+        if (!immediate && nextIndex === activeIndex) return
+        activeIndex = nextIndex
+        stepTransition?.kill()
+
+        steps.forEach((step, index) => {
+          if (index === nextIndex) step.setAttribute('aria-current', 'step')
+          else step.removeAttribute('aria-current')
+        })
+
+        if (immediate) {
+          gsap.set(steps, { opacity: 0.42 })
+          gsap.set(steps[nextIndex], { opacity: 1 })
+          gsap.set(stepDescriptions, {
+            autoAlpha: 0,
+            height: 0,
+            paddingTop: 0,
+            y: 6,
+          })
+          gsap.set(stepDescriptions[nextIndex], {
+            autoAlpha: 1,
+            height: 'auto',
+            paddingTop: '0.5rem',
+            y: 0,
+          })
+          return
+        }
+
+        stepTransition = gsap.timeline({ defaults: { overwrite: true } })
+        stepTransition
+          .to(steps, { opacity: 0.42, duration: 0.18, ease: 'power2.out' }, 0)
+          .to(
+            stepDescriptions,
+            {
+              autoAlpha: 0,
+              height: 0,
+              paddingTop: 0,
+              y: 6,
+              duration: 0.22,
+              ease: 'power2.inOut',
+            },
+            0,
+          )
+          .to(
+            steps[nextIndex],
+            { opacity: 1, duration: 0.22, ease: 'power2.out' },
+            0.12,
+          )
+          .to(
+            stepDescriptions[nextIndex],
+            {
+              autoAlpha: 1,
+              height: 'auto',
+              paddingTop: '0.5rem',
+              y: 0,
+              duration: 0.34,
+              ease: 'power2.inOut',
+            },
+            0.1,
+          )
+      }
+
+      showStep(0, true)
+      const scrollSource: HTMLElement | Window = modalScroller ?? window
+      let updateFrame = 0
+      const updateActiveStep = () => {
+        updateFrame = 0
+        const viewportTop = modalScroller?.getBoundingClientRect().top ?? 0
+        const viewportHeight = modalScroller?.clientHeight ?? window.innerHeight
+        const rect = section.getBoundingClientRect()
+        const travel = Math.max(section.offsetHeight - viewportHeight, 1)
+        const progress = gsap.utils.clamp(
+          0,
+          1,
+          (viewportTop - rect.top) / travel,
+        )
+        const nextIndex = progress < 1 / 3 ? 0 : progress < 2 / 3 ? 1 : 2
+        showStep(nextIndex)
+      }
+      const queueStepUpdate = () => {
+        if (updateFrame) return
+        updateFrame = window.requestAnimationFrame(updateActiveStep)
+      }
+
+      scrollSource.addEventListener('scroll', queueStepUpdate, {
+        passive: true,
+      })
+      updateActiveStep()
+
+      return () => {
+        scrollSource.removeEventListener('scroll', queueStepUpdate)
+        if (updateFrame) window.cancelAnimationFrame(updateFrame)
+        stepTransition?.kill()
+        entrance.kill()
+      }
+    },
+    { scope: strategySection, dependencies: [modal] },
+  )
+
+  useGSAP(
+    () => {
+      const section = formatsSection.current
+      const pinnedStage = section?.querySelector<HTMLElement>(
+        '.indoor-formats__sticky',
+      )
+      const modalScroller = page.current?.closest<HTMLElement>(
+        '.route-modal__panel',
+      )
+
+      if (
+        !modal ||
+        !section ||
+        !pinnedStage ||
+        !modalScroller ||
+        prefersReducedMotion()
+      ) {
+        return
+      }
+
+      const selectFormat = (format: OutdoorFormat) => {
+        if (activeFormatRef.current === format) return
+        activeFormatRef.current = format
+        setActiveFormat(format)
+      }
+
+      const formatMedia = gsap.matchMedia()
+
+      formatMedia.add('(min-width: 901px)', () => {
+        const sectionStart = () => section.offsetTop
+        const sectionEnd = () =>
+          sectionStart() + section.offsetHeight - modalScroller.clientHeight
+
+        const formatTrigger = ScrollTrigger.create({
+          trigger: section,
+          scroller: modalScroller,
+          start: sectionStart,
+          end: sectionEnd,
+          invalidateOnRefresh: true,
+          snap: {
+            snapTo: [0, 0.5, 1],
+            delay: 0.08,
+            duration: { min: 0.25, max: 0.45 },
+            ease: 'power2.inOut',
+          },
+          onEnter: () => selectFormat('gran-formato'),
+          onEnterBack: () => selectFormat('proximidad'),
+          onLeave: () => selectFormat('proximidad'),
+          onLeaveBack: () => selectFormat('gran-formato'),
+          onUpdate: ({ progress }) => {
+            selectFormat(
+              progress < 1 / 3
+                ? 'gran-formato'
+                : progress < 2 / 3
+                  ? 'digital'
+                  : 'proximidad',
+            )
+          },
+        })
+
+        const refreshCall = gsap.delayedCall(0, () => ScrollTrigger.refresh())
+
+        return () => {
+          refreshCall.kill()
+          formatTrigger.kill()
+        }
+      })
+
+      return () => formatMedia.revert()
+    },
+    { scope: formatsSection, dependencies: [modal] },
+  )
+
+  useGSAP(
+    () => {
       if (prefersReducedMotion() || !formatStage.current) return
 
       const layers = gsap.utils.toArray<HTMLElement>(
@@ -266,12 +501,15 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
           </header>
 
           <section
-            className="indoor-strategy outdoor-strategy outdoor-reveal"
+            className="indoor-strategy outdoor-strategy"
             aria-labelledby="outdoor-strategy-title"
+            ref={strategySection}
           >
             <div className="indoor-strategy__sticky">
               <div className="indoor-strategy__lead">
-                <p className="indoor-kicker">Cobertura estratégica</p>
+                <p className="indoor-kicker indoor-strategy__eyebrow">
+                  Cobertura estratégica
+                </p>
                 <h2 id="outdoor-strategy-title">
                   No solo mostramos
                   <br />
@@ -282,7 +520,7 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
               </div>
 
               <div className="indoor-strategy__body">
-                <p>
+                <p className="indoor-strategy__description">
                   Combinamos ubicación, formato y exposición para que cada
                   campaña conecte con la ciudad en el momento y lugar indicados.
                 </p>
@@ -307,6 +545,7 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
           <section
             className="indoor-formats outdoor-formats"
             aria-labelledby="outdoor-formats-title"
+            ref={formatsSection}
           >
             <div className="indoor-formats__sticky">
               <header className="indoor-formats__header outdoor-reveal">
@@ -362,7 +601,10 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
                         role="tab"
                         aria-controls="outdoor-format-panel"
                         aria-selected={activeFormat === format}
-                        onClick={() => setActiveFormat(format)}
+                        onClick={() => {
+                          activeFormatRef.current = format
+                          setActiveFormat(format)
+                        }}
                       >
                         {formats[format].label}
                       </button>
@@ -377,14 +619,14 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
                         aria-hidden={activeFormat !== format}
                         key={format}
                       >
-                        <span className="outdoor-formats__index">
-                          {formats[format].index} / 03
-                        </span>
                         <h3>{formats[format].title}</h3>
                         <p>{formats[format].description}</p>
                         <ul aria-label={`Incluye ${formats[format].label}`}>
                           {formats[format].products.map((product) => (
-                            <li key={product}>{product}</li>
+                            <li key={product}>
+                              <span aria-hidden="true" />
+                              {product}
+                            </li>
                           ))}
                         </ul>
                       </div>
