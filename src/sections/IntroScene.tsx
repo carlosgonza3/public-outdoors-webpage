@@ -490,6 +490,7 @@ export function IntroScene({
         'public:navigate-to-media',
         releaseIntroForNavigation,
       )
+      window.addEventListener('public:navigate-home', releaseIntroForNavigation)
 
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -681,6 +682,10 @@ export function IntroScene({
         window.removeEventListener('touchend', endTouchGesture)
         window.removeEventListener(
           'public:navigate-to-media',
+          releaseIntroForNavigation,
+        )
+        window.removeEventListener(
+          'public:navigate-home',
           releaseIntroForNavigation,
         )
         timeline.kill()

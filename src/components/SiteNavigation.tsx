@@ -31,7 +31,7 @@ export function SiteNavigation({
   onMedia,
 }: SiteNavigationProps) {
   const navigation = useRef<HTMLElement>(null)
-  const butterflyButton = useRef<HTMLButtonElement>(null)
+  const butterflyButton = useRef<HTMLAnchorElement>(null)
   const butterflyImage = useRef<HTMLImageElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [mediaOpen, setMediaOpen] = useState(false)
@@ -266,10 +266,11 @@ export function SiteNavigation({
       aria-hidden={!revealed || temporarilyHidden}
       ref={navigation}
     >
-      <button
+      <a
         className="site-nav__butterfly"
         ref={butterflyButton}
-        type="button"
+        href="#hero"
+        role={compact ? 'button' : undefined}
         aria-label={
           compact
             ? revealed && menuOpen
@@ -281,22 +282,20 @@ export function SiteNavigation({
         aria-controls={compact ? menuId : undefined}
         tabIndex={revealed && !temporarilyHidden && !hideButterfly ? 0 : -1}
         hidden={hideButterfly}
-        onClick={() => {
+        onClick={(event) => {
           if (compact) {
+            event.preventDefault()
             if (menuOpen) setMediaOpen(false)
             setMenuOpen(!menuOpen)
             return
           }
 
-          window.scrollTo({
-            top: 0,
-            behavior: prefersReducedMotion() ? 'auto' : 'smooth',
-          })
+          window.dispatchEvent(new Event('public:navigate-home'))
         }}
       >
         <img ref={butterflyImage} src={butterfly} alt="" />
         <span className="site-nav__butterfly-ring" aria-hidden="true" />
-      </button>
+      </a>
 
       <div className="site-nav__menu" id={menuId}>
         <button

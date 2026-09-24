@@ -57,7 +57,7 @@ function HomePage() {
         onMedia={scrollToMedia}
       />
 
-      <main>
+      <main id="hero">
         <IntroScene
           onMaskStateChange={handleMaskStateChange}
           onMobileNavigationGapChange={setMobileNavigationGap}
