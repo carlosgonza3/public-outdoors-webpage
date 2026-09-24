@@ -94,6 +94,20 @@
   line-height: 1.25;
 }
 
+@media (min-width: 901px) {
+  .impact-track {
+    gap: clamp(4rem, 6vw, 7rem);
+  }
+
+  .impact-metric {
+    width: fit-content;
+  }
+
+  .impact-metric:first-child {
+    margin-left: clamp(4rem, 8vw, 9rem);
+  }
+}
+
 .clients-intro {
   flex: none;
   width: clamp(27rem, 44vw, 48rem);

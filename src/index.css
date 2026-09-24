@@ -12,9 +12,15 @@
 html {
   min-height: 100%;
   min-height: -webkit-fill-available;
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
   background-color: var(--page-background);
   overscroll-behavior-y: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 body {
   margin: 0;

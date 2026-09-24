@@ -1,8 +1,7 @@
 import { useRef } from 'react'
-import { gsap, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
-import { LightboxImage } from '../components/ImageLightbox'
 import { setPageTone } from '../animation/pageTone'
 import { isIOSSafari } from '../platform/iosSafari'
 
@@ -38,7 +37,6 @@ clientLogos.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 export function ImpactScene() {
   const section = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
-  const chrome = useRef<HTMLDivElement>(null)
   const metricValues = useRef<Array<HTMLElement | null>>([])
 
   useGSAP(
@@ -48,6 +46,158 @@ export function ImpactScene() {
       const mobile = isMobileExperience()
       const reducedMotion = prefersReducedMotion()
       const iosSafari = isIOSSafari()
+
+      if (mobile) {
+        const mobileMetrics = gsap.utils.toArray<HTMLElement>(
+          '.impact-metric',
+          section.current,
+        )
+        const clientsIntro = section.current.querySelector<HTMLElement>(
+          '.clients-intro',
+        )
+        const clientLogos = gsap.utils.toArray<HTMLElement>(
+          '.client-logo',
+          section.current,
+        )
+        const clientsList = section.current.querySelector<HTMLElement>(
+          '.clients-list',
+        )
+        const endMessage = section.current.querySelector<HTMLElement>(
+          '.impact-track__end',
+        )
+        const mobileAnimations: gsap.core.Animation[] = []
+
+        gsap.set(track.current, { clearProps: 'transform' })
+
+        const toneTrigger = ScrollTrigger.create({
+          trigger: section.current,
+          start: 'top 78%',
+          end: 'bottom top',
+          onEnter: () => setPageTone('#080b0a', true),
+          onEnterBack: () => setPageTone('#080b0a', true),
+          onLeaveBack: () => setPageTone('#171717', true),
+        })
+
+        if (!reducedMotion) {
+          mobileMetrics.forEach((metric) => {
+            const value = metric.querySelector<HTMLElement>('strong > span')
+            const label = metric.querySelector<HTMLElement>('p')
+            if (!value || !label) return
+
+            const timeline = gsap.timeline({
+              scrollTrigger: {
+                trigger: metric,
+                start: 'top 92%',
+                end: 'top 54%',
+                scrub: 0.42,
+              },
+            })
+
+            timeline
+              .from(metric, {
+                autoAlpha: 0.12,
+                y: 64,
+                scale: 0.965,
+                duration: 1,
+                ease: 'power3.out',
+              })
+              .from(value, {
+                autoAlpha: 0,
+                yPercent: 24,
+                scale: 0.92,
+                duration: 0.82,
+                ease: 'power3.out',
+              }, 0.04)
+              .from(label, {
+                autoAlpha: 0,
+                y: 22,
+                duration: 0.64,
+                ease: 'power2.out',
+              }, 0.24)
+
+            mobileAnimations.push(timeline)
+          })
+
+          if (clientsIntro) {
+            const eyebrow = clientsIntro.querySelector<HTMLElement>('p')
+            const title = clientsIntro.querySelector<HTMLElement>('strong')
+            const timeline = gsap.timeline({
+              scrollTrigger: {
+                trigger: clientsIntro,
+                start: 'top 90%',
+                end: 'top 52%',
+                scrub: 0.45,
+              },
+            })
+
+            timeline
+              .from(clientsIntro, {
+                autoAlpha: 0.18,
+                y: 58,
+                scale: 0.97,
+                duration: 1,
+                ease: 'power3.out',
+              })
+              .from(eyebrow, {
+                autoAlpha: 0,
+                y: 16,
+                duration: 0.5,
+                ease: 'power2.out',
+              }, 0.08)
+              .from(title, {
+                autoAlpha: 0,
+                yPercent: 18,
+                duration: 0.76,
+                ease: 'power3.out',
+              }, 0.2)
+
+            mobileAnimations.push(timeline)
+          }
+
+          if (clientsList && clientLogos.length) {
+            mobileAnimations.push(gsap.from(clientLogos, {
+              autoAlpha: 0,
+              y: (index) => 42 + (index % 3) * 9,
+              scale: 0.72,
+              rotation: (index) => (index % 2 === 0 ? -11 : 11),
+              duration: 0.82,
+              stagger: {
+                each: 0.045,
+                from: 'random',
+              },
+              ease: 'back.out(1.45)',
+              scrollTrigger: {
+                trigger: clientsList,
+                start: 'top 92%',
+                end: 'bottom 58%',
+                scrub: 0.5,
+              },
+            }))
+          }
+
+          if (endMessage) {
+            mobileAnimations.push(gsap.from(endMessage, {
+              autoAlpha: 0,
+              y: 54,
+              scale: 0.97,
+              duration: 1,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: endMessage,
+                start: 'top 90%',
+                end: 'top 56%',
+                scrub: 0.45,
+              },
+            }))
+          }
+        }
+
+        return () => {
+          toneTrigger.kill()
+          mobileAnimations.forEach((animation) => animation.kill())
+        }
+      }
+
       const counterAnimations = new Map<Element, gsap.core.Tween>()
       const playedCounters = new Set<Element>()
 
@@ -78,22 +228,6 @@ export function ImpactScene() {
 
             playedCounters.add(value)
             counterObserver.unobserve(value)
-
-            if (mobile) {
-              const animation = gsap.fromTo(
-                value,
-                { autoAlpha: 0, yPercent: 10 },
-                {
-                  autoAlpha: 1,
-                  yPercent: 0,
-                  duration: 0.42,
-                  ease: 'power3.out',
-                  onComplete: () => counterAnimations.delete(value),
-                },
-              )
-              counterAnimations.set(value, animation)
-              return
-            }
 
             const animation = gsap.to(
               { progress: 0 },
@@ -131,8 +265,8 @@ export function ImpactScene() {
         if (!reducedMotion) {
           gsap.set(value, {
             autoAlpha: 0,
-            yPercent: mobile ? 10 : 14,
-            filter: mobile ? 'none' : 'blur(10px)',
+            yPercent: 14,
+            filter: 'blur(10px)',
           })
         }
         counterObserver.observe(value)
@@ -147,61 +281,128 @@ export function ImpactScene() {
 
       const distance = () =>
         Math.max(0, track.current!.scrollWidth - document.documentElement.clientWidth)
-      const leadInProgress = mobile ? 0 : 0.035
-      const scrollDistance = () => {
-        if (!mobile) return distance() / (1 - leadInProgress)
+      const previewDistance = () =>
+        Math.min(window.innerWidth * 0.1, 160)
+      const scrollDistance = () =>
+        Math.max(1, distance() - previewDistance())
 
-        // Keep the complete horizontal journey, but cap its vertical pin time
-        // so a phone never feels trapped inside the scene. The track still
-        // reaches its exact endpoint; it simply travels farther per scroll px.
-        const viewportHeight = window.innerHeight
-        return Math.max(
-          viewportHeight * 1.35,
-          Math.min(distance() * 0.62, viewportHeight * 2.4),
-        )
-      }
-
-      const horizontalScroll = gsap.timeline({
-        scrollTrigger: {
-          trigger: section.current,
-          start: 'top top',
-          end: () => `+=${scrollDistance()}`,
-          pin: true,
-          pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: mobile ? true : 0.8,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onEnter: () => setPageTone('#080b0a', true),
-          onEnterBack: () => setPageTone('#080b0a', true),
-          onLeaveBack: () => setPageTone(mobile ? '#171717' : '#03131c', true),
+      const entryPreview = gsap.fromTo(
+        track.current,
+        { x: 0 },
+        {
+          x: () => -previewDistance(),
+          force3D: true,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section.current,
+            start: 'top 90%',
+            end: 'top top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
         },
+      )
+
+      const horizontalScroll = gsap.fromTo(
+        track.current,
+        { x: () => -previewDistance() },
+        {
+          x: () => -distance(),
+          force3D: true,
+          ease: 'none',
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: section.current,
+            start: 'top top',
+            end: () => `+=${scrollDistance()}`,
+            pin: true,
+            pinType: iosSafari ? 'transform' : 'fixed',
+            scrub: 0.55,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onEnter: () => setPageTone('#080b0a', true),
+            onEnterBack: () => setPageTone('#080b0a', true),
+            onLeaveBack: () => setPageTone('#03131c', true),
+          },
+        },
+      )
+
+      const desktopClientLogos = gsap.utils.toArray<HTMLElement>(
+        '.client-logo',
+        section.current,
+      )
+      const cardPulseAnimations = desktopClientLogos.map((logo, index) => {
+        const image = logo.querySelector('img')
+        const restingRotation = Number(gsap.getProperty(logo, 'rotation')) || 0
+        const rotationNudge = index % 2 === 0 ? 1.25 : -1.25
+        const timeline = gsap.timeline({ paused: true })
+
+        timeline
+          .to(logo, {
+            y: 3,
+            scaleX: 1.025,
+            scaleY: 0.965,
+            duration: 0.1,
+            ease: 'power2.in',
+          })
+          .to(logo, {
+            y: -9,
+            scaleX: 1.065,
+            scaleY: 1.085,
+            rotation: restingRotation + rotationNudge,
+            duration: 0.17,
+            ease: 'power3.out',
+          })
+          .to(logo, {
+            y: 1,
+            scaleX: 0.992,
+            scaleY: 0.985,
+            rotation: restingRotation - rotationNudge * 0.25,
+            duration: 0.12,
+            ease: 'power2.in',
+          })
+          .to(logo, {
+            y: 0,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: restingRotation,
+            duration: 0.34,
+            ease: 'elastic.out(1, 0.52)',
+          })
+
+        if (image) {
+          timeline
+            .to(image, {
+              scale: 1.36,
+              duration: 0.18,
+              ease: 'power2.out',
+            }, 0.08)
+            .to(image, {
+              scale: 1.28,
+              duration: 0.38,
+              ease: 'elastic.out(1, 0.55)',
+            }, 0.27)
+        }
+
+        return timeline
+      })
+      const cardCenterTriggers = desktopClientLogos.map((logo, index) => {
+        const pulse = () => cardPulseAnimations[index].restart()
+
+        return ScrollTrigger.create({
+          trigger: logo,
+          containerAnimation: horizontalScroll,
+          start: 'center center',
+          onEnter: pulse,
+          onLeaveBack: pulse,
+        })
       })
 
-      horizontalScroll
-        .to({}, { duration: leadInProgress })
-        .to(
-          chrome.current,
-          {
-            autoAlpha: 0,
-            y: -24,
-            duration: 0.045,
-            ease: 'power2.out',
-          },
-          leadInProgress,
-        )
-        .to(
-          track.current,
-          {
-            x: () => -distance(),
-            force3D: true,
-            duration: 1 - leadInProgress,
-            ease: 'none',
-          },
-          leadInProgress,
-        )
-
       return () => {
+        entryPreview.kill()
         horizontalScroll.kill()
+        cardCenterTriggers.forEach((trigger) => trigger.kill())
+        cardPulseAnimations.forEach((animation) => animation.kill())
         counterObserver.disconnect()
         counterAnimations.forEach((animation) => animation.kill())
       }
@@ -216,7 +417,6 @@ export function ImpactScene() {
       aria-label="Nuestro impacto y clientes"
       data-scene-id="impact"
     >
-
       <div className="impact-track" ref={track}>
         {metrics.map((metric, index) => (
           <article className="impact-metric" key={metric.value}>
@@ -238,25 +438,22 @@ export function ImpactScene() {
             <p>{metric.label}</p>
           </article>
         ))}
-
         <div className="clients-intro">
           <p>Marcas que confían en nosotros</p>
           <strong>Nuestros clientes</strong>
         </div>
-
         <div className="clients-list" aria-label="Logotipos de nuestros clientes">
           {clientLogos.map((logo, index) => (
             <figure className="client-logo" key={logo}>
-              <LightboxImage
+              <img
                 src={logo}
                 alt={`Cliente ${index + 1}`}
-                caption={`Cliente ${index + 1}`}
-                triggerClassName="image-lightbox-trigger--contain"
+                loading="lazy"
+                decoding="async"
               />
             </figure>
           ))}
         </div>
-
         <p className="impact-track__end" aria-hidden="true">
           Juntos llegamos más lejos.
         </p>

@@ -10,8 +10,17 @@ import {
   type ProjectCollection,
 } from '../data/projects'
 
+type AmbientRuntime = {
+  xTo: ReturnType<typeof gsap.quickTo>
+  yTo: ReturnType<typeof gsap.quickTo>
+  consumed: boolean
+}
+
+const ambientRuntimes = new WeakMap<HTMLElement, AmbientRuntime>()
+
 export function GalleryScene() {
   const section = useRef<HTMLElement>(null)
+  const galleryAmbient = useRef<HTMLDivElement>(null)
   const carouselRefs = useRef<
     Partial<Record<ProjectCollection['id'], HTMLDivElement>>
   >({})
@@ -25,7 +34,7 @@ export function GalleryScene() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  useGSAP(
+  const { contextSafe } = useGSAP(
     () => {
       if (prefersReducedMotion()) return
 
@@ -162,6 +171,411 @@ export function GalleryScene() {
     { scope: section },
   )
 
+  useGSAP(
+    () => {
+      const ambient = galleryAmbient.current
+      if (
+        !ambient ||
+        isMobileExperience() ||
+        prefersReducedMotion() ||
+        !window.matchMedia('(hover: hover) and (pointer: fine)').matches
+      ) {
+        return
+      }
+
+      const collections = gsap.utils.toArray<HTMLElement>('.project-collection')
+      const orb = ambient.querySelector<HTMLElement>('.gallery-ambient__orb')
+      const orbLight = ambient.querySelector<HTMLElement>(
+        '.gallery-ambient__orb-light',
+      )
+      if (!orb || !orbLight) return
+
+      const titleLights = new Map<
+        HTMLElement,
+        {
+          title: HTMLElement
+          xTo: ReturnType<typeof gsap.quickTo>
+          yTo: ReturnType<typeof gsap.quickTo>
+          opacityTo: ReturnType<typeof gsap.quickTo>
+        }
+      >()
+
+      collections.forEach((collection) => {
+        const title = collection.querySelector<HTMLElement>(
+          '.collection-heading__title',
+        )
+        if (!title) return
+
+        gsap.set(title, {
+          '--title-light-x': '0px',
+          '--title-light-y': '0px',
+          '--title-light-opacity': 0,
+        })
+        titleLights.set(collection, {
+          title,
+          xTo: gsap.quickTo(title, '--title-light-x', {
+            duration: 0.58,
+            ease: 'power3.out',
+          }),
+          yTo: gsap.quickTo(title, '--title-light-y', {
+            duration: 0.58,
+            ease: 'power3.out',
+          }),
+          opacityTo: gsap.quickTo(title, '--title-light-opacity', {
+            duration: 0.48,
+            ease: 'power2.out',
+          }),
+        })
+      })
+
+      const sizeMatrix = [
+        [0.88, 0.95, 0.87],
+        [0.96, 1.08, 0.95],
+        [0.89, 1, 0.9],
+      ]
+      let collectionScale = 1
+
+      const matrixScaleAt = (clientX: number, clientY: number) => {
+        const matrixX = gsap.utils.clamp(0, 2, (clientX / window.innerWidth) * 2)
+        const matrixY = gsap.utils.clamp(0, 2, (clientY / window.innerHeight) * 2)
+        const x0 = Math.floor(matrixX)
+        const y0 = Math.floor(matrixY)
+        const x1 = Math.min(2, x0 + 1)
+        const y1 = Math.min(2, y0 + 1)
+        const xMix = matrixX - x0
+        const yMix = matrixY - y0
+        const top = gsap.utils.interpolate(sizeMatrix[y0][x0], sizeMatrix[y0][x1], xMix)
+        const bottom = gsap.utils.interpolate(
+          sizeMatrix[y1][x0],
+          sizeMatrix[y1][x1],
+          xMix,
+        )
+
+        return gsap.utils.interpolate(top, bottom, yMix) * collectionScale
+      }
+
+      const xTo = gsap.quickTo(orb, 'x', {
+        duration: 0.68,
+        ease: 'power3.out',
+      })
+      const yTo = gsap.quickTo(orb, 'y', {
+        duration: 0.68,
+        ease: 'power3.out',
+      })
+      const scaleXTo = gsap.quickTo(orb, 'scaleX', {
+        duration: 0.88,
+        ease: 'power3.out',
+      })
+      const scaleYTo = gsap.quickTo(orb, 'scaleY', {
+        duration: 0.88,
+        ease: 'power3.out',
+      })
+      const runtime: AmbientRuntime = { xTo, yTo, consumed: false }
+      ambientRuntimes.set(ambient, runtime)
+
+      const moveAmbient = (event: PointerEvent) => {
+        if (event.pointerType === 'touch') return
+        if (!runtime.consumed) {
+          xTo(event.clientX)
+          yTo(event.clientY)
+          const scale = matrixScaleAt(event.clientX, event.clientY)
+          scaleXTo(scale)
+          scaleYTo(scale)
+        }
+
+        const collection = event.currentTarget as HTMLElement
+        const titleLight = titleLights.get(collection)
+        if (!titleLight) return
+
+        const bounds = titleLight.title.getBoundingClientRect()
+        const localX = gsap.utils.clamp(0, bounds.width, event.clientX - bounds.left)
+        const localY = gsap.utils.clamp(0, bounds.height, event.clientY - bounds.top)
+        const distanceX = Math.max(
+          bounds.left - event.clientX,
+          0,
+          event.clientX - bounds.right,
+        )
+        const distanceY = Math.max(
+          bounds.top - event.clientY,
+          0,
+          event.clientY - bounds.bottom,
+        )
+        const distance = Math.hypot(distanceX, distanceY)
+        const proximity = 1 - gsap.utils.clamp(0, 1, distance / (window.innerHeight * 0.72))
+
+        titleLight.xTo(localX)
+        titleLight.yTo(localY)
+        titleLight.opacityTo(0.06 + proximity * 0.28)
+      }
+
+      const showAmbient = (event: PointerEvent) => {
+        if (event.pointerType === 'touch') return
+        const collection = event.currentTarget as HTMLElement
+        const accent = getComputedStyle(collection)
+          .getPropertyValue('--collection-accent')
+          .trim()
+        collectionScale = collection.classList.contains('collection--outdoor')
+          ? 1.03
+          : collection.classList.contains('collection--innovations')
+            ? 0.97
+            : 1
+        const initialScale = matrixScaleAt(event.clientX, event.clientY)
+        const titleLight = titleLights.get(collection)
+
+        gsap.set(orb, {
+          x: event.clientX,
+          y: event.clientY,
+          xPercent: -50,
+          yPercent: -50,
+          scaleX: initialScale * 0.9,
+          scaleY: initialScale * 0.9,
+        })
+        gsap.to(ambient, {
+          autoAlpha: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+          overwrite: true,
+        })
+        gsap.to(orb, {
+          color: accent || '#ff0109',
+          duration: 0.68,
+          ease: 'power3.out',
+          overwrite: 'auto',
+        })
+        if (!runtime.consumed) {
+          gsap.to(orbLight, {
+            scale: 1,
+            opacity: 0.6,
+            duration: 0.35,
+            ease: 'power2.out',
+            overwrite: true,
+          })
+        }
+        scaleXTo(initialScale)
+        scaleYTo(initialScale)
+        if (titleLight) {
+          const bounds = titleLight.title.getBoundingClientRect()
+          titleLight.xTo(
+            gsap.utils.clamp(0, bounds.width, event.clientX - bounds.left),
+          )
+          titleLight.yTo(
+            gsap.utils.clamp(0, bounds.height, event.clientY - bounds.top),
+          )
+          titleLight.opacityTo(0.12)
+        }
+      }
+
+      const hideAmbient = (event: PointerEvent) => {
+        gsap.to(ambient, {
+          autoAlpha: 0,
+          duration: 0.45,
+          ease: 'power2.out',
+          overwrite: true,
+        })
+        titleLights.get(event.currentTarget as HTMLElement)?.opacityTo(0)
+      }
+
+      collections.forEach((collection) => {
+        collection.addEventListener('pointerenter', showAmbient)
+        collection.addEventListener('pointermove', moveAmbient, { passive: true })
+        collection.addEventListener('pointerleave', hideAmbient)
+      })
+
+      return () => {
+        ambientRuntimes.delete(ambient)
+        collections.forEach((collection) => {
+          collection.removeEventListener('pointerenter', showAmbient)
+          collection.removeEventListener('pointermove', moveAmbient)
+          collection.removeEventListener('pointerleave', hideAmbient)
+        })
+        gsap.killTweensOf([
+          ambient,
+          orb,
+          orbLight,
+          ...Array.from(titleLights.values(), ({ title }) => title),
+        ])
+      }
+    },
+    { scope: section },
+  )
+
+  const animateCtaFluid = contextSafe((
+    button: HTMLAnchorElement,
+    originX: number,
+    originY: number,
+    fill: boolean,
+  ) => {
+    const fluid = button.querySelector<HTMLElement>(
+      '.collection-heading__fluid',
+    )
+    const waves = fluid
+      ? gsap.utils.toArray<HTMLElement>('.collection-heading__fluid-wave', fluid)
+      : []
+    const ambient = button
+      .closest<HTMLElement>('.project-grid-section')
+      ?.querySelector<HTMLElement>('.gallery-ambient')
+    const orbLight = ambient?.querySelector<HTMLElement>(
+      '.gallery-ambient__orb-light',
+    )
+    const runtime = ambient ? ambientRuntimes.get(ambient) : undefined
+
+    if (!fluid) return
+
+    const origin = `${originX}% ${originY}%`
+    const bounds = button.getBoundingClientRect()
+    const consumeX = bounds.left + bounds.width * (originX / 100)
+    const consumeY = bounds.top + bounds.height * (originY / 100)
+    gsap.killTweensOf([fluid, ...waves, ...(orbLight ? [orbLight] : [])])
+
+    if (orbLight && runtime) {
+      runtime.xTo(consumeX)
+      runtime.yTo(consumeY)
+      runtime.consumed = fill
+    }
+
+    if (prefersReducedMotion()) {
+      gsap.set(fluid, {
+        clipPath: `circle(${fill ? 160 : 0}% at ${origin})`,
+      })
+      gsap.set(waves, { opacity: 0 })
+      if (orbLight && runtime) {
+        gsap.set(orbLight, {
+          scale: fill ? 0.12 : 1,
+          opacity: fill ? 0.04 : 0.6,
+        })
+      }
+      return
+    }
+
+    gsap.set(waves, {
+      left: `${originX}%`,
+      top: `${originY}%`,
+      xPercent: -50,
+      yPercent: -50,
+    })
+
+    if (fill) {
+      gsap.set(fluid, { clipPath: `circle(0% at ${origin})` })
+      gsap.set(waves, {
+        opacity: 0.26,
+        scale: (index) => 0.16 + index * 0.05,
+        rotation: (index) => -28 + index * 31,
+      })
+
+      const timeline = gsap.timeline()
+
+      timeline
+        .to(fluid, {
+          clipPath: `circle(160% at ${origin})`,
+          duration: 0.68,
+          ease: 'power3.inOut',
+        })
+        .to(waves, {
+          scale: (index) => 2.1 + index * 0.34,
+          rotation: (index) => 42 + index * 47,
+          duration: 0.64,
+          stagger: 0.045,
+          ease: 'power2.out',
+        }, 0)
+        .to(waves, {
+          opacity: 0,
+          duration: 0.2,
+          stagger: 0.025,
+          ease: 'power1.out',
+        }, 0.43)
+
+      if (orbLight && runtime) {
+        timeline.to(orbLight, {
+          scale: 0.12,
+          opacity: 0.04,
+          duration: 0.68,
+          ease: 'power3.inOut',
+        }, 0)
+      }
+      return
+    }
+
+    gsap.set(fluid, { clipPath: `circle(160% at ${origin})` })
+    gsap.set(waves, {
+      opacity: 0.2,
+      scale: (index) => 1.75 + index * 0.22,
+      rotation: (index) => 18 + index * 38,
+    })
+
+    const timeline = gsap.timeline()
+
+    timeline
+      .to(waves, {
+        scale: (index) => 0.12 + index * 0.04,
+        rotation: (index) => -34 - index * 27,
+        opacity: 0,
+        duration: 0.48,
+        stagger: 0.025,
+        ease: 'power3.in',
+      })
+      .to(fluid, {
+        clipPath: `circle(0% at ${origin})`,
+        duration: 0.5,
+        ease: 'power3.inOut',
+      }, 0)
+
+    if (orbLight && runtime) {
+      timeline.to(orbLight, {
+        scale: 1,
+        opacity: 0.6,
+        duration: 0.5,
+        ease: 'power3.inOut',
+      }, 0)
+    }
+  })
+
+  const getCtaEdgeOrigin = (
+    event: React.PointerEvent<HTMLAnchorElement>,
+  ) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const relativeX = gsap.utils.clamp(0, 1, (event.clientX - bounds.left) / bounds.width)
+    const relativeY = gsap.utils.clamp(0, 1, (event.clientY - bounds.top) / bounds.height)
+    const normalizedX = relativeX * 2 - 1
+    const normalizedY = relativeY * 2 - 1
+
+    if (Math.abs(normalizedX) > Math.abs(normalizedY)) {
+      return {
+        x: normalizedX > 0 ? 100 : 0,
+        y: relativeY * 100,
+      }
+    }
+
+    return {
+      x: relativeX * 100,
+      y: normalizedY > 0 ? 100 : 0,
+    }
+  }
+
+  const handleCtaPointerEnter = (
+    event: React.PointerEvent<HTMLAnchorElement>,
+  ) => {
+    if (event.pointerType === 'touch') return
+    const origin = getCtaEdgeOrigin(event)
+    animateCtaFluid(event.currentTarget, origin.x, origin.y, true)
+  }
+
+  const handleCtaPointerLeave = (
+    event: React.PointerEvent<HTMLAnchorElement>,
+  ) => {
+    if (event.pointerType === 'touch') return
+    const origin = getCtaEdgeOrigin(event)
+    animateCtaFluid(event.currentTarget, origin.x, origin.y, false)
+  }
+
+  const handleCtaFocus = (event: React.FocusEvent<HTMLAnchorElement>) => {
+    if (!event.currentTarget.matches(':focus-visible')) return
+    animateCtaFluid(event.currentTarget, 50, 50, true)
+  }
+
+  const handleCtaBlur = (event: React.FocusEvent<HTMLAnchorElement>) => {
+    animateCtaFluid(event.currentTarget, 50, 50, false)
+  }
+
   const openCollection = (
     event: React.MouseEvent<HTMLAnchorElement>,
     collectionId: string,
@@ -208,8 +622,17 @@ export function GalleryScene() {
           to={`/${collection.id}`}
           state={{ backgroundLocation: location }}
           onClick={(event) => openCollection(event, collection.id)}
+          onPointerEnter={handleCtaPointerEnter}
+          onPointerLeave={handleCtaPointerLeave}
+          onFocus={handleCtaFocus}
+          onBlur={handleCtaBlur}
           aria-label={`Ver más proyectos ${collection.label}`}
         >
+          <span className="collection-heading__fluid" aria-hidden="true">
+            <i className="collection-heading__fluid-wave" />
+            <i className="collection-heading__fluid-wave" />
+            <i className="collection-heading__fluid-wave" />
+          </span>
           <strong>Ver más</strong>
           <svg viewBox="0 0 64 64" aria-hidden="true">
             <path d="M10 32h42M36 16l16 16-16 16" />
@@ -220,9 +643,20 @@ export function GalleryScene() {
           <Link
             className="collection-heading__availability"
             to="/disponibilidad"
+            onPointerEnter={handleCtaPointerEnter}
+            onPointerLeave={handleCtaPointerLeave}
+            onFocus={handleCtaFocus}
+            onBlur={handleCtaBlur}
             aria-label={`Ver disponibilidad de medios ${collection.label}`}
           >
-            Ver disponibilidad
+            <span className="collection-heading__fluid" aria-hidden="true">
+              <i className="collection-heading__fluid-wave" />
+              <i className="collection-heading__fluid-wave" />
+              <i className="collection-heading__fluid-wave" />
+            </span>
+            <span className="collection-heading__availability-label">
+              Ver disponibilidad
+            </span>
           </Link>
         )}
       </div>
@@ -311,7 +745,12 @@ export function GalleryScene() {
               <header className="collection-heading" data-collection-label>
                 <div className="collection-heading__intro">
                   <div className="collection-heading__title-mask">
-                    <h2 className="collection-heading__title">{collection.label}</h2>
+                    <h2
+                      className="collection-heading__title"
+                      data-title={collection.label}
+                    >
+                      {collection.label}
+                    </h2>
                   </div>
                   <div className="collection-heading__details">
                     <p>{collection.description}</p>
@@ -374,6 +813,13 @@ export function GalleryScene() {
             </div>
           </section>
         ))}
+      </div>
+
+      <div className="gallery-ambient" ref={galleryAmbient} aria-hidden="true">
+        <i className="gallery-ambient__orb">
+          <i className="gallery-ambient__orb-light" />
+        </i>
+        <i className="gallery-ambient__glass" />
       </div>
     </section>
   )
