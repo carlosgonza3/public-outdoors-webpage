@@ -47,7 +47,6 @@ export function PurposeScene() {
 
       if (mobile) {
         gsap.set(stages, { autoAlpha: 0, y: 24 })
-        gsap.set(question.current, { autoAlpha: 1 })
         gsap.set(contactContainer, { autoAlpha: 1, pointerEvents: 'none' })
         gsap.set(backdrop, { autoAlpha: 0 })
         gsap.set(contactMotion, {
