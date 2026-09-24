@@ -21,14 +21,16 @@ main {
 }
 
 .site-nav__butterfly {
+  --site-nav-butterfly-size: clamp(2.7rem, 3.4vw, 3.55rem);
   position: absolute;
   top: clamp(1rem, 2.15vw, 2rem);
   left: clamp(1rem, 2.5vw, 2.6rem);
-  width: clamp(2.7rem, 3.4vw, 3.55rem);
-  aspect-ratio: 1;
+  width: var(--site-nav-butterfly-size);
+  height: var(--site-nav-butterfly-size);
   display: grid;
   place-items: center;
   padding: .48rem;
+  box-sizing: content-box;
   border: 1px solid rgb(255 255 255 / 16%);
   border-radius: 50%;
   background: rgb(7 8 11 / 58%);
