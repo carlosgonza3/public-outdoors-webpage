@@ -327,9 +327,82 @@ export function ImpactScene() {
         },
       )
 
+      const desktopClientLogos = gsap.utils.toArray<HTMLElement>(
+        '.client-logo',
+        section.current,
+      )
+      const cardPulseAnimations = desktopClientLogos.map((logo, index) => {
+        const image = logo.querySelector('img')
+        const restingRotation = Number(gsap.getProperty(logo, 'rotation')) || 0
+        const rotationNudge = index % 2 === 0 ? 1.25 : -1.25
+        const timeline = gsap.timeline({ paused: true })
+
+        timeline
+          .to(logo, {
+            y: 3,
+            scaleX: 1.025,
+            scaleY: 0.965,
+            duration: 0.1,
+            ease: 'power2.in',
+          })
+          .to(logo, {
+            y: -9,
+            scaleX: 1.065,
+            scaleY: 1.085,
+            rotation: restingRotation + rotationNudge,
+            duration: 0.17,
+            ease: 'power3.out',
+          })
+          .to(logo, {
+            y: 1,
+            scaleX: 0.992,
+            scaleY: 0.985,
+            rotation: restingRotation - rotationNudge * 0.25,
+            duration: 0.12,
+            ease: 'power2.in',
+          })
+          .to(logo, {
+            y: 0,
+            scaleX: 1,
+            scaleY: 1,
+            rotation: restingRotation,
+            duration: 0.34,
+            ease: 'elastic.out(1, 0.52)',
+          })
+
+        if (image) {
+          timeline
+            .to(image, {
+              scale: 1.36,
+              duration: 0.18,
+              ease: 'power2.out',
+            }, 0.08)
+            .to(image, {
+              scale: 1.28,
+              duration: 0.38,
+              ease: 'elastic.out(1, 0.55)',
+            }, 0.27)
+        }
+
+        return timeline
+      })
+      const cardCenterTriggers = desktopClientLogos.map((logo, index) => {
+        const pulse = () => cardPulseAnimations[index].restart()
+
+        return ScrollTrigger.create({
+          trigger: logo,
+          containerAnimation: horizontalScroll,
+          start: 'center center',
+          onEnter: pulse,
+          onLeaveBack: pulse,
+        })
+      })
+
       return () => {
         entryPreview.kill()
         horizontalScroll.kill()
+        cardCenterTriggers.forEach((trigger) => trigger.kill())
+        cardPulseAnimations.forEach((animation) => animation.kill())
         counterObserver.disconnect()
         counterAnimations.forEach((animation) => animation.kill())
       }
