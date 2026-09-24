@@ -1,10 +1,11 @@
 import { useRef } from 'react'
-import { gsap, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 import { ContactCard } from '../components/ContactCard'
+import { isGoogleAppBrowser } from '../platform/googleApp'
 import { isIOSSafari } from '../platform/iosSafari'
 
 const questionWords = ['¿No', 'viste', 'tu', 'marca?']
@@ -35,6 +36,7 @@ export function PurposeScene() {
       )
       const mobile = isMobileExperience()
       const iosSafari = isIOSSafari()
+      const googleAppBrowser = isGoogleAppBrowser()
 
       if (!contactContainer || !backdrop || !contactMotion) return
 
@@ -46,6 +48,13 @@ export function PurposeScene() {
       }
 
       if (mobile) {
+        const impactEnd = document.querySelector<HTMLElement>(
+          '.impact-track__end',
+        )
+        const mobileTrigger =
+          googleAppBrowser && impactEnd ? impactEnd : section.current
+
+        if (googleAppBrowser) gsap.set(section.current, { zIndex: 2 })
         gsap.set(stages, { autoAlpha: 0, y: 24 })
         gsap.set(contactContainer, { autoAlpha: 1, pointerEvents: 'none' })
         gsap.set(backdrop, { autoAlpha: 0 })
@@ -65,11 +74,12 @@ export function PurposeScene() {
         const mobileTimeline = gsap.timeline({
           defaults: { ease: 'power2.inOut' },
           scrollTrigger: {
-            trigger: section.current,
-            start: 'top top',
+            trigger: mobileTrigger,
+            start: googleAppBrowser && impactEnd ? 'bottom top' : 'top top',
             end: '+=390%',
-            pin: true,
+            pin: section.current,
             pinType: 'fixed',
+            pinReparent: googleAppBrowser,
             scrub: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
@@ -158,7 +168,31 @@ export function PurposeScene() {
             '-=.08',
           )
 
-        return () => mobileTimeline.kill()
+        let viewportRefresh: gsap.core.Tween | undefined
+        const refreshForGoogleApp = () => {
+          viewportRefresh?.kill()
+          viewportRefresh = gsap.delayedCall(0.3, () => ScrollTrigger.refresh())
+        }
+
+        if (googleAppBrowser) {
+          window.visualViewport?.addEventListener(
+            'resize',
+            refreshForGoogleApp,
+            { passive: true },
+          )
+          window.addEventListener('orientationchange', refreshForGoogleApp)
+          viewportRefresh = gsap.delayedCall(0.45, () => ScrollTrigger.refresh())
+        }
+
+        return () => {
+          viewportRefresh?.kill()
+          window.visualViewport?.removeEventListener(
+            'resize',
+            refreshForGoogleApp,
+          )
+          window.removeEventListener('orientationchange', refreshForGoogleApp)
+          mobileTimeline.kill()
+        }
       }
 
       gsap.set(statement.current, { autoAlpha: 0 })
