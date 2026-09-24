@@ -34,6 +34,7 @@ export function PurposeScene() {
         '.contact-card__motion',
       )
       const mobile = isMobileExperience()
+      const iosSafari = isIOSSafari()
 
       if (!contactContainer || !backdrop || !contactMotion) return
 
@@ -86,12 +87,12 @@ export function PurposeScene() {
             start: 'top top',
             end: '+=390%',
             pin: true,
-            pinType: 'fixed',
-            scrub: true,
+            pinType: iosSafari ? 'transform' : 'fixed',
+            scrub: 0.18,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            onEnter: () => setPageTone('#03131c', true),
-            onEnterBack: () => setPageTone('#03131c', true),
+            onEnter: () => setPageTone('#07110f', true),
+            onEnterBack: () => setPageTone('#07110f', true),
             onLeaveBack: () => setPageTone('#080b0a', true),
           },
         })
@@ -111,11 +112,6 @@ export function PurposeScene() {
             scale: 0.985,
             duration: 0.38,
           })
-          .to(
-            ambient.current,
-            { xPercent: 1.5, scale: 1.02, duration: 0.38 },
-            '<',
-          )
           .set(statement.current, { autoAlpha: 1 })
           .to(statementWords, {
             yPercent: 0,
@@ -130,11 +126,6 @@ export function PurposeScene() {
             yPercent: -8,
             duration: 0.38,
           })
-          .to(
-            ambient.current,
-            { xPercent: -1, scale: 1.01, duration: 0.38 },
-            '<',
-          )
           .set(action.current, { autoAlpha: 1 })
           .to(actionLead, {
             yPercent: 0,
@@ -205,8 +196,6 @@ export function PurposeScene() {
 
         return () => mobileTimeline.kill()
       }
-
-      const iosSafari = isIOSSafari()
 
       gsap.set(statement.current, { autoAlpha: 0 })
       gsap.set(action.current, { autoAlpha: 0 })

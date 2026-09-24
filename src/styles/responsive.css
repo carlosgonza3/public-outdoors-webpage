@@ -477,9 +477,6 @@
     transform-origin: center bottom;
     will-change: transform, opacity;
   }
-  .purpose-section {
-    min-height: 100svh;
-  }
   .project-grid-section {
     min-height: 0;
     margin-top: -18svh;

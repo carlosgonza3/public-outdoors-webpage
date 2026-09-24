@@ -186,7 +186,10 @@
 
 @media (max-width: 900px) {
   .purpose-section {
+    height: 100vh;
+    height: 100lvh;
     min-height: 100svh;
+    min-height: 100lvh;
     display: grid;
     padding: 1.25rem;
     perspective: none;
@@ -196,12 +199,14 @@
   .purpose-section .ambient-field {
     position: absolute;
     inset: 0;
+    contain: strict;
   }
 
   .purpose-section .purpose-glow {
     display: block;
     animation: none;
     filter: blur(18px) saturate(108%);
+    will-change: auto;
   }
 
   .purpose-section .purpose-glow--blue-small,
