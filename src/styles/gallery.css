@@ -268,20 +268,41 @@
     transform .35s cubic-bezier(.2, .8, .2, 1);
 }
 
-.collection-heading__cta::before {
-  content: '';
+.collection-heading__fluid {
   position: absolute;
-  z-index: -1;
+  z-index: 0;
   inset: 0;
+  overflow: hidden;
   border-radius: inherit;
   background: var(--collection-accent);
-  transform: translateX(-102%);
-  transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+  clip-path: circle(0% at 0 50%);
+  pointer-events: none;
+  will-change: clip-path;
 }
 
-.collection-heading__cta strong { font-weight: 760; }
+.collection-heading__fluid-wave {
+  position: absolute;
+  width: 58%;
+  aspect-ratio: 1;
+  display: block;
+  border-radius: 43% 57% 62% 38% / 58% 44% 56% 42%;
+  opacity: 0;
+  background: color-mix(in srgb, #fff 22%, var(--collection-accent));
+  filter: blur(1.5px);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.collection-heading__cta strong {
+  position: relative;
+  z-index: 1;
+  font-weight: 760;
+}
 
 .collection-heading__cta svg {
+  position: relative;
+  z-index: 1;
   width: 1.25rem;
   height: 1.25rem;
   fill: none;
@@ -299,9 +320,6 @@
   transform: translateY(-2px);
 }
 
-.collection-heading__cta:hover::before,
-.collection-heading__cta:focus-visible::before { transform: translateX(0); }
-
 .collection-heading__cta:hover svg,
 .collection-heading__cta:focus-visible svg { transform: translateX(.18rem); }
 
@@ -311,11 +329,13 @@
 }
 
 .collection-heading__availability {
+  position: relative;
   min-height: 3.35rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: .78rem 1.35rem;
+  overflow: hidden;
   border: 1px solid rgb(247 245 239 / 38%);
   border-radius: 999px;
   background: transparent;
@@ -327,6 +347,7 @@
   text-decoration: none;
   text-transform: uppercase;
   box-sizing: border-box;
+  isolation: isolate;
   transition:
     background-color .3s ease,
     border-color .3s ease,
@@ -334,11 +355,16 @@
     transform .35s cubic-bezier(.2, .8, .2, 1);
 }
 
+.collection-heading__availability-label {
+  position: relative;
+  z-index: 1;
+}
+
 .collection-heading__availability:hover,
 .collection-heading__availability:focus-visible {
-  border-color: var(--collection-accent);
-  background: color-mix(in srgb, var(--collection-accent) 10%, transparent);
-  color: #f7f5ef;
+  border-color: rgb(247 245 239 / 72%);
+  background: transparent;
+  color: #07080b;
   transform: translateY(-2px);
 }
 

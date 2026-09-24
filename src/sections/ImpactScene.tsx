@@ -216,7 +216,6 @@ export function ImpactScene() {
       aria-label="Nuestro impacto y clientes"
       data-scene-id="impact"
     >
-
       <div className="impact-track" ref={track}>
         {metrics.map((metric, index) => (
           <article className="impact-metric" key={metric.value}>
@@ -238,12 +237,10 @@ export function ImpactScene() {
             <p>{metric.label}</p>
           </article>
         ))}
-
         <div className="clients-intro">
           <p>Marcas que confían en nosotros</p>
           <strong>Nuestros clientes</strong>
         </div>
-
         <div className="clients-list" aria-label="Logotipos de nuestros clientes">
           {clientLogos.map((logo, index) => (
             <figure className="client-logo" key={logo}>
@@ -256,7 +253,6 @@ export function ImpactScene() {
             </figure>
           ))}
         </div>
-
         <p className="impact-track__end" aria-hidden="true">
           Juntos llegamos más lejos.
         </p>

@@ -25,7 +25,7 @@ export function GalleryScene() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  useGSAP(
+  const { contextSafe } = useGSAP(
     () => {
       if (prefersReducedMotion()) return
 
@@ -162,6 +162,141 @@ export function GalleryScene() {
     { scope: section },
   )
 
+  const animateCtaFluid = contextSafe((
+    button: HTMLAnchorElement,
+    originX: number,
+    originY: number,
+    fill: boolean,
+  ) => {
+    const fluid = button.querySelector<HTMLElement>(
+      '.collection-heading__fluid',
+    )
+    const waves = fluid
+      ? gsap.utils.toArray<HTMLElement>('.collection-heading__fluid-wave', fluid)
+      : []
+
+    if (!fluid) return
+
+    const origin = `${originX}% ${originY}%`
+    gsap.killTweensOf([fluid, ...waves])
+
+    if (prefersReducedMotion()) {
+      gsap.set(fluid, {
+        clipPath: `circle(${fill ? 160 : 0}% at ${origin})`,
+      })
+      gsap.set(waves, { opacity: 0 })
+      return
+    }
+
+    gsap.set(waves, {
+      left: `${originX}%`,
+      top: `${originY}%`,
+      xPercent: -50,
+      yPercent: -50,
+    })
+
+    if (fill) {
+      gsap.set(fluid, { clipPath: `circle(0% at ${origin})` })
+      gsap.set(waves, {
+        opacity: 0.26,
+        scale: (index) => 0.16 + index * 0.05,
+        rotation: (index) => -28 + index * 31,
+      })
+
+      gsap
+        .timeline()
+        .to(fluid, {
+          clipPath: `circle(160% at ${origin})`,
+          duration: 0.68,
+          ease: 'power3.inOut',
+        })
+        .to(waves, {
+          scale: (index) => 2.1 + index * 0.34,
+          rotation: (index) => 42 + index * 47,
+          duration: 0.64,
+          stagger: 0.045,
+          ease: 'power2.out',
+        }, 0)
+        .to(waves, {
+          opacity: 0,
+          duration: 0.2,
+          stagger: 0.025,
+          ease: 'power1.out',
+        }, 0.43)
+      return
+    }
+
+    gsap.set(fluid, { clipPath: `circle(160% at ${origin})` })
+    gsap.set(waves, {
+      opacity: 0.2,
+      scale: (index) => 1.75 + index * 0.22,
+      rotation: (index) => 18 + index * 38,
+    })
+
+    gsap
+      .timeline()
+      .to(waves, {
+        scale: (index) => 0.12 + index * 0.04,
+        rotation: (index) => -34 - index * 27,
+        opacity: 0,
+        duration: 0.48,
+        stagger: 0.025,
+        ease: 'power3.in',
+      })
+      .to(fluid, {
+        clipPath: `circle(0% at ${origin})`,
+        duration: 0.5,
+        ease: 'power3.inOut',
+      }, 0)
+  })
+
+  const getCtaEdgeOrigin = (
+    event: React.PointerEvent<HTMLAnchorElement>,
+  ) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const relativeX = gsap.utils.clamp(0, 1, (event.clientX - bounds.left) / bounds.width)
+    const relativeY = gsap.utils.clamp(0, 1, (event.clientY - bounds.top) / bounds.height)
+    const normalizedX = relativeX * 2 - 1
+    const normalizedY = relativeY * 2 - 1
+
+    if (Math.abs(normalizedX) > Math.abs(normalizedY)) {
+      return {
+        x: normalizedX > 0 ? 100 : 0,
+        y: relativeY * 100,
+      }
+    }
+
+    return {
+      x: relativeX * 100,
+      y: normalizedY > 0 ? 100 : 0,
+    }
+  }
+
+  const handleCtaPointerEnter = (
+    event: React.PointerEvent<HTMLAnchorElement>,
+  ) => {
+    if (event.pointerType === 'touch') return
+    const origin = getCtaEdgeOrigin(event)
+    animateCtaFluid(event.currentTarget, origin.x, origin.y, true)
+  }
+
+  const handleCtaPointerLeave = (
+    event: React.PointerEvent<HTMLAnchorElement>,
+  ) => {
+    if (event.pointerType === 'touch') return
+    const origin = getCtaEdgeOrigin(event)
+    animateCtaFluid(event.currentTarget, origin.x, origin.y, false)
+  }
+
+  const handleCtaFocus = (event: React.FocusEvent<HTMLAnchorElement>) => {
+    if (!event.currentTarget.matches(':focus-visible')) return
+    animateCtaFluid(event.currentTarget, 50, 50, true)
+  }
+
+  const handleCtaBlur = (event: React.FocusEvent<HTMLAnchorElement>) => {
+    animateCtaFluid(event.currentTarget, 50, 50, false)
+  }
+
   const openCollection = (
     event: React.MouseEvent<HTMLAnchorElement>,
     collectionId: string,
@@ -208,8 +343,17 @@ export function GalleryScene() {
           to={`/${collection.id}`}
           state={{ backgroundLocation: location }}
           onClick={(event) => openCollection(event, collection.id)}
+          onPointerEnter={handleCtaPointerEnter}
+          onPointerLeave={handleCtaPointerLeave}
+          onFocus={handleCtaFocus}
+          onBlur={handleCtaBlur}
           aria-label={`Ver más proyectos ${collection.label}`}
         >
+          <span className="collection-heading__fluid" aria-hidden="true">
+            <i className="collection-heading__fluid-wave" />
+            <i className="collection-heading__fluid-wave" />
+            <i className="collection-heading__fluid-wave" />
+          </span>
           <strong>Ver más</strong>
           <svg viewBox="0 0 64 64" aria-hidden="true">
             <path d="M10 32h42M36 16l16 16-16 16" />
@@ -220,9 +364,20 @@ export function GalleryScene() {
           <Link
             className="collection-heading__availability"
             to="/disponibilidad"
+            onPointerEnter={handleCtaPointerEnter}
+            onPointerLeave={handleCtaPointerLeave}
+            onFocus={handleCtaFocus}
+            onBlur={handleCtaBlur}
             aria-label={`Ver disponibilidad de medios ${collection.label}`}
           >
-            Ver disponibilidad
+            <span className="collection-heading__fluid" aria-hidden="true">
+              <i className="collection-heading__fluid-wave" />
+              <i className="collection-heading__fluid-wave" />
+              <i className="collection-heading__fluid-wave" />
+            </span>
+            <span className="collection-heading__availability-label">
+              Ver disponibilidad
+            </span>
           </Link>
         )}
       </div>
