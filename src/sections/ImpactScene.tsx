@@ -38,7 +38,6 @@ clientLogos.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 export function ImpactScene() {
   const section = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
-  const chrome = useRef<HTMLDivElement>(null)
   const metricValues = useRef<Array<HTMLElement | null>>([])
 
   useGSAP(
@@ -147,9 +146,10 @@ export function ImpactScene() {
 
       const distance = () =>
         Math.max(0, track.current!.scrollWidth - document.documentElement.clientWidth)
-      const leadInProgress = mobile ? 0 : 0.035
+      const previewDistance = () =>
+        mobile ? 0 : Math.min(window.innerWidth * 0.1, 160)
       const scrollDistance = () => {
-        if (!mobile) return distance() / (1 - leadInProgress)
+        if (!mobile) return Math.max(1, distance() - previewDistance())
 
         // Keep the complete horizontal journey, but cap its vertical pin time
         // so a phone never feels trapped inside the scene. The track still
@@ -161,46 +161,51 @@ export function ImpactScene() {
         )
       }
 
-      const horizontalScroll = gsap.timeline({
-        scrollTrigger: {
-          trigger: section.current,
-          start: 'top top',
-          end: () => `+=${scrollDistance()}`,
-          pin: true,
-          pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: mobile ? true : 0.8,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onEnter: () => setPageTone('#080b0a', true),
-          onEnterBack: () => setPageTone('#080b0a', true),
-          onLeaveBack: () => setPageTone(mobile ? '#171717' : '#03131c', true),
-        },
-      })
+      const entryPreview = mobile
+        ? null
+        : gsap.fromTo(
+            track.current,
+            { x: 0 },
+            {
+              x: () => -previewDistance(),
+              force3D: true,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: section.current,
+                start: 'top 90%',
+                end: 'top top',
+                scrub: true,
+                invalidateOnRefresh: true,
+              },
+            },
+          )
 
-      horizontalScroll
-        .to({}, { duration: leadInProgress })
-        .to(
-          chrome.current,
-          {
-            autoAlpha: 0,
-            y: -24,
-            duration: 0.045,
-            ease: 'power2.out',
+      const horizontalScroll = gsap.fromTo(
+        track.current,
+        { x: () => -previewDistance() },
+        {
+          x: () => -distance(),
+          force3D: true,
+          ease: 'none',
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: section.current,
+            start: 'top top',
+            end: () => `+=${scrollDistance()}`,
+            pin: true,
+            pinType: iosSafari ? 'transform' : 'fixed',
+            scrub: mobile ? true : 0.55,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onEnter: () => setPageTone('#080b0a', true),
+            onEnterBack: () => setPageTone('#080b0a', true),
+            onLeaveBack: () => setPageTone(mobile ? '#171717' : '#03131c', true),
           },
-          leadInProgress,
-        )
-        .to(
-          track.current,
-          {
-            x: () => -distance(),
-            force3D: true,
-            duration: 1 - leadInProgress,
-            ease: 'none',
-          },
-          leadInProgress,
-        )
+        },
+      )
 
       return () => {
+        entryPreview?.kill()
         horizontalScroll.kill()
         counterObserver.disconnect()
         counterAnimations.forEach((animation) => animation.kill())
