@@ -183,7 +183,7 @@
   width: min(72rem, 100%);
   display: grid;
   place-items: center;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .purpose-contact .contact-card__motion,

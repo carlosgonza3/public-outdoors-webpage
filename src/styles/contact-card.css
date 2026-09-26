@@ -42,6 +42,11 @@
   will-change: transform;
 }
 
+.is-safari .contact-card__motion,
+.is-safari .contact-card__stage {
+  transform-style: flat;
+}
+
 .contact-card__stage::before,
 .contact-card__stage::after {
   content: '';
@@ -101,6 +106,7 @@
     0 3rem 8rem rgb(0 0 0 / 42%);
   color: #090b0d;
   box-sizing: border-box;
+  pointer-events: auto;
 }
 
 @property --contact-glow-angle {
@@ -143,9 +149,12 @@
 }
 
 .contact-card__actions {
+  position: relative;
+  z-index: 3;
   display: flex;
   align-items: center;
   gap: clamp(.9rem, 1.8vw, 1.7rem);
+  pointer-events: auto;
 }
 
 .contact-card__share,
@@ -259,10 +268,13 @@
 }
 
 .contact-card__details {
+  position: relative;
+  z-index: 3;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-content: end;
   gap: 0 clamp(1.25rem, 2.5vw, 2.5rem);
+  pointer-events: auto;
 }
 
 .contact-card__datum {
@@ -486,6 +498,17 @@
   .contact-card__whatsapp-list a:hover small { color: rgb(245 242 235 / 62%); }
 }
 
+.is-safari .contact-card__whatsapp-list a:hover {
+  border-color: #090b0d;
+  background: #090b0d;
+  color: #f5f2eb;
+  transform: translateX(.2rem);
+}
+
+.is-safari .contact-card__whatsapp-list a:hover small {
+  color: rgb(245 242 235 / 62%);
+}
+
 @keyframes contact-whatsapp-panel-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -508,6 +531,27 @@
     color: rgb(245 242 235 / 58%);
   }
 
+}
+
+.is-safari .contact-card__share:not(:disabled):hover svg {
+  transform: translateY(-2px);
+}
+
+.is-safari .contact-card__close:hover svg {
+  transform: rotate(90deg);
+}
+
+.is-safari .contact-card__datum:hover {
+  color: #f5f2eb;
+}
+
+.is-safari .contact-card__datum:hover::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.is-safari .contact-card__datum:hover .contact-card__datum-label {
+  color: rgb(245 242 235 / 58%);
 }
 
 @keyframes contact-share-pulse {
@@ -596,6 +640,17 @@
   .contact-card__socials a:not([aria-disabled='true']):hover img {
     filter: invert(1);
   }
+}
+
+.is-safari .contact-card__socials a:not([aria-disabled='true']):hover {
+  border-color: #090b0d;
+  background: #090b0d;
+  color: #f5f2eb;
+  transform: translateY(-2px);
+}
+
+.is-safari .contact-card__socials a:not([aria-disabled='true']):hover img {
+  filter: invert(1);
 }
 
 @media (max-width: 829px) {

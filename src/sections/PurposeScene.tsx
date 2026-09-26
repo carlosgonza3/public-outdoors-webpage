@@ -5,7 +5,7 @@ import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 import { ContactCard } from '../components/ContactCard'
-import { isIOSSafari } from '../platform/iosSafari'
+import { isIOSSafari, isSafari } from '../platform/iosSafari'
 
 const questionWords = ['¿No', 'viste', 'tu', 'marca?']
 const statementWords = ['No', 'dejes', 'que', 'pase', 'de', 'nuevo.']
@@ -40,6 +40,7 @@ export function PurposeScene() {
       )
       const mobile = isMobileExperience()
       const iosSafari = isIOSSafari()
+      const safari = isSafari()
 
       if (
         !contactContainer ||
@@ -132,15 +133,22 @@ export function PurposeScene() {
         pointerEvents: 'none',
       })
       gsap.set(backdrop, { autoAlpha: 0 })
-      gsap.set(contactMotion, {
-        autoAlpha: 0,
-        xPercent: -12,
-        yPercent: 0,
-        rotationY: -48,
-        scale: 0.96,
-        clipPath: 'inset(0 82% 0 0 round 1.5rem)',
-        transformOrigin: 'left center',
-      })
+      if (safari) {
+        gsap.set(contactMotion, {
+          autoAlpha: 0,
+          clearProps: 'transform,clipPath',
+        })
+      } else {
+        gsap.set(contactMotion, {
+          autoAlpha: 0,
+          xPercent: -12,
+          yPercent: 0,
+          rotationY: -48,
+          scale: 0.96,
+          clipPath: 'inset(0 82% 0 0 round 1.5rem)',
+          transformOrigin: 'left center',
+        })
+      }
       gsap.set(ambient.current, {
         transformOrigin: '50% 50%',
         force3D: true,
@@ -376,32 +384,47 @@ export function PurposeScene() {
         )
         .to(
           contactMotion,
-          {
-            autoAlpha: 1,
-            xPercent: 0,
-            yPercent: 0,
-            rotationY: 0,
-            scale: 1,
-            clipPath: 'inset(0 0% 0 0 round 1.5rem)',
-            duration: 0.82,
-            ease: 'power4.out',
-          },
+          safari
+            ? {
+                autoAlpha: 1,
+                duration: 0.42,
+                ease: 'power2.out',
+              }
+            : {
+                autoAlpha: 1,
+                xPercent: 0,
+                yPercent: 0,
+                rotationY: 0,
+                scale: 1,
+                clipPath: 'inset(0 0% 0 0 round 1.5rem)',
+                duration: 0.82,
+                ease: 'power4.out',
+              },
           '<',
         )
         .set(contactMotion, { clipPath: 'none' })
         .to({}, { duration: 0.9 })
-        .to(contactMotion, {
-          xPercent: 16,
-          yPercent: 0,
-          rotationX: 0,
-          rotationY: 62,
-          scale: 0.91,
-          clipPath: 'inset(0 0 0 100% round 1.5rem)',
-          autoAlpha: 0,
-          duration: 0.72,
-          ease: 'power3.inOut',
-          transformOrigin: 'right center',
-        })
+        .to(
+          contactMotion,
+          safari
+            ? {
+                autoAlpha: 0,
+                duration: 0.38,
+                ease: 'power2.in',
+              }
+            : {
+                xPercent: 16,
+                yPercent: 0,
+                rotationX: 0,
+                rotationY: 62,
+                scale: 0.91,
+                clipPath: 'inset(0 0 0 100% round 1.5rem)',
+                autoAlpha: 0,
+                duration: 0.72,
+                ease: 'power3.inOut',
+                transformOrigin: 'right center',
+              },
+        )
         .set(contactContainer, { pointerEvents: 'none' })
         .to(
           backdrop,
