@@ -53,7 +53,7 @@ export function IntroScene({
   const logoButton = useRef<HTMLButtonElement>(null)
 
   useGSAP(
-    () => {
+    (_context, contextSafe) => {
       const mobile = isMobileExperience()
       let maskComplete = false
       let mobileNavigationHidden = false
@@ -369,6 +369,8 @@ export function IntroScene({
       const press = { y: 0, rotation: 0, scale: 1 }
       const pressTimeline = gsap.timeline({ paused: true })
       let logoButtonActive = true
+      let logoPresses = 0
+      let logoPressResetTimer: number | undefined
 
       const measureLogoCenter = () => {
         const bounds = colorMark.current?.getBoundingClientRect()
@@ -447,10 +449,73 @@ export function IntroScene({
         colorMarkPress.current?.setAttribute('transform', transform)
       }
 
-      const handleLogoPress = () => {
+      const runLogoPress = () => {
         if (!logoButtonActive) return
+
+        window.clearTimeout(logoPressResetTimer)
+        logoPresses += 1
+        const isTriplePress = logoPresses === 3
+
+        if (isTriplePress) {
+          logoPresses = 0
+        } else {
+          logoPressResetTimer = window.setTimeout(() => {
+            logoPresses = 0
+          }, 900)
+        }
+
+        pressTimeline.pause().clear()
+
+        if (isTriplePress) {
+          pressTimeline
+            .to(press, {
+              y: 2.4,
+              rotation: -5,
+              scale: 0.84,
+              duration: 0.08,
+              ease: 'power2.in',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              y: -18,
+              rotation: 180,
+              scale: 1.1,
+              duration: 0.25,
+              ease: 'power3.out',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              y: 0,
+              rotation: 360,
+              scale: 0.95,
+              duration: 0.3,
+              ease: 'power2.in',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              y: -1.2,
+              scale: 1.06,
+              duration: 0.1,
+              ease: 'power2.out',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              y: 0,
+              rotation: 360,
+              scale: 1,
+              duration: 0.18,
+              ease: 'back.out(2.4)',
+              onUpdate: renderPress,
+              onComplete: () => {
+                press.rotation = 0
+                renderPress()
+              },
+            })
+            .restart()
+          return
+        }
+
         pressTimeline
-          .clear()
           .to(press, {
             y: 1.8,
             rotation: -2.4,
@@ -485,6 +550,9 @@ export function IntroScene({
           })
           .restart()
       }
+      const handleLogoPress = contextSafe
+        ? contextSafe(runLogoPress)
+        : runLogoPress
 
       const setLogoButtonActive = (active: boolean) => {
         if (active === logoButtonActive) return
@@ -495,6 +563,8 @@ export function IntroScene({
         }
 
         if (active) return
+        window.clearTimeout(logoPressResetTimer)
+        logoPresses = 0
         pressTimeline.pause(0).clear()
         press.y = 0
         press.rotation = 0
@@ -792,6 +862,7 @@ export function IntroScene({
           resetPerspectiveTarget,
         )
         logoButton.current?.removeEventListener('click', handleLogoPress)
+        window.clearTimeout(logoPressResetTimer)
         window.clearTimeout(quietTimer)
         window.removeEventListener('wheel', stopMomentum)
         window.removeEventListener('touchstart', startTouchGesture)
