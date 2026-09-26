@@ -480,22 +480,28 @@
   .scroll-cue i { height: 2rem; }
   .scene-copy { padding-inline: 1.25rem; }
   .scene-copy--intro h1 {
-    width: min(100%, 45rem);
-    font-size: clamp(2.55rem, 11.8vw, 4rem);
+    width: min(calc(100vw - 1.5rem), 45rem);
+    font-size: clamp(1.5rem, 7.2vw, 3.25rem);
     line-height: .9;
     letter-spacing: -.065em;
+    text-align: center;
   }
   .scene-copy--intro .slogan-line {
     width: 100%;
     max-width: 100%;
   }
   .scene-copy--intro .slogan-line > span {
-    text-wrap: balance;
+    white-space: nowrap;
+    text-wrap: nowrap;
     overflow-wrap: normal;
     word-break: normal;
   }
-  .brand-intro-lockup { gap: clamp(.7rem, 3vw, 1rem); }
-  .brand-intro__prefix { font-size: clamp(2rem, 10.5vw, 3rem); }
+  .brand-intro-lockup {
+    --brand-word-gap: clamp(.7rem, 3vw, 1rem);
+    --brand-punctuation-gap: .2rem;
+  }
+  .brand-intro__prefix,
+  .brand-intro__punctuation { font-size: clamp(2rem, 10.5vw, 3rem); }
   .brand-intro__wordmark { width: min(52vw, 15rem); }
   .purpose-stage { padding-inline: 1.25rem; }
   .purpose-question h2 { font-size: clamp(3.2rem, 14vw, 5rem); }
@@ -1449,9 +1455,10 @@
   }
 
   .intro .scene-copy--intro h1 {
-    width: calc(100% - clamp(2rem, 9vw, 4rem));
-    margin-left: clamp(2rem, 9vw, 4rem);
-    font-size: clamp(2.35rem, 10vw, 3.45rem);
+    width: min(calc(100vw - 1.5rem), 45rem);
+    margin-inline: auto;
+    font-size: clamp(1.5rem, 7.2vw, 3.25rem);
+    text-align: center;
   }
 
   .grid-heading {

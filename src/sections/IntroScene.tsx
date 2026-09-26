@@ -917,17 +917,21 @@ export function IntroScene({
           aria-hidden="true"
         >
           <div className="brand-intro-lockup">
-            <span className="brand-intro__prefix">Somos</span>
+            <span className="brand-intro__phrase">
+              <span className="brand-intro__punctuation">¡</span>
+              <span className="brand-intro__prefix">Somos</span>
+            </span>
             <PublicWordmark />
+            <span className="brand-intro__punctuation brand-intro__punctuation--closing">!</span>
           </div>
         </div>
         <div className="scene-copy scene-copy--intro" ref={copy}>
           <h1>
             <span className="slogan-line">
-              <span>Creamos espacios únicos para</span>
+              <span>Creamos espacios únicos</span>
             </span>
             <span className="slogan-line">
-              <span>elevar tu marca</span>
+              <span>para elevar tu marca</span>
             </span>
           </h1>
         </div>

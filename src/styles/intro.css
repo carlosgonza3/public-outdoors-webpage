@@ -200,20 +200,40 @@
 }
 
 .brand-intro-lockup {
+  --brand-word-gap: clamp(1rem, 2.25vw, 2.25rem);
+  --brand-punctuation-gap: clamp(.3rem, .55vw, .55rem);
   width: min(100%, 58rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1rem, 2.25vw, 2.25rem);
+  gap: 0;
   color: #f7f5ef;
   line-height: 1;
 }
 
-.brand-intro__prefix {
+.brand-intro__phrase {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--brand-punctuation-gap);
+  margin-right: var(--brand-word-gap);
+}
+
+.brand-intro__prefix,
+.brand-intro__punctuation {
   flex: 0 0 auto;
   font-size: clamp(3rem, 5.8vw, 5.8rem);
   font-weight: 520;
   letter-spacing: -.065em;
+}
+
+.brand-intro__punctuation {
+  line-height: .8;
+  transform: translateY(-.02em);
+}
+
+.brand-intro__punctuation--closing {
+  margin-left: var(--brand-punctuation-gap);
 }
 
 .brand-intro__wordmark {
@@ -243,13 +263,19 @@
   letter-spacing: -.07em;
 }
 
+.scene-copy--intro h1 {
+  width: min(100%, 80rem);
+  max-width: 80rem;
+  text-align: center;
+}
+
 .slogan-line {
   display: block;
   overflow: hidden;
   padding: .06em .08em .1em;
   margin: -.06em -.08em -.1em;
   font-weight: 500;
-  width: 45rem;
+  width: 100%;
 }
 
 .slogan-line > span {
