@@ -128,6 +128,15 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       if (!overlay.current || !cardMotion.current) return
       if (mode === 'scroll') return
 
+      if (prefersReducedMotion()) {
+        gsap.set([overlay.current, cardMotion.current], {
+          autoAlpha: 1,
+          clearProps: 'transform,filter,clipPath',
+        })
+        tiltReady.current = true
+        return
+      }
+
       if (isMobileExperience()) {
         tiltReady.current = false
         const timeline = gsap
@@ -157,12 +166,6 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           )
 
         return () => timeline.kill()
-      }
-
-      if (prefersReducedMotion()) {
-        gsap.set([overlay.current, cardMotion.current], { autoAlpha: 1 })
-        tiltReady.current = true
-        return
       }
 
       gsap

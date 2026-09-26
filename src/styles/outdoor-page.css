@@ -208,6 +208,13 @@
   }
 }
 
+@media (min-width: 701px) and (prefers-reduced-motion: reduce) {
+  .route-modal__panel .outdoor-formats .indoor-formats__visual {
+    min-height: clamp(24rem, 42vw, 36rem);
+    aspect-ratio: 16 / 10;
+  }
+}
+
 @media (max-width: 960px) {
   .outdoor-page .indoor-hero__heading {
     grid-template-columns: 1fr;

@@ -8,6 +8,10 @@
   color: #f7f5ef;
 }
 
+.reduced-intro-prelude {
+  display: none;
+}
+
 .reveal-content {
   position: absolute;
   inset: 0;

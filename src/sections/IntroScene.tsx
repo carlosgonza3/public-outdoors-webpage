@@ -3,6 +3,7 @@ import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
+import butterfly from '../assets/public-butterfly.svg'
 import { AmbientField } from '../components/AmbientField'
 import { BrandMask } from '../components/BrandMask'
 import { isIOSSafari } from '../platform/iosSafari'
@@ -47,6 +48,7 @@ export function IntroScene({
   const copy = useRef<HTMLDivElement>(null)
   const sloganGlow = useRef<HTMLDivElement>(null)
   const ambient = useRef<HTMLDivElement>(null)
+  const reducedPrelude = useRef<HTMLDivElement>(null)
   const scrollCue = useRef<HTMLDivElement>(null)
   const logoButton = useRef<HTMLButtonElement>(null)
 
@@ -71,12 +73,35 @@ export function IntroScene({
 
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
-        gsap.set(content.current, { autoAlpha: 1 })
-        gsap.set(brandCopy.current, { autoAlpha: 0 })
-        gsap.set(copy.current, { autoAlpha: 1 })
-        updateMaskState(true)
-        setPageTone('#07080b')
-        return
+        gsap.set(content.current, { autoAlpha: 1, clearProps: 'transform' })
+        gsap.set(ambient.current, { autoAlpha: 1, clearProps: 'transform' })
+        gsap.set([brandCopy.current, copy.current], {
+          autoAlpha: 1,
+          clearProps: 'transform,filter',
+        })
+        gsap.set('.slogan-line > span', { clearProps: 'transform' })
+        gsap.set(sloganGlow.current, { autoAlpha: 0 })
+
+        const prelude = reducedPrelude.current
+        const syncPreludeState = (showingPrelude: boolean) => {
+          updateMaskState(!showingPrelude)
+          setPageTone(showingPrelude ? '#f7f5ef' : '#07080b', true)
+        }
+
+        syncPreludeState(true)
+
+        if (!prelude) return
+
+        const preludeObserver = new IntersectionObserver(
+          ([entry]) => {
+            syncPreludeState(entry.isIntersecting)
+          },
+          { threshold: [0, 1] },
+        )
+
+        preludeObserver.observe(prelude)
+
+        return () => preludeObserver.disconnect()
       }
 
       const pulse = { scale: 1 }
@@ -795,6 +820,10 @@ export function IntroScene({
       ref={section}
       aria-label="Public Outdoors introduction"
     >
+      <div className="reduced-intro-prelude" ref={reducedPrelude}>
+        <img src={butterfly} alt="Public" />
+      </div>
+
       <div className="reveal-content" ref={content}>
         <AmbientField variant="intro" fieldRef={ambient} />
         <div className="slogan-glow" ref={sloganGlow} aria-hidden="true" />
