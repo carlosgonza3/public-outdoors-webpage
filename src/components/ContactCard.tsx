@@ -345,6 +345,14 @@ export function ContactCard({
       return
     }
 
+    if (mobileExperience) {
+      tiltReady.current = false
+      setMotionAccess('unavailable')
+      requestMotionAccess.current = () => undefined
+      gsap.set(stage, { clearProps: 'transform' })
+      return
+    }
+
     if (desktopSafari) {
       tiltReady.current = false
       setMotionAccess('unavailable')
