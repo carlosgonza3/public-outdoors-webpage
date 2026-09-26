@@ -277,24 +277,24 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     if (mode === 'scroll') tiltReady.current = true
 
     gsap.set(stage, {
-      transformPerspective: 900,
+      transformPerspective: 1050,
       transformOrigin: 'center center',
     })
 
     const rotateX = gsap.quickTo(stage, 'rotationX', {
-      duration: 0.28,
+      duration: 0.36,
       ease: 'power2.out',
     })
     const rotateY = gsap.quickTo(stage, 'rotationY', {
-      duration: 0.28,
+      duration: 0.36,
       ease: 'power2.out',
     })
     const shiftX = gsap.quickTo(stage, 'x', {
-      duration: 0.32,
+      duration: 0.4,
       ease: 'power2.out',
     })
     const shiftY = gsap.quickTo(stage, 'y', {
-      duration: 0.32,
+      duration: 0.4,
       ease: 'power2.out',
     })
 
@@ -317,12 +317,19 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
       let initialBeta: number | null = null
       let initialGamma: number | null = null
+      let calibrationBetaTotal = 0
+      let calibrationGammaTotal = 0
+      let calibrationSamples = 0
+      const requiredCalibrationSamples = 12
       let listening = false
       let permissionRequested = false
 
       const resetCalibration = safe(() => {
         initialBeta = null
         initialGamma = null
+        calibrationBetaTotal = 0
+        calibrationGammaTotal = 0
+        calibrationSamples = 0
         resetTilt()
       })
 
@@ -334,11 +341,20 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           event.gamma === null
         ) return
 
-        if (initialBeta === null || initialGamma === null) {
-          initialBeta = event.beta
-          initialGamma = event.gamma
+        if (calibrationSamples < requiredCalibrationSamples) {
+          calibrationBetaTotal += event.beta
+          calibrationGammaTotal += event.gamma
+          calibrationSamples += 1
+
+          if (calibrationSamples === requiredCalibrationSamples) {
+            initialBeta = calibrationBetaTotal / requiredCalibrationSamples
+            initialGamma = calibrationGammaTotal / requiredCalibrationSamples
+            resetTilt()
+          }
           return
         }
+
+        if (initialBeta === null || initialGamma === null) return
 
         const beta = event.beta - initialBeta
         const gamma = event.gamma - initialGamma
@@ -361,13 +377,20 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           vertical = gamma
         }
 
-        const tiltX = gsap.utils.clamp(-9, 9, (vertical / 14) * -9)
-        const tiltY = gsap.utils.clamp(-12, 12, (horizontal / 14) * 12)
+        const removeNeutralDrift = (value: number) => {
+          const deadZone = 1.35
+          if (Math.abs(value) <= deadZone) return 0
+          return value - Math.sign(value) * deadZone
+        }
+        const centeredHorizontal = removeNeutralDrift(horizontal)
+        const centeredVertical = removeNeutralDrift(vertical)
+        const tiltX = gsap.utils.clamp(-6, 6, (centeredVertical / 16) * -6)
+        const tiltY = gsap.utils.clamp(-8, 8, (centeredHorizontal / 16) * 8)
 
         rotateX(tiltX)
         rotateY(tiltY)
-        shiftX(gsap.utils.clamp(-5, 5, horizontal * 0.32))
-        shiftY(gsap.utils.clamp(-3.5, 3.5, vertical * 0.22))
+        shiftX(gsap.utils.clamp(-3, 3, centeredHorizontal * 0.18))
+        shiftY(gsap.utils.clamp(-2, 2, centeredVertical * 0.12))
       })
 
       const startListening = () => {
@@ -743,20 +766,6 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
             className="contact-card__actions"
             data-export-exclude="true"
           >
-            {motionAccess === 'needs-permission' && (
-              <button
-                className="contact-card__motion-access"
-                type="button"
-                onClick={() => requestMotionAccess.current()}
-                aria-label="Activar movimiento de la tarjeta"
-              >
-                <span>Activar movimiento</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <rect x="7.5" y="3" width="9" height="18" rx="2" />
-                  <path d="M4.5 8.5a8 8 0 0 0 0 7M19.5 8.5a8 8 0 0 1 0 7" />
-                </svg>
-              </button>
-            )}
             <button
               className={`contact-card__share is-${shareState}`}
               type="button"
@@ -867,6 +876,22 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
             ))}
           </nav>
         </footer>
+
+        {motionAccess === 'needs-permission' && (
+          <button
+            className="contact-card__motion-access"
+            type="button"
+            onClick={() => requestMotionAccess.current()}
+            aria-label="Activar movimiento de la tarjeta"
+            data-export-exclude="true"
+          >
+            <span>Activar movimiento</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="7.5" y="3" width="9" height="18" rx="2" />
+              <path d="M4.5 8.5a8 8 0 0 0 0 7M19.5 8.5a8 8 0 0 1 0 7" />
+            </svg>
+          </button>
+        )}
 
         {!useWhatsappSheet && whatsappChooser}
 
