@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import butterfly from '../assets/public-butterfly.svg'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
@@ -30,6 +30,8 @@ export function SiteNavigation({
   onContact,
   onMedia,
 }: SiteNavigationProps) {
+  const location = useLocation()
+  const navigate = useNavigate()
   const navigation = useRef<HTMLElement>(null)
   const butterflyButton = useRef<HTMLAnchorElement>(null)
   const butterflyImage = useRef<HTMLImageElement>(null)
@@ -401,9 +403,35 @@ export function SiteNavigation({
         <Link
           to="/disponibilidad"
           tabIndex={revealed && !temporarilyHidden ? 0 : -1}
-          onClick={() => {
+          onClick={(event) => {
             setMenuOpen(false)
             setMediaOpen(false)
+
+            if (
+              event.button !== 0 ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            ) {
+              return
+            }
+
+            event.preventDefault()
+            const sourceBounds = event.currentTarget.getBoundingClientRect()
+
+            navigate('/disponibilidad', {
+              state: {
+                backgroundLocation: location,
+                backgroundScrollY: window.scrollY,
+                transitionOrigin: {
+                  x: sourceBounds.x,
+                  y: sourceBounds.y,
+                  width: sourceBounds.width,
+                  height: sourceBounds.height,
+                },
+              },
+            })
           }}
         >
           Disponibilidad

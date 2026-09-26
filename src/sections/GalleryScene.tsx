@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
@@ -31,15 +31,24 @@ export function GalleryScene() {
     outdoor: 0,
     innovations: 0,
   })
+  const [railRevision, setRailRevision] = useState(0)
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const restoreRails = () => setRailRevision((revision) => revision + 1)
+
+    window.addEventListener('public:restore-gallery-rails', restoreRails)
+    return () => {
+      window.removeEventListener('public:restore-gallery-rails', restoreRails)
+    }
+  }, [])
 
   const { contextSafe } = useGSAP(
     () => {
       if (prefersReducedMotion()) return
 
       const mobile = isMobileExperience()
-      const railMedia = gsap.matchMedia()
       let removePointerTracker: (() => void) | undefined
       const heading = section.current?.querySelector<HTMLElement>('.grid-heading')
       const headingLines = heading
@@ -333,66 +342,6 @@ export function GalleryScene() {
         }
       }
 
-      railMedia.add(
-        '(min-width: 901px) and (prefers-reduced-motion: no-preference)',
-        () => {
-          const railCollections = gsap.utils.toArray<HTMLElement>(
-            '.collection--indoor, .collection--outdoor',
-          )
-
-          railCollections.forEach((collection) => {
-            const stage = collection.querySelector<HTMLElement>(
-              '.project-collection__stage',
-            )
-            const carousel = collection.querySelector<HTMLElement>(
-              '.collection-carousel',
-            )
-            const track = carousel?.querySelector<HTMLElement>(
-              '.collection-carousel__track',
-            )
-            const cards = track
-              ? gsap.utils.toArray<HTMLElement>('.project-card', track)
-              : []
-
-            if (!stage || !carousel || !track || cards.length < 2) return
-
-            const cardEntryY = () => carousel.clientHeight * 0.92
-
-            gsap.set(track, { y: 0 })
-            gsap.set(cards, {
-              y: (index) => index === 0 ? 0 : cardEntryY(),
-              zIndex: (index) => index + 1,
-              force3D: true,
-            })
-
-            const railTimeline = gsap.timeline({
-              scrollTrigger: {
-                id: `collection-rail-${collection.dataset.sceneId}`,
-                trigger: collection,
-                start: 'top top',
-                end: () =>
-                  `+=${(cards.length - 1) * window.innerHeight * 0.82 + window.innerHeight * 0.5}`,
-                pin: stage,
-                scrub: 0.65,
-                anticipatePin: 1,
-                invalidateOnRefresh: true,
-              },
-            })
-
-            cards.slice(1).forEach((card, index) => {
-              railTimeline.to(card, {
-                y: 0,
-                duration: 1,
-                ease: 'none',
-                force3D: true,
-              }, index)
-            })
-
-            railTimeline.to({}, { duration: 0.45 })
-          })
-        },
-      )
-
       collections.forEach((collection) => {
         const label = collection.querySelector<HTMLElement>('[data-collection-label]')
         const title = label?.querySelector<HTMLElement>('.collection-heading__title')
@@ -435,12 +384,83 @@ export function GalleryScene() {
           }, 0.28)
       })
 
-      return () => {
-        railMedia.revert()
-        removePointerTracker?.()
-      }
+      return () => removePointerTracker?.()
     },
     { scope: section },
+  )
+
+  useGSAP(
+    () => {
+      const railMedia = gsap.matchMedia()
+
+      railMedia.add(
+        '(min-width: 901px) and (prefers-reduced-motion: no-preference)',
+        () => {
+          const railCollections = gsap.utils.toArray<HTMLElement>(
+            '.collection--indoor, .collection--outdoor',
+          )
+
+          railCollections.forEach((collection) => {
+            const stage = collection.querySelector<HTMLElement>(
+              '.project-collection__stage',
+            )
+            const carousel = collection.querySelector<HTMLElement>(
+              '.collection-carousel',
+            )
+            const track = carousel?.querySelector<HTMLElement>(
+              '.collection-carousel__track',
+            )
+            const cards = track
+              ? gsap.utils.toArray<HTMLElement>('.project-card', track)
+              : []
+
+            if (!stage || !carousel || !track || cards.length < 2) return
+
+            const cardEntryY = () => carousel.clientHeight * 0.92
+
+            gsap.set(track, { y: 0 })
+            gsap.set(cards, {
+              y: (index) => index === 0 ? 0 : cardEntryY(),
+              zIndex: (index) => index + 1,
+              force3D: true,
+            })
+
+            const railTimeline = gsap.timeline({
+              scrollTrigger: {
+                id: `collection-rail-${collection.dataset.sceneId}`,
+                trigger: collection,
+                start: 'top top',
+                end: () =>
+                  `+=${(cards.length - 1) * window.innerHeight * 0.82 + window.innerHeight * 0.5}`,
+                pin: stage,
+                scrub: 0.65,
+                anticipatePin: 1,
+                refreshPriority: 0,
+                invalidateOnRefresh: true,
+              },
+            })
+
+            cards.slice(1).forEach((card, index) => {
+              railTimeline.to(card, {
+                y: 0,
+                duration: 1,
+                ease: 'none',
+                force3D: true,
+              }, index)
+            })
+
+            railTimeline.to({}, { duration: 0.45 })
+          })
+        },
+      )
+
+      return () => railMedia.revert()
+    },
+    {
+      dependencies: [railRevision],
+      scope: section,
+      revertOnUpdate: true,
+    },
   )
 
   useGSAP(
@@ -884,6 +904,34 @@ export function GalleryScene() {
     })
   }
 
+  const openAvailability = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return
+    }
+
+    event.preventDefault()
+    const sourceBounds = event.currentTarget.getBoundingClientRect()
+
+    navigate('/disponibilidad', {
+      state: {
+        backgroundLocation: location,
+        backgroundScrollY: window.scrollY,
+        transitionOrigin: {
+          x: sourceBounds.x,
+          y: sourceBounds.y,
+          width: sourceBounds.width,
+          height: sourceBounds.height,
+        },
+      },
+    })
+  }
+
   const renderHeadingActions = (
     collection: (typeof projectCollections)[number],
   ) => {
@@ -915,6 +963,7 @@ export function GalleryScene() {
           <Link
             className="collection-heading__availability"
             to="/disponibilidad"
+            onClick={openAvailability}
             onPointerEnter={handleCtaPointerEnter}
             onPointerLeave={handleCtaPointerLeave}
             onFocus={handleCtaFocus}

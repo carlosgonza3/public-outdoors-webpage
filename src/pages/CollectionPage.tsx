@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { gsap, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
 
@@ -31,6 +31,9 @@ export function CollectionPage({
     if (!modal) return
 
     const previousOverflow = document.body.style.overflow
+    const backgroundScrollY = location.state?.backgroundScrollY as
+      | number
+      | undefined
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') navigate(-1)
     }
@@ -41,8 +44,21 @@ export function CollectionPage({
     return () => {
       document.body.style.overflow = previousOverflow
       window.removeEventListener('keydown', closeOnEscape)
+
+      if (typeof backgroundScrollY === 'number') {
+        window.requestAnimationFrame(() => {
+          window.scrollTo({ top: backgroundScrollY, behavior: 'instant' })
+          window.dispatchEvent(new Event('public:restore-gallery-rails'))
+
+          window.requestAnimationFrame(() => {
+            ScrollTrigger.refresh()
+            window.scrollTo({ top: backgroundScrollY, behavior: 'instant' })
+            ScrollTrigger.update()
+          })
+        })
+      }
     }
-  }, [modal, navigate])
+  }, [location.state, modal, navigate])
 
   useGSAP(
     () => {
