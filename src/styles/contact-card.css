@@ -877,15 +877,20 @@
 }
 
 @media (max-width: 469px) {
+  .contact-card__body {
+    padding-bottom: clamp(.65rem, 3vw, .9rem);
+  }
+
   .contact-card__details {
     gap: clamp(.3rem, 1.5vw, .45rem);
     margin-inline-end: 0;
+    margin-block-end: clamp(.35rem, 1.8vw, .55rem);
   }
 
   .contact-card__datum {
     width: clamp(2.4rem, 11vw, 3rem);
     aspect-ratio: 1;
-    padding: .4rem;
+    padding: clamp(.18rem, 1vw, .28rem);
   }
 
   .contact-card__datum-label {
@@ -905,7 +910,7 @@
 
   .contact-card__datum {
     width: clamp(2rem, 10vw, 2.2rem);
-    padding: .3rem;
+    padding: .16rem;
   }
 
   .contact-card__datum-icon {

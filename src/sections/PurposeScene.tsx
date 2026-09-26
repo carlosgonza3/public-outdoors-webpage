@@ -74,6 +74,9 @@ export function PurposeScene() {
         )
         const mobileTrigger =
           googleAppBrowser && impactEnd ? impactEnd : section.current
+        const contactReveals = contactMotion.querySelectorAll<HTMLElement>(
+          '.contact-card__reveal',
+        )
 
         if (googleAppBrowser) gsap.set(section.current, { zIndex: 2 })
         gsap.set(stages, { autoAlpha: 0, y: 24 })
@@ -81,10 +84,14 @@ export function PurposeScene() {
         gsap.set(backdrop, { autoAlpha: 0 })
         gsap.set(contactMotion, {
           autoAlpha: 0,
-          yPercent: 7,
-          scale: 0.98,
-          transformOrigin: 'center center',
+          yPercent: 44,
+          rotationX: -14,
+          rotationZ: -1.4,
+          scale: 0.92,
+          transformOrigin: 'center bottom',
+          force3D: true,
         })
+        gsap.set(contactReveals, { autoAlpha: 0, y: 12 })
         gsap.set(ambient.current, {
           autoAlpha: 1,
           scale: 1,
@@ -163,11 +170,24 @@ export function PurposeScene() {
             {
               autoAlpha: 1,
               yPercent: 0,
+              rotationX: 0,
+              rotationZ: 0,
               scale: 1,
-              duration: 0.48,
-              ease: 'power3.out',
+              duration: 0.72,
+              ease: 'back.out(1.18)',
             },
             '<',
+          )
+          .to(
+            contactReveals,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.34,
+              stagger: 0.035,
+              ease: 'power3.out',
+            },
+            '-=.5',
           )
           .to({}, { duration: 0.58 })
           .to(contactMotion, {
