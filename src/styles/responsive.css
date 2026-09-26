@@ -555,9 +555,6 @@
   .brand-intro__punctuation { font-size: clamp(2rem, 10.5vw, 3rem); }
   .brand-intro__wordmark { width: min(48vw, 14rem); }
   .purpose-stage { padding-inline: 1.25rem; }
-  .purpose-question h2 { font-size: clamp(3.2rem, 14vw, 5rem); }
-  .purpose-statement h2 { font-size: clamp(3rem, 13vw, 4.8rem); }
-  .purpose-action h2 { font-size: clamp(3.2rem, 14vw, 5rem); }
   .indoor-heading .eyebrow,
   .outdoor-heading .eyebrow,
   .innovations-heading .eyebrow {
