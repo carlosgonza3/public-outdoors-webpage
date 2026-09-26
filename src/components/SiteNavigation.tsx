@@ -117,7 +117,7 @@ export function SiteNavigation({
       const menuItems = gsap.utils.toArray<HTMLElement>('.site-nav__menu > *')
 
       if (reducedMotion) {
-        gsap.set(root, { autoAlpha: 1, y: 0, pointerEvents: 'none' })
+        gsap.set(root, { autoAlpha: 1, y: 0, pointerEvents: 'auto' })
         gsap.set(menuItems, { autoAlpha: 1, y: 0 })
         gsap.set(
           button,

@@ -41,9 +41,30 @@ export function PurposeScene() {
       if (!contactContainer || !backdrop || !contactMotion) return
 
       if (prefersReducedMotion()) {
-        gsap.set(stages, { autoAlpha: 0 })
-        gsap.set(action.current, { autoAlpha: 1 })
-        gsap.set(contactContainer, { autoAlpha: 0 })
+        gsap.set(stages, {
+          autoAlpha: 1,
+          clearProps: 'transform,filter',
+        })
+        gsap.set(
+          [
+            '.purpose-stage__word > span',
+            '.purpose-statement__word',
+            '.purpose-action__word > span',
+          ],
+          { autoAlpha: 1, clearProps: 'transform,filter' },
+        )
+        gsap.set(ambient.current, { autoAlpha: 1, clearProps: 'transform' })
+        gsap.set(contactContainer, {
+          autoAlpha: 1,
+          pointerEvents: 'auto',
+          clearProps: 'transform,filter',
+        })
+        gsap.set(backdrop, { autoAlpha: 0 })
+        gsap.set(contactMotion, {
+          autoAlpha: 1,
+          clearProps: 'transform,filter,clipPath',
+        })
+        setPageTone('#03131c', true)
         return
       }
 
