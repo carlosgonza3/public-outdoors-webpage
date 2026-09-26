@@ -1,11 +1,10 @@
 import { useRef } from 'react'
-import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
+import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
 import { AmbientField } from '../components/AmbientField'
 import { ContactCard } from '../components/ContactCard'
-import { isGoogleAppBrowser } from '../platform/googleApp'
 import { isIOSSafari } from '../platform/iosSafari'
 
 const questionWords = ['¿No', 'viste', 'tu', 'marca?']
@@ -14,10 +13,12 @@ const actionWords = ['¡Anúnciate', 'con', 'nosotros!']
 
 export function PurposeScene() {
   const section = useRef<HTMLElement>(null)
+  const story = useRef<HTMLDivElement>(null)
   const ambient = useRef<HTMLDivElement>(null)
   const question = useRef<HTMLDivElement>(null)
   const statement = useRef<HTMLDivElement>(null)
   const action = useRef<HTMLDivElement>(null)
+  const mobileAction = useRef<HTMLDivElement>(null)
   const contact = useRef<HTMLDivElement>(null)
   const contactBackdrop = useRef<HTMLDivElement>(null)
 
@@ -31,14 +32,21 @@ export function PurposeScene() {
       )
       const contactContainer = contact.current
       const backdrop = contactBackdrop.current
+      const storyContainer = story.current
       const contactMotion = contactContainer?.querySelector<HTMLElement>(
         '.contact-card__motion',
       )
+      const mobileActionContainer = mobileAction.current
       const mobile = isMobileExperience()
       const iosSafari = isIOSSafari()
-      const googleAppBrowser = isGoogleAppBrowser()
 
-      if (!contactContainer || !backdrop || !contactMotion) return
+      if (
+        !contactContainer ||
+        !backdrop ||
+        !contactMotion ||
+        !storyContainer ||
+        !mobileActionContainer
+      ) return
 
       if (prefersReducedMotion()) {
         gsap.set(stages, {
@@ -55,8 +63,8 @@ export function PurposeScene() {
         )
         gsap.set(ambient.current, { autoAlpha: 1, clearProps: 'transform' })
         gsap.set(contactContainer, {
-          autoAlpha: 1,
-          pointerEvents: 'auto',
+          autoAlpha: mobile ? 1 : 0,
+          pointerEvents: mobile ? 'auto' : 'none',
           clearProps: 'transform,filter',
         })
         gsap.set(backdrop, { autoAlpha: 0 })
@@ -64,175 +72,48 @@ export function PurposeScene() {
           autoAlpha: 1,
           clearProps: 'transform,filter,clipPath',
         })
+        gsap.set(mobileActionContainer, {
+          autoAlpha: mobile ? 1 : 0,
+          clearProps: 'transform,filter',
+        })
+        if (mobile) {
+          gsap.set(question.current, { autoAlpha: 0 })
+        }
         setPageTone('#03131c', true)
         return
       }
 
       if (mobile) {
-        const impactEnd = document.querySelector<HTMLElement>(
-          '.impact-track__end',
-        )
-        const mobileTrigger =
-          googleAppBrowser && impactEnd ? impactEnd : section.current
-        const contactReveals = contactMotion.querySelectorAll<HTMLElement>(
-          '.contact-card__reveal',
-        )
-
-        if (googleAppBrowser) gsap.set(section.current, { zIndex: 2 })
-        gsap.set(stages, { autoAlpha: 0, y: 24 })
-        gsap.set(contactContainer, { autoAlpha: 1, pointerEvents: 'none' })
-        gsap.set(backdrop, { autoAlpha: 0 })
-        gsap.set(contactMotion, {
-          autoAlpha: 0,
-          yPercent: 44,
-          rotationX: -14,
-          rotationZ: -1.4,
-          scale: 0.92,
-          transformOrigin: 'center bottom',
-          force3D: true,
-        })
-        gsap.set(contactReveals, { autoAlpha: 0, y: 12 })
-        gsap.set(ambient.current, {
-          autoAlpha: 1,
-          scale: 1,
-          transformOrigin: '50% 50%',
-          force3D: true,
-        })
-
-        const mobileTimeline = gsap.timeline({
-          defaults: { ease: 'power2.inOut' },
-          scrollTrigger: {
-            trigger: mobileTrigger,
-            start: googleAppBrowser && impactEnd ? 'bottom top' : 'top top',
-            end: '+=390%',
-            pin: section.current,
-            pinType: 'fixed',
-            pinReparent: googleAppBrowser,
-            scrub: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            onEnter: () => setPageTone('#07110f', true),
-            onEnterBack: () => setPageTone('#07110f', true),
-            onLeaveBack: () => setPageTone('#080b0a', true),
+        const sectionElement = section.current
+        const toneObserver = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setPageTone('#07110f', true)
+            } else if (entry.boundingClientRect.top > 0) {
+              setPageTone('#080b0a', true)
+            }
           },
-        })
+          { threshold: 0.02 },
+        )
+        const contactObserver = new IntersectionObserver(
+          ([entry]) => {
+            sectionElement.classList.toggle(
+              'is-mobile-contact-visible',
+              entry.isIntersecting,
+            )
+          },
+          {
+            threshold: 0,
+            rootMargin: '0px 0px -48% 0px',
+          },
+        )
 
-        mobileTimeline
-          .to(question.current, {
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.42,
-            ease: 'power3.out',
-          })
-          .to({}, { duration: 0.32 })
-          .to(question.current, {
-            autoAlpha: 0,
-            y: -20,
-            duration: 0.32,
-          })
-          .to(statement.current, {
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.42,
-            ease: 'power3.out',
-          })
-          .to({}, { duration: 0.34 })
-          .to(statement.current, {
-            autoAlpha: 0,
-            y: -20,
-            duration: 0.32,
-          })
-          .to(action.current, {
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.42,
-            ease: 'power3.out',
-          })
-          .to({}, { duration: 0.42 })
-          .to(action.current, {
-            autoAlpha: 0,
-            y: -20,
-            duration: 0.32,
-          })
-          .set(contactContainer, { pointerEvents: 'auto' })
-          .to(
-            backdrop,
-            { autoAlpha: 1, duration: 0.28, ease: 'power2.out' },
-            '-=.14',
-          )
-          .to(
-            siteNavigation,
-            { autoAlpha: 0, y: -8, duration: 0.24, ease: 'power2.in' },
-            '<',
-          )
-          .to(
-            contactMotion,
-            {
-              autoAlpha: 1,
-              yPercent: 0,
-              rotationX: 0,
-              rotationZ: 0,
-              scale: 1,
-              duration: 0.72,
-              ease: 'back.out(1.18)',
-            },
-            '<',
-          )
-          .to(
-            contactReveals,
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.34,
-              stagger: 0.035,
-              ease: 'power3.out',
-            },
-            '-=.5',
-          )
-          .to({}, { duration: 0.58 })
-          .to(contactMotion, {
-            autoAlpha: 0,
-            yPercent: -6,
-            scale: 0.98,
-            duration: 0.42,
-            ease: 'power2.inOut',
-          })
-          .set(contactContainer, { pointerEvents: 'none' })
-          .to(
-            backdrop,
-            { autoAlpha: 0, duration: 0.26, ease: 'power2.in' },
-            '-=.26',
-          )
-          .to(
-            siteNavigation,
-            { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power2.out' },
-            '-=.08',
-          )
-
-        let viewportRefresh: gsap.core.Tween | undefined
-        const refreshForGoogleApp = () => {
-          viewportRefresh?.kill()
-          viewportRefresh = gsap.delayedCall(0.3, () => ScrollTrigger.refresh())
-        }
-
-        if (googleAppBrowser) {
-          window.visualViewport?.addEventListener(
-            'resize',
-            refreshForGoogleApp,
-            { passive: true },
-          )
-          window.addEventListener('orientationchange', refreshForGoogleApp)
-          viewportRefresh = gsap.delayedCall(0.45, () => ScrollTrigger.refresh())
-        }
-
+        toneObserver.observe(sectionElement)
+        contactObserver.observe(contactContainer)
         return () => {
-          viewportRefresh?.kill()
-          window.visualViewport?.removeEventListener(
-            'resize',
-            refreshForGoogleApp,
-          )
-          window.removeEventListener('orientationchange', refreshForGoogleApp)
-          mobileTimeline.kill()
+          toneObserver.disconnect()
+          contactObserver.disconnect()
+          sectionElement.classList.remove('is-mobile-contact-visible')
         }
       }
 
@@ -557,41 +438,43 @@ export function PurposeScene() {
     <section className="purpose-section" ref={section} data-scene-id="purpose">
       <AmbientField variant="purpose" fieldRef={ambient} />
 
-      <div className="purpose-stage purpose-question" ref={question}>
-        <h2 aria-label="¿No viste tu marca?">
-          {questionWords.map((word) => (
-            <span className="purpose-stage__word" key={word}>
-              <span>{word}</span>
-            </span>
-          ))}
-        </h2>
-      </div>
+      <div className="purpose-story" ref={story}>
+        <div className="purpose-stage purpose-question" ref={question}>
+          <h2 aria-label="¿No viste tu marca?">
+            {questionWords.map((word) => (
+              <span className="purpose-stage__word" key={word}>
+                <span>{word}</span>
+              </span>
+            ))}
+          </h2>
+        </div>
 
-      <div className="purpose-stage purpose-statement" ref={statement}>
-        <h2 aria-label="No dejes que pase de nuevo.">
-          {statementWords.map((word) => (
-            <span className="purpose-statement__clip" key={word}>
-              <span className="purpose-statement__word">{word}</span>
-            </span>
-          ))}
-        </h2>
-      </div>
+        <div className="purpose-stage purpose-statement" ref={statement}>
+          <h2 aria-label="No dejes que pase de nuevo.">
+            {statementWords.map((word) => (
+              <span className="purpose-statement__clip" key={word}>
+                <span className="purpose-statement__word">{word}</span>
+              </span>
+            ))}
+          </h2>
+        </div>
 
-      <div className="purpose-stage purpose-action" ref={action}>
-        <h2 aria-label="¡Anúnciate con nosotros!">
-          {actionWords.map((word, index) => (
-            <span
-              className={`purpose-action__word ${
-                index === 0
-                  ? 'purpose-action__word--lead'
-                  : 'purpose-action__word--support'
-              }`}
-              key={word}
-            >
-              <span>{word}</span>
-            </span>
-          ))}
-        </h2>
+        <div className="purpose-stage purpose-action" ref={action}>
+          <h2 aria-label="¡Anúnciate con nosotros!">
+            {actionWords.map((word, index) => (
+              <span
+                className={`purpose-action__word ${
+                  index === 0
+                    ? 'purpose-action__word--lead'
+                    : 'purpose-action__word--support'
+                }`}
+                key={word}
+              >
+                <span>{word}</span>
+              </span>
+            ))}
+          </h2>
+        </div>
       </div>
 
       <div className="purpose-contact" ref={contact}>
@@ -601,6 +484,10 @@ export function PurposeScene() {
           aria-hidden="true"
         />
         <ContactCard mode="scroll" />
+      </div>
+
+      <div className="purpose-mobile-action" ref={mobileAction}>
+        <h2>¡Anúnciate con nosotros!</h2>
       </div>
     </section>
   )

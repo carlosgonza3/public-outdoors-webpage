@@ -87,9 +87,9 @@ export function ImpactScene() {
             const timeline = gsap.timeline({
               scrollTrigger: {
                 trigger: metric,
-                start: 'top 92%',
-                end: 'top 54%',
-                scrub: 0.42,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+                once: true,
               },
             })
 
@@ -124,9 +124,9 @@ export function ImpactScene() {
             const timeline = gsap.timeline({
               scrollTrigger: {
                 trigger: clientsIntro,
-                start: 'top 90%',
-                end: 'top 52%',
-                scrub: 0.45,
+                start: 'top 86%',
+                toggleActions: 'play none none none',
+                once: true,
               },
             })
 
@@ -160,17 +160,17 @@ export function ImpactScene() {
               y: (index) => 42 + (index % 3) * 9,
               scale: 0.72,
               rotation: (index) => (index % 2 === 0 ? -11 : 11),
-              duration: 0.82,
+              duration: 0.58,
               stagger: {
-                each: 0.045,
+                each: 0.025,
                 from: 'random',
               },
               ease: 'back.out(1.45)',
               scrollTrigger: {
                 trigger: clientsList,
-                start: 'top 92%',
-                end: 'bottom 58%',
-                scrub: 0.5,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+                once: true,
               },
             }))
           }
@@ -184,9 +184,9 @@ export function ImpactScene() {
               ease: 'power3.out',
               scrollTrigger: {
                 trigger: endMessage,
-                start: 'top 90%',
-                end: 'top 56%',
-                scrub: 0.45,
+                start: 'top 86%',
+                toggleActions: 'play none none none',
+                once: true,
               },
             }))
           }

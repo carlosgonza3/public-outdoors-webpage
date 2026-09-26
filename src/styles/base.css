@@ -168,6 +168,10 @@ main {
     transform .4s cubic-bezier(.2, .8, .2, 1);
 }
 
+.site-nav__home {
+  display: none !important;
+}
+
 .site-nav__media {
   position: relative;
   display: inline-flex;

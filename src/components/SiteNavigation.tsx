@@ -186,7 +186,7 @@ export function SiteNavigation({
         0.18,
       )
 
-      const idle = gsap
+      const idle = compact ? null : gsap
         .timeline({ repeat: -1, delay: 2.4, repeatDelay: 3.8 })
         .to(image, {
           rotation: -7,
@@ -275,7 +275,7 @@ export function SiteNavigation({
 
       return () => {
         entrance.kill()
-        idle.kill()
+        idle?.kill()
         window.removeEventListener('pointermove', trackPointer)
         document.documentElement.removeEventListener('mouseleave', settle)
         gsap.killTweensOf([button, image])
@@ -329,6 +329,19 @@ export function SiteNavigation({
       </a>
 
       <div className="site-nav__menu" id={menuId}>
+        <a
+          className="site-nav__home"
+          href="#hero"
+          aria-label="Volver al inicio"
+          tabIndex={revealed && !temporarilyHidden ? 0 : -1}
+          onClick={() => {
+            setMenuOpen(false)
+            setMediaOpen(false)
+            window.dispatchEvent(new Event('public:navigate-home'))
+          }}
+        >
+          Inicio
+        </a>
         <button
           type="button"
           tabIndex={revealed && !temporarilyHidden ? 0 : -1}

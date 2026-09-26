@@ -232,7 +232,7 @@
     justify-self: center;
     transform: none;
     rotate: none !important;
-    will-change: transform, opacity;
+    will-change: auto;
   }
 
   .team-profile__copy { display: contents; text-align: left; }
