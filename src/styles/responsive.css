@@ -261,7 +261,14 @@
   }
 
   .logo-veil { display: none; }
-  .logo-play-button { display: none; }
+
+  .logo-play-button {
+    z-index: 4;
+    width: clamp(7.5rem, 32vw, 9.5rem);
+    display: block;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   .intro-mobile-mask {
     position: absolute;
@@ -290,15 +297,22 @@
     will-change: transform;
   }
 
-  .intro-mobile-mask__logo {
+  .intro-mobile-mask__logo-interaction {
     position: absolute;
     z-index: 1;
     top: 50%;
     left: 50%;
     width: clamp(5.25rem, 22vw, 7rem);
+    transform: translate(-50%, -50%);
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .intro-mobile-mask__logo {
+    width: 100%;
     height: auto;
     display: block;
-    transform: translate(-50%, -50%);
     backface-visibility: hidden;
     will-change: transform, opacity;
   }
@@ -1100,6 +1114,8 @@
 }
 
 @media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .logo-play-button { display: none; }
+
   .scene-copy--intro,
   .scroll-cue { animation: none; }
 
