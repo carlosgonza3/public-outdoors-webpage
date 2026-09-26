@@ -39,6 +39,7 @@ export function GalleryScene() {
       if (prefersReducedMotion()) return
 
       const mobile = isMobileExperience()
+      const railMedia = gsap.matchMedia()
       let removePointerTracker: (() => void) | undefined
       const heading = section.current?.querySelector<HTMLElement>('.grid-heading')
       const headingLines = heading
@@ -332,6 +333,66 @@ export function GalleryScene() {
         }
       }
 
+      railMedia.add(
+        '(min-width: 901px) and (prefers-reduced-motion: no-preference)',
+        () => {
+          const railCollections = gsap.utils.toArray<HTMLElement>(
+            '.collection--indoor, .collection--outdoor',
+          )
+
+          railCollections.forEach((collection) => {
+            const stage = collection.querySelector<HTMLElement>(
+              '.project-collection__stage',
+            )
+            const carousel = collection.querySelector<HTMLElement>(
+              '.collection-carousel',
+            )
+            const track = carousel?.querySelector<HTMLElement>(
+              '.collection-carousel__track',
+            )
+            const cards = track
+              ? gsap.utils.toArray<HTMLElement>('.project-card', track)
+              : []
+
+            if (!stage || !carousel || !track || cards.length < 2) return
+
+            const cardEntryY = () => carousel.clientHeight * 0.92
+
+            gsap.set(track, { y: 0 })
+            gsap.set(cards, {
+              y: (index) => index === 0 ? 0 : cardEntryY(),
+              zIndex: (index) => index + 1,
+              force3D: true,
+            })
+
+            const railTimeline = gsap.timeline({
+              scrollTrigger: {
+                id: `collection-rail-${collection.dataset.sceneId}`,
+                trigger: collection,
+                start: 'top top',
+                end: () =>
+                  `+=${(cards.length - 1) * window.innerHeight * 0.82 + window.innerHeight * 0.5}`,
+                pin: stage,
+                scrub: 0.65,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+              },
+            })
+
+            cards.slice(1).forEach((card, index) => {
+              railTimeline.to(card, {
+                y: 0,
+                duration: 1,
+                ease: 'none',
+                force3D: true,
+              }, index)
+            })
+
+            railTimeline.to({}, { duration: 0.45 })
+          })
+        },
+      )
+
       collections.forEach((collection) => {
         const label = collection.querySelector<HTMLElement>('[data-collection-label]')
         const title = label?.querySelector<HTMLElement>('.collection-heading__title')
@@ -374,7 +435,10 @@ export function GalleryScene() {
           }, 0.28)
       })
 
-      return () => removePointerTracker?.()
+      return () => {
+        railMedia.revert()
+        removePointerTracker?.()
+      }
     },
     { scope: section },
   )
