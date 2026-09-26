@@ -15,6 +15,7 @@ import { GalleryScene } from './sections/GalleryScene'
 import { ImpactScene } from './sections/ImpactScene'
 import { IntroScene } from './sections/IntroScene'
 import { PurposeScene } from './sections/PurposeScene'
+import { TeamScene } from './sections/TeamScene'
 import './App.css'
 
 function HomePage() {
@@ -65,6 +66,7 @@ function HomePage() {
         <GalleryScene />
         <ImpactScene />
         <PurposeScene />
+        <TeamScene />
       </main>
 
       {contactOpen && <ContactCard onClose={() => setContactOpen(false)} />}
