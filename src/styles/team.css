@@ -72,9 +72,9 @@
 .team-profile__portrait {
   position: absolute;
   z-index: 1;
-  top: calc(50% - min(13.75vw, 23.75dvh));
+  top: calc(50% - min(12.1875vw, 21.25dvh));
   left: 50%;
-  width: min(22vw, 38dvh);
+  width: min(19.5vw, 34dvh);
   aspect-ratio: .8;
   margin: 0;
   overflow: hidden;
@@ -171,7 +171,7 @@
     left: auto;
     grid-column: 1 / -1;
     grid-row: 2;
-    width: min(86vw, 28rem);
+    width: min(78vw, 24rem);
     justify-self: center;
     transform: none;
     rotate: none !important;
@@ -265,7 +265,8 @@
     inset: auto;
     grid-column: 1 / -1;
     grid-row: 2;
-    width: 100%;
+    width: min(88%, 24rem);
+    justify-self: center;
     transform: none !important;
     rotate: none !important;
     will-change: auto;
@@ -302,7 +303,7 @@
   .team-list { grid-template-columns: 1fr; }
 
   .team-profile__portrait {
-    width: min(86vw, 28rem);
+    width: min(78vw, 24rem);
     justify-self: center;
   }
 
@@ -322,5 +323,11 @@
     max-width: 30rem;
     font-size: .94rem;
     line-height: 1.38;
+  }
+}
+
+@media (max-width: 600px) {
+  .team-profile__portrait {
+    width: min(66vw, 20.5rem);
   }
 }

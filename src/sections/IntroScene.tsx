@@ -45,6 +45,7 @@ export function IntroScene({
   const mobileReveal = useRef<SVGCircleElement>(null)
   const mobileMask = useRef<HTMLDivElement>(null)
   const mobileWipe = useRef<HTMLDivElement>(null)
+  const mobileLogoInteraction = useRef<HTMLDivElement>(null)
   const mobileLogo = useRef<HTMLImageElement>(null)
   const veil = useRef<SVGSVGElement>(null)
   const content = useRef<HTMLDivElement>(null)
@@ -109,11 +110,21 @@ export function IntroScene({
         return () => preludeObserver.disconnect()
       }
 
+      const finePointer = window.matchMedia('(pointer: fine)').matches
+      const press = { y: 0, rotation: 0, scale: 1 }
       const pulse = { scale: 1 }
+      const renderMobileLogoMotion = () => {
+        if (!mobileLogoInteraction.current) return
+        const scale = press.scale * pulse.scale
+        mobileLogoInteraction.current.style.transform =
+          `translate(-50%, -50%) translate3d(0, ${press.y}px, 0) ` +
+          `rotate(${press.rotation}deg) scale(${scale})`
+      }
       const renderPulse = () => {
         const transform = `scale(${pulse.scale})`
         markPulse.current?.setAttribute('transform', transform)
         colorMarkPulse.current?.setAttribute('transform', transform)
+        if (mobile) renderMobileLogoMotion()
       }
       let pulseActive = true
       const pulseTimeline = gsap.timeline({ repeat: -1, delay: 0.8 })
@@ -201,261 +212,18 @@ export function IntroScene({
         renderPulse()
       }
 
-      if (mobile) {
-        pulseTimeline.kill()
-        pulseActive = false
-        const sloganLines = gsap.utils.toArray<HTMLElement>(
-          '.slogan-line > span',
-        )
-        let darkToneActive = false
-        gsap.set(veil.current, { autoAlpha: 0 })
-        gsap.set(mobileMask.current, { autoAlpha: 1 })
-        gsap.set(mobileWipe.current, {
-          autoAlpha: 0,
-          scale: 0,
-          transformOrigin: '50% 50%',
-          force3D: true,
-        })
-        gsap.set(mobileLogo.current, {
-          autoAlpha: 1,
-          scale: 1,
-          transformOrigin: '50% 50%',
-          force3D: true,
-        })
-        gsap.set(content.current, { autoAlpha: 1 })
-        gsap.set(ambient.current, {
-          autoAlpha: 1,
-          xPercent: -18,
-          yPercent: 14,
-          rotation: 0,
-          scale: 1.28,
-          transformOrigin: '50% 50%',
-          force3D: true,
-        })
-        gsap.set(brandCopy.current, { autoAlpha: 0, y: 24, scale: 0.92 })
-        gsap.set(copy.current, { autoAlpha: 0, y: 24 })
-        gsap.set(sloganLines, { yPercent: 34 })
-        gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.84 })
-        const mobileTimeline = gsap.timeline({
-          scrollTrigger: {
-            id: 'intro-scene-mobile',
-            trigger: section.current,
-            start: 'top top',
-            end: '+=225%',
-            pin: true,
-            pinType: 'fixed',
-            scrub: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              const duration = mobileTimeline.duration()
-              const timelineTime = self.progress * duration
-              updateMobileNavigationGap(
-                timelineTime >= 0.2 && timelineTime < 0.26,
-              )
-              updateMaskState(duration > 0 && timelineTime >= 0.26)
-              const shouldUseDarkTone = self.progress > 0.04
-              if (shouldUseDarkTone === darkToneActive) return
-              darkToneActive = shouldUseDarkTone
-              setPageTone(shouldUseDarkTone ? '#07080b' : '#f7f5ef')
-            },
-          },
-        })
-
-        mobileTimeline
-          .set(mobileWipe.current, { autoAlpha: 1 }, 0.001)
-          .to(
-            mobileWipe.current,
-            {
-              scale: 1.7,
-              duration: 0.28,
-              ease: 'power3.inOut',
-              force3D: true,
-            },
-            0,
-          )
-          .to(
-            mobileLogo.current,
-            {
-              scale: 5.5,
-              autoAlpha: 0,
-              duration: 0.2,
-              ease: 'power3.in',
-              force3D: true,
-            },
-            0,
-          )
-          .to(
-            mobileMask.current,
-            {
-              autoAlpha: 0,
-              duration: 0.08,
-              ease: 'power2.inOut',
-            },
-            0.28,
-          )
-          .to(
-            scrollCue.current,
-            { autoAlpha: 0, y: -8, duration: 0.14, ease: 'power2.out' },
-            0.12,
-          )
-          .to(
-            content.current,
-            { autoAlpha: 1, duration: 0.24, ease: 'power2.out' },
-            0.16,
-          )
-          .to(
-            brandCopy.current,
-            { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: 'power3.out' },
-            0.22,
-          )
-          .to({}, { duration: 0.32 })
-          .addLabel('sloganTransition')
-          .to(brandCopy.current, {
-            autoAlpha: 0,
-            yPercent: -16,
-            scale: 1.04,
-            duration: 0.2,
-            ease: 'power2.inOut',
-          })
-          .to(
-            ambient.current,
-            {
-              xPercent: 15,
-              yPercent: -12,
-              rotation: 0,
-              scale: 1.12,
-              duration: 0.65,
-              ease: 'power3.inOut',
-              force3D: true,
-            },
-            'sloganTransition-=0.325',
-          )
-          .to(
-            sloganGlow.current,
-            { autoAlpha: 0.72, scale: 1, duration: 0.28, ease: 'power2.out' },
-            'sloganTransition+=0.06',
-          )
-          .to(
-            copy.current,
-            { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
-            'sloganTransition+=0.24',
-          )
-          .to(
-            sloganLines,
-            { yPercent: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out' },
-            'sloganTransition+=0.24',
-          )
-          .to({}, { duration: 0.34 })
-          .to(copy.current, {
-            autoAlpha: 0,
-            yPercent: -16,
-            scale: 1.035,
-            duration: 0.2,
-            ease: 'power2.inOut',
-          })
-          .to(
-            sloganGlow.current,
-            { autoAlpha: 0, scale: 1.18, duration: 0.2, ease: 'power2.inOut' },
-            '<',
-          )
-          .to(
-            ambient.current,
-            { autoAlpha: 0, scale: 1.1, duration: 0.22, ease: 'power2.inOut' },
-            '<',
-          )
-
-        return () => {
-          pulseTimeline.kill()
-          mobileTimeline.kill()
-        }
-      }
-
-      const perspective = { x: 0, y: 0 }
-      let perspectiveTargetX = 0
-      let perspectiveTargetY = 0
-      let perspectiveActive = true
-      let logoCenterX = window.innerWidth / 2
-      let logoCenterY = window.innerHeight / 2
-      const finePointer = window.matchMedia('(pointer: fine)').matches
-      const press = { y: 0, rotation: 0, scale: 1 }
       const pressTimeline = gsap.timeline({ paused: true })
       let logoButtonActive = true
       let logoPressLocked = false
       let logoPresses = 0
       let logoPressResetTimer: number | undefined
 
-      const measureLogoCenter = () => {
-        const bounds = colorMark.current?.getBoundingClientRect()
-        if (!bounds) return
-        logoCenterX = bounds.left + bounds.width / 2
-        logoCenterY = bounds.top + bounds.height / 2
-      }
-
-      const renderPerspective = () => {
-        const x = perspective.x
-        const y = perspective.y
-        const transform = [
-          `translate(${x * 0.8} ${y * 0.55})`,
-          `rotate(${x * 1.8})`,
-          `skewX(${-y * 2.4})`,
-          `skewY(${x * 3.2})`,
-          `scale(${1 - Math.abs(x) * 0.025} ${1 - Math.abs(y) * 0.02})`,
-        ].join(' ')
-        markPerspective.current?.setAttribute('transform', transform)
-        colorMarkPerspective.current?.setAttribute('transform', transform)
-      }
-
-      const updatePerspective = () => {
-        if (!perspectiveActive) return
-
-        const deltaX = perspectiveTargetX - perspective.x
-        const deltaY = perspectiveTargetY - perspective.y
-        if (Math.abs(deltaX) < 0.0001 && Math.abs(deltaY) < 0.0001) return
-
-        const smoothing = 1 - Math.pow(0.84, gsap.ticker.deltaRatio(60))
-        perspective.x += deltaX * smoothing
-        perspective.y += deltaY * smoothing
-        renderPerspective()
-      }
-
-      const resetPerspectiveTarget = () => {
-        perspectiveTargetX = 0
-        perspectiveTargetY = 0
-      }
-
-      const handlePointerMove = (event: PointerEvent) => {
-        if (!perspectiveActive) return
-        const horizontalRange = Math.max(280, window.innerWidth * 0.36)
-        const verticalRange = Math.max(220, window.innerHeight * 0.38)
-        perspectiveTargetX = gsap.utils.clamp(
-          -1,
-          1,
-          (event.clientX - logoCenterX) / horizontalRange,
-        )
-        perspectiveTargetY = gsap.utils.clamp(
-          -1,
-          1,
-          (event.clientY - logoCenterY) / verticalRange,
-        )
-      }
-
-      const setPerspectiveActive = (active: boolean) => {
-        if (!finePointer || active === perspectiveActive) return
-        perspectiveActive = active
-        resetPerspectiveTarget()
-
-        if (active) {
-          measureLogoCenter()
+      const renderPress = () => {
+        if (mobile) {
+          renderMobileLogoMotion()
           return
         }
 
-        perspective.x = 0
-        perspective.y = 0
-        renderPerspective()
-      }
-
-      const renderPress = () => {
         const transform =
           `translate(0 ${press.y}) rotate(${press.rotation}) scale(${press.scale})`
         markPress.current?.setAttribute('transform', transform)
@@ -589,12 +357,301 @@ export function IntroScene({
         if (active) return
         window.clearTimeout(logoPressResetTimer)
         logoPresses = 0
-        if (logoPressLocked) return
         pressTimeline.pause(0).clear()
         press.y = 0
         press.rotation = 0
         press.scale = 1
+        logoPressLocked = false
         renderPress()
+        syncLogoButtonInteractivity()
+      }
+
+      if (mobile || finePointer) {
+        logoButton.current?.addEventListener('click', handleLogoPress)
+      }
+
+      if (mobile) {
+        const sloganLines = gsap.utils.toArray<HTMLElement>(
+          '.slogan-line > span',
+        )
+        let darkToneActive = false
+        gsap.set(veil.current, { autoAlpha: 0 })
+        gsap.set(mobileMask.current, { autoAlpha: 1 })
+        gsap.set(mobileWipe.current, {
+          autoAlpha: 0,
+          scale: 0,
+          transformOrigin: '50% 50%',
+          force3D: true,
+        })
+        gsap.set(mobileLogo.current, {
+          autoAlpha: 1,
+          scale: 1,
+          transformOrigin: '50% 50%',
+          force3D: true,
+        })
+        gsap.set(content.current, { autoAlpha: 1 })
+        gsap.set(ambient.current, {
+          autoAlpha: 1,
+          xPercent: -18,
+          yPercent: 14,
+          rotation: 0,
+          scale: 1.28,
+          transformOrigin: '50% 50%',
+          force3D: true,
+        })
+        gsap.set(brandCopy.current, { autoAlpha: 0, y: 24, scale: 0.92 })
+        gsap.set(copy.current, { autoAlpha: 0, y: 24 })
+        gsap.set(sloganLines, { yPercent: 34 })
+        gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.84 })
+        const mobileTimeline = gsap.timeline({
+          scrollTrigger: {
+            id: 'intro-scene-mobile',
+            trigger: section.current,
+            start: 'top top',
+            end: '+=225%',
+            pin: true,
+            pinType: 'fixed',
+            scrub: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              const duration = mobileTimeline.duration()
+              const timelineTime = self.progress * duration
+              const maskStart = mobileTimeline.labels.maskStart ?? 0
+              const maskComplete = mobileTimeline.labels.maskComplete ?? 0
+              const atStart = self.progress <= 0.001
+              setPulseActive(atStart)
+              setLogoButtonActive(atStart)
+              updateMobileNavigationGap(
+                timelineTime >= maskStart + 0.2 &&
+                  timelineTime < maskStart + 0.26,
+              )
+              updateMaskState(
+                duration > 0 && timelineTime >= maskComplete,
+              )
+              const shouldUseDarkTone = timelineTime > maskStart + 0.01
+              if (shouldUseDarkTone === darkToneActive) return
+              darkToneActive = shouldUseDarkTone
+              setPageTone(shouldUseDarkTone ? '#07080b' : '#f7f5ef')
+            },
+          },
+        })
+
+        mobileTimeline
+          .to(mobileLogo.current, {
+            x: -3,
+            y: -8,
+            rotation: -3,
+            scale: 1.1,
+            duration: 0.14,
+            ease: 'sine.inOut',
+          })
+          .to(mobileLogo.current, {
+            x: 4,
+            y: -22,
+            rotation: 3,
+            scale: 1.28,
+            duration: 0.14,
+            ease: 'sine.inOut',
+          })
+          .to(mobileLogo.current, {
+            x: -3,
+            y: -46,
+            rotation: -2,
+            scale: 1.58,
+            duration: 0.14,
+            ease: 'sine.inOut',
+          })
+          .addLabel('maskStart')
+          .set(mobileWipe.current, { autoAlpha: 1 }, 'maskStart')
+          .to(
+            mobileWipe.current,
+            {
+              scale: 1.7,
+              duration: 0.28,
+              ease: 'power3.inOut',
+              force3D: true,
+            },
+            'maskStart',
+          )
+          .to(
+            mobileLogo.current,
+            {
+              x: 0,
+              y: -120,
+              rotation: 0,
+              scale: 5.5,
+              autoAlpha: 0,
+              duration: 0.2,
+              ease: 'power3.in',
+              force3D: true,
+            },
+            'maskStart',
+          )
+          .to(
+            mobileMask.current,
+            {
+              autoAlpha: 0,
+              duration: 0.08,
+              ease: 'power2.inOut',
+            },
+            'maskStart+=0.28',
+          )
+          .to(
+            scrollCue.current,
+            { autoAlpha: 0, y: -8, duration: 0.14, ease: 'power2.out' },
+            'maskStart+=0.12',
+          )
+          .to(
+            content.current,
+            { autoAlpha: 1, duration: 0.24, ease: 'power2.out' },
+            'maskStart+=0.16',
+          )
+          .to(
+            brandCopy.current,
+            { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: 'power3.out' },
+            'maskStart+=0.22',
+          )
+          .addLabel('maskComplete', 'maskStart+=0.28')
+          .to({}, { duration: 0.32 })
+          .addLabel('sloganTransition')
+          .to(brandCopy.current, {
+            autoAlpha: 0,
+            yPercent: -16,
+            scale: 1.04,
+            duration: 0.2,
+            ease: 'power2.inOut',
+          })
+          .to(
+            ambient.current,
+            {
+              xPercent: 15,
+              yPercent: -12,
+              rotation: 0,
+              scale: 1.12,
+              duration: 0.65,
+              ease: 'power3.inOut',
+              force3D: true,
+            },
+            'sloganTransition-=0.325',
+          )
+          .to(
+            sloganGlow.current,
+            { autoAlpha: 0.72, scale: 1, duration: 0.28, ease: 'power2.out' },
+            'sloganTransition+=0.06',
+          )
+          .to(
+            copy.current,
+            { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
+            'sloganTransition+=0.24',
+          )
+          .to(
+            sloganLines,
+            { yPercent: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out' },
+            'sloganTransition+=0.24',
+          )
+          .to({}, { duration: 0.34 })
+          .to(copy.current, {
+            autoAlpha: 0,
+            yPercent: -16,
+            scale: 1.035,
+            duration: 0.2,
+            ease: 'power2.inOut',
+          })
+          .to(
+            sloganGlow.current,
+            { autoAlpha: 0, scale: 1.18, duration: 0.2, ease: 'power2.inOut' },
+            '<',
+          )
+          .to(
+            ambient.current,
+            { autoAlpha: 0, scale: 1.1, duration: 0.22, ease: 'power2.inOut' },
+            '<',
+          )
+
+        return () => {
+          pulseTimeline.kill()
+          pressTimeline.kill()
+          logoButton.current?.removeEventListener('click', handleLogoPress)
+          window.clearTimeout(logoPressResetTimer)
+          mobileTimeline.kill()
+        }
+      }
+
+      const perspective = { x: 0, y: 0 }
+      let perspectiveTargetX = 0
+      let perspectiveTargetY = 0
+      let perspectiveActive = true
+      let logoCenterX = window.innerWidth / 2
+      let logoCenterY = window.innerHeight / 2
+      const measureLogoCenter = () => {
+        const bounds = colorMark.current?.getBoundingClientRect()
+        if (!bounds) return
+        logoCenterX = bounds.left + bounds.width / 2
+        logoCenterY = bounds.top + bounds.height / 2
+      }
+
+      const renderPerspective = () => {
+        const x = perspective.x
+        const y = perspective.y
+        const transform = [
+          `translate(${x * 0.8} ${y * 0.55})`,
+          `rotate(${x * 1.8})`,
+          `skewX(${-y * 2.4})`,
+          `skewY(${x * 3.2})`,
+          `scale(${1 - Math.abs(x) * 0.025} ${1 - Math.abs(y) * 0.02})`,
+        ].join(' ')
+        markPerspective.current?.setAttribute('transform', transform)
+        colorMarkPerspective.current?.setAttribute('transform', transform)
+      }
+
+      const updatePerspective = () => {
+        if (!perspectiveActive) return
+
+        const deltaX = perspectiveTargetX - perspective.x
+        const deltaY = perspectiveTargetY - perspective.y
+        if (Math.abs(deltaX) < 0.0001 && Math.abs(deltaY) < 0.0001) return
+
+        const smoothing = 1 - Math.pow(0.84, gsap.ticker.deltaRatio(60))
+        perspective.x += deltaX * smoothing
+        perspective.y += deltaY * smoothing
+        renderPerspective()
+      }
+
+      const resetPerspectiveTarget = () => {
+        perspectiveTargetX = 0
+        perspectiveTargetY = 0
+      }
+
+      const handlePointerMove = (event: PointerEvent) => {
+        if (!perspectiveActive) return
+        const horizontalRange = Math.max(280, window.innerWidth * 0.36)
+        const verticalRange = Math.max(220, window.innerHeight * 0.38)
+        perspectiveTargetX = gsap.utils.clamp(
+          -1,
+          1,
+          (event.clientX - logoCenterX) / horizontalRange,
+        )
+        perspectiveTargetY = gsap.utils.clamp(
+          -1,
+          1,
+          (event.clientY - logoCenterY) / verticalRange,
+        )
+      }
+
+      const setPerspectiveActive = (active: boolean) => {
+        if (!finePointer || active === perspectiveActive) return
+        perspectiveActive = active
+        resetPerspectiveTarget()
+
+        if (active) {
+          measureLogoCenter()
+          return
+        }
+
+        perspective.x = 0
+        perspective.y = 0
+        renderPerspective()
       }
 
       if (finePointer) {
@@ -603,7 +660,6 @@ export function IntroScene({
         window.addEventListener('pointermove', handlePointerMove, { passive: true })
         window.addEventListener('resize', measureLogoCenter, { passive: true })
         document.documentElement.addEventListener('mouseleave', resetPerspectiveTarget)
-        logoButton.current?.addEventListener('click', handleLogoPress)
       }
 
       let lockedProgress: number | null = null
@@ -964,12 +1020,17 @@ export function IntroScene({
 
       <div className="intro-mobile-mask" ref={mobileMask} aria-hidden="true">
         <div className="intro-mobile-mask__wipe" ref={mobileWipe} />
-        <img
-          className="intro-mobile-mask__logo"
-          ref={mobileLogo}
-          src={butterfly}
-          alt=""
-        />
+        <div
+          className="intro-mobile-mask__logo-interaction"
+          ref={mobileLogoInteraction}
+        >
+          <img
+            className="intro-mobile-mask__logo"
+            ref={mobileLogo}
+            src={butterfly}
+            alt=""
+          />
+        </div>
       </div>
 
       <button
