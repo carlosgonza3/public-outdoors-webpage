@@ -44,6 +44,10 @@ main {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   will-change: transform, opacity;
+  transition:
+    border-color .35s ease,
+    background-color .35s ease,
+    box-shadow .35s ease;
 }
 
 .site-nav--without-butterfly .site-nav__butterfly {
@@ -105,6 +109,14 @@ main {
 
 .site-nav--light-surface {
   --site-nav-ink: #173d35;
+}
+
+.site-nav--light-surface .site-nav__butterfly {
+  border-color: rgb(23 61 53 / 18%);
+  background: rgb(247 245 239 / 68%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 62%) inset,
+    0 .65rem 2rem rgb(23 61 53 / 10%);
 }
 
 .site-nav--light-surface .site-nav__menu {

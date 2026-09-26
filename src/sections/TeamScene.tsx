@@ -98,6 +98,13 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
       }, (context) => {
         const { desktop, reducedMotion } = context.conditions!
         const profiles = gsap.utils.toArray<HTMLElement>('.team-profile', root)
+        let surfaceIsLight = false
+        const syncSurface = (light: boolean) => {
+          if (surfaceIsLight === light) return
+          surfaceIsLight = light
+          onSurfaceChange?.(light)
+          setPageTone(light ? '#f7f5ef' : '#080b0a', true)
+        }
 
         if (!reducedMotion && desktop) {
           const portraits = gsap.utils.toArray<HTMLElement>('.team-profile__portrait', root)
@@ -145,6 +152,8 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
               scrub: 0.7,
               anticipatePin: 1,
               invalidateOnRefresh: true,
+              onUpdate: (self) => syncSurface(self.progress > 0),
+              onRefresh: (self) => syncSurface(self.progress > 0),
             },
           })
 
@@ -213,18 +222,19 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
           })
         }
 
-        // Create this after the pin so the light navigation covers its full range.
-        ScrollTrigger.create({
-          trigger: root,
-          start: 'top 58%',
-          end: 'bottom 42%',
-          onToggle: (self) => {
-            onSurfaceChange?.(self.isActive)
-            if (self.isActive) setPageTone('#f7f5ef', true)
-            else if (self.direction < 0) setPageTone('#080b0a', true)
-          },
-          onRefresh: (self) => onSurfaceChange?.(self.isActive),
-        })
+        if (!desktop || reducedMotion) {
+          ScrollTrigger.create({
+            trigger: root,
+            start: 'top 58%',
+            end: 'bottom 42%',
+            onEnter: () => syncSurface(true),
+            onEnterBack: () => syncSurface(true),
+            onLeaveBack: () => syncSurface(false),
+            // The team scene closes the page, so keep its light navigation
+            // after the trigger's forward end instead of reverting over it.
+            onRefresh: (self) => syncSurface(self.progress > 0),
+          })
+        }
       })
 
       return () => {

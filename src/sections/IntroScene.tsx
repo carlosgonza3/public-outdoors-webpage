@@ -369,6 +369,7 @@ export function IntroScene({
       const press = { y: 0, rotation: 0, scale: 1 }
       const pressTimeline = gsap.timeline({ paused: true })
       let logoButtonActive = true
+      let logoPressLocked = false
       let logoPresses = 0
       let logoPressResetTimer: number | undefined
 
@@ -449,8 +450,20 @@ export function IntroScene({
         colorMarkPress.current?.setAttribute('transform', transform)
       }
 
+      const syncLogoButtonInteractivity = () => {
+        if (!logoButton.current) return
+        const interactive = logoButtonActive && !logoPressLocked
+        logoButton.current.disabled = !interactive
+        logoButton.current.style.pointerEvents = interactive ? 'auto' : 'none'
+      }
+
+      const setLogoPressLocked = (locked: boolean) => {
+        logoPressLocked = locked
+        syncLogoButtonInteractivity()
+      }
+
       const runLogoPress = () => {
-        if (!logoButtonActive) return
+        if (!logoButtonActive || logoPressLocked) return
 
         window.clearTimeout(logoPressResetTimer)
         logoPresses += 1
@@ -467,6 +480,7 @@ export function IntroScene({
         pressTimeline.pause().clear()
 
         if (isTriplePress) {
+          setLogoPressLocked(true)
           pressTimeline
             .to(press, {
               y: 2.4,
@@ -509,6 +523,7 @@ export function IntroScene({
               onComplete: () => {
                 press.rotation = 0
                 renderPress()
+                setLogoPressLocked(false)
               },
             })
             .restart()
@@ -557,14 +572,12 @@ export function IntroScene({
       const setLogoButtonActive = (active: boolean) => {
         if (active === logoButtonActive) return
         logoButtonActive = active
-        if (logoButton.current) {
-          logoButton.current.disabled = !active
-          logoButton.current.style.pointerEvents = active ? 'auto' : 'none'
-        }
+        syncLogoButtonInteractivity()
 
         if (active) return
         window.clearTimeout(logoPressResetTimer)
         logoPresses = 0
+        if (logoPressLocked) return
         pressTimeline.pause(0).clear()
         press.y = 0
         press.rotation = 0

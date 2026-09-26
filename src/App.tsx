@@ -22,7 +22,6 @@ function HomePage() {
   const [contactOpen, setContactOpen] = useState(false)
   const [navigationRevealed, setNavigationRevealed] = useState(false)
   const [mobileNavigationGap, setMobileNavigationGap] = useState(false)
-  const [teamLightSurface, setTeamLightSurface] = useState(false)
 
   const handleMaskStateChange = useCallback((complete: boolean) => {
     setNavigationRevealed(complete)
@@ -53,7 +52,7 @@ function HomePage() {
       <SiteNavigation
         revealed
         hideButterfly={!navigationRevealed}
-        lightSurface={!navigationRevealed || teamLightSurface}
+        lightSurface={!navigationRevealed}
         temporarilyHidden={mobileNavigationGap}
         onContact={() => setContactOpen(true)}
         onMedia={scrollToMedia}
@@ -67,7 +66,7 @@ function HomePage() {
         <GalleryScene />
         <ImpactScene />
         <PurposeScene />
-        <TeamScene onSurfaceChange={setTeamLightSurface} />
+        <TeamScene />
       </main>
 
       {contactOpen && <ContactCard onClose={() => setContactOpen(false)} />}
