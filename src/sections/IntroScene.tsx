@@ -327,12 +327,12 @@ export function IntroScene({
           .to(
             copy.current,
             { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
-            'sloganTransition+=0.06',
+            'sloganTransition+=0.24',
           )
           .to(
             sloganLines,
             { yPercent: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out' },
-            'sloganTransition+=0.06',
+            'sloganTransition+=0.24',
           )
           .to({}, { duration: 0.34 })
           .to(copy.current, {
@@ -820,7 +820,7 @@ export function IntroScene({
             duration: 0.38,
             ease: 'power3.out',
           },
-          'sloganTransition+=0.1',
+          'sloganTransition+=0.38',
         )
         .to(
           sloganLines,
@@ -830,7 +830,7 @@ export function IntroScene({
             stagger: 0.045,
             ease: 'power4.out',
           },
-          'sloganTransition+=0.1',
+          'sloganTransition+=0.38',
         )
         .to({}, { duration: 0.5 })
         .to(

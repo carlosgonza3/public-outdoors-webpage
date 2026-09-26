@@ -349,11 +349,23 @@ export function GalleryScene() {
         const actions = label?.querySelector<HTMLElement>(
           '.collection-heading__actions',
         )
+        const carousel = collection.querySelector<HTMLElement>(
+          '.collection-carousel',
+        )
+        const pagination = collection.querySelector<HTMLElement>(
+          '.collection-carousel__pagination',
+        )
+        const collectionId = collection.dataset.sceneId
+        const isInnovations = collectionId === 'innovations'
+        const horizontalDirection = collectionId === 'indoor'
+          ? -1
+          : collectionId === 'outdoor'
+            ? 1
+            : 0
 
-        if (!title || !details || !actions) return
+        if (!label || !title || !details || !actions || !carousel) return
 
-        gsap
-          .timeline({
+        const revealTimeline = gsap.timeline({
             scrollTrigger: {
               trigger: collection,
               start: 'top 76%',
@@ -364,24 +376,49 @@ export function GalleryScene() {
               once: mobile,
             },
           })
+          .from(label, {
+            x: () => horizontalDirection * Math.min(120, window.innerWidth * 0.12),
+            y: isInnovations ? 32 : 0,
+            scale: isInnovations ? 0.97 : 1,
+            autoAlpha: 0,
+            duration: 0.72,
+            ease: 'power3.out',
+          })
           .from(title, {
             yPercent: 80,
             autoAlpha: 0,
             duration: 0.58,
             ease: 'power4.out',
-          })
+          }, 0.08)
           .from(details, {
             y: 12,
             autoAlpha: 0,
             duration: 0.36,
             ease: 'power3.out',
-          }, 0.18)
+          }, 0.24)
           .from(actions, {
             y: 8,
             autoAlpha: 0,
             duration: 0.3,
             ease: 'power3.out',
-          }, 0.28)
+          }, 0.34)
+          .from(carousel, {
+            x: () => horizontalDirection * Math.min(90, window.innerWidth * 0.085),
+            y: isInnovations ? 42 : 0,
+            scale: isInnovations ? 0.965 : 1,
+            autoAlpha: 0,
+            duration: 0.78,
+            ease: 'power3.out',
+          }, 0.16)
+
+        if (pagination) {
+          revealTimeline.from(pagination, {
+            y: 8,
+            autoAlpha: 0,
+            duration: 0.32,
+            ease: 'power2.out',
+          }, 0.5)
+        }
       })
 
       return () => removePointerTracker?.()

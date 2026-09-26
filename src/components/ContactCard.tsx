@@ -13,15 +13,19 @@ type ContactCardProps = {
 
 type ShareState = 'idle' | 'exporting' | 'shared' | 'error'
 
+type DeviceOrientationEventWithPermission = typeof DeviceOrientationEvent & {
+  requestPermission?: () => Promise<'granted' | 'denied'>
+}
+
 const contactDetails = [
   {
     id: 'address',
     label: 'Oficina',
     display: (
       <>
-        Condominio Balam Quitze, local 2-31
+        Condominio Balam Quitze, segundo nivel, local 2-31
         <br />
-        Paseo General Escalón, San Salvador
+        Paseo General Escalón, San Salvador, El Salvador
       </>
     ),
     value:
@@ -40,11 +44,17 @@ const contactDetails = [
     value: 'marketing@publicsv.net',
   },
   {
-    id: 'website',
-    label: 'Sitio web',
-    display: 'publicoutdoors.com',
-    value: 'https://publicoutdoors.com',
+    id: 'whatsapp',
+    label: 'WhatsApp',
+    display: 'Elige tu contacto',
+    value: 'Seleccionar contacto de WhatsApp',
   },
+]
+
+const whatsappContacts = [
+  { name: 'Iris Cisneros', number: '+503 7840 0641', whatsapp: '50378400641' },
+  { name: 'Zayda Reyes', number: '+503 7607 9725', whatsapp: '50376079725' },
+  { name: 'Rosemary Daboub', number: '+503 7855 7192', whatsapp: '50378557192' },
 ]
 
 const socialLinks = [
@@ -75,6 +85,50 @@ function SocialIcon({ id }: { id: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M14.5 20v-7h2.7l.4-3h-3.1V8.1c0-.9.3-1.6 1.7-1.6H18V3.8c-.5-.1-1.4-.2-2.5-.2-2.5 0-4.2 1.5-4.2 4.3V10H8.5v3h2.8v7" />
+    </svg>
+  )
+}
+
+function ContactDetailIcon({ id }: { id: string }) {
+  if (id === 'address') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z" />
+        <circle cx="12" cy="10" r="2.1" />
+      </svg>
+    )
+  }
+
+  if (id === 'phone') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.1 3.7 4.5 5c-.7.4-1 1.2-.8 2 1.6 6.4 6.6 11.4 13 13 .8.2 1.6-.1 2-.8l1.3-2.6-4.2-2-1.3 2a13.2 13.2 0 0 1-7.1-7.1l2-1.3-2.3-4.5Z" />
+      </svg>
+    )
+  }
+
+  if (id === 'email') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+        <path d="m5 7 7 5 7-5" />
+      </svg>
+    )
+  }
+
+  if (id === 'whatsapp') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.4 11.8a8.4 8.4 0 0 1-12.5 7.3L3.5 20.5l1.4-4.3a8.4 8.4 0 1 1 15.5-4.4Z" />
+        <path d="M8.1 7.3c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l1 2.3c.1.3 0 .5-.1.7l-.7.9c-.2.2-.1.4 0 .6.8 1.4 1.9 2.5 3.4 3.2.2.1.4.1.6-.1l.9-1.1c.2-.2.4-.3.7-.2l2.2 1c.3.1.4.3.4.5 0 .3-.2 1.5-.8 2.1-.6.6-1.5.9-2.4.7-1.1-.2-2.5-.7-4.2-1.8-2.5-1.6-4.1-4-4.5-5.4-.4-1.3 0-2.7.6-3.3.3-.3.7-.5 1.1-.5" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M3.8 12h16.4M12 3.5c2.2 2.3 3.3 5.1 3.3 8.5S14.2 18.2 12 20.5M12 3.5C9.8 5.8 8.7 8.6 8.7 12s1.1 6.2 3.3 8.5" />
     </svg>
   )
 }
@@ -112,6 +166,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
   const cardMotion = useRef<HTMLDivElement>(null)
   const cardStage = useRef<HTMLDivElement>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
+  const whatsappPanel = useRef<HTMLDivElement>(null)
   const closing = useRef(false)
   const tiltReady = useRef(false)
   const copiedTimer = useRef<ReturnType<typeof window.setTimeout> | undefined>(
@@ -122,6 +177,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
   )
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [shareState, setShareState] = useState<ShareState>('idle')
+  const [whatsappOpen, setWhatsappOpen] = useState(false)
 
   useGSAP(
     () => {
@@ -140,7 +196,11 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       if (isMobileExperience()) {
         tiltReady.current = false
         const timeline = gsap
-          .timeline()
+          .timeline({
+            onComplete: () => {
+              tiltReady.current = true
+            },
+          })
           .set(overlay.current, { autoAlpha: 0 })
           .set(cardMotion.current, {
             autoAlpha: 0,
@@ -206,18 +266,14 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     { scope: overlay },
   )
 
-  useEffect(() => {
+  useGSAP((_, contextSafe) => {
     const stage = cardStage.current
-    const canTilt = window.matchMedia(
+    const safe = contextSafe!
+    const canPointerTilt = window.matchMedia(
       '(any-hover: hover) and (any-pointer: fine)',
     ).matches
 
-    if (
-      !stage ||
-      !canTilt ||
-      isMobileExperience() ||
-      prefersReducedMotion()
-    ) return
+    if (!stage || prefersReducedMotion()) return
 
     if (mode === 'scroll') tiltReady.current = true
 
@@ -235,7 +291,105 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       ease: 'power3.out',
     })
 
-    const handlePointerMove = (event: PointerEvent) => {
+    const resetTilt = safe(() => {
+      if (!tiltReady.current || closing.current) return
+      rotateX(0)
+      rotateY(0)
+    })
+
+    if (isMobileExperience() || !canPointerTilt) {
+      if (typeof window.DeviceOrientationEvent === 'undefined') return
+
+      let initialBeta: number | null = null
+      let initialGamma: number | null = null
+      let listening = false
+      let permissionRequested = false
+
+      const resetCalibration = safe(() => {
+        initialBeta = null
+        initialGamma = null
+        resetTilt()
+      })
+
+      const handleOrientation = safe((event: DeviceOrientationEvent) => {
+        if (
+          !tiltReady.current ||
+          closing.current ||
+          event.beta === null ||
+          event.gamma === null
+        ) return
+
+        if (initialBeta === null || initialGamma === null) {
+          initialBeta = event.beta
+          initialGamma = event.gamma
+          return
+        }
+
+        const beta = event.beta - initialBeta
+        const gamma = event.gamma - initialGamma
+        const angle = screen.orientation?.angle ?? 0
+
+        let horizontal = gamma
+        let vertical = beta
+
+        if (angle === 90) {
+          horizontal = beta
+          vertical = -gamma
+        } else if (angle === 180) {
+          horizontal = -gamma
+          vertical = -beta
+        } else if (angle === 270) {
+          horizontal = -beta
+          vertical = gamma
+        }
+
+        rotateX(gsap.utils.clamp(-4, 4, (vertical / 18) * -4))
+        rotateY(gsap.utils.clamp(-5.5, 5.5, (horizontal / 18) * 5.5))
+      })
+
+      const startListening = () => {
+        if (listening) return
+        listening = true
+        window.addEventListener('deviceorientation', handleOrientation, {
+          passive: true,
+        })
+      }
+
+      const orientationEvent = window.DeviceOrientationEvent as
+        DeviceOrientationEventWithPermission
+
+      const requestOrientationAccess = safe(async () => {
+        if (permissionRequested) return
+        permissionRequested = true
+
+        try {
+          const permission = await orientationEvent.requestPermission?.()
+          if (permission === 'granted') startListening()
+        } catch {
+          // Sensor permission was declined or is unavailable in this context.
+        }
+      })
+
+      if (orientationEvent.requestPermission) {
+        stage.addEventListener('pointerdown', requestOrientationAccess)
+      } else {
+        startListening()
+      }
+
+      screen.orientation?.addEventListener('change', resetCalibration)
+      window.addEventListener('blur', resetCalibration)
+
+      return () => {
+        stage.removeEventListener('pointerdown', requestOrientationAccess)
+        window.removeEventListener('deviceorientation', handleOrientation)
+        screen.orientation?.removeEventListener('change', resetCalibration)
+        window.removeEventListener('blur', resetCalibration)
+        gsap.killTweensOf(stage, ['rotationX', 'rotationY'])
+        tiltReady.current = false
+      }
+    }
+
+    const handlePointerMove = safe((event: PointerEvent) => {
       if (
         event.pointerType === 'touch' ||
         !tiltReady.current ||
@@ -247,13 +401,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
       rotateX(vertical * -4)
       rotateY(horizontal * 5.5)
-    }
-
-    const resetTilt = () => {
-      if (!tiltReady.current || closing.current) return
-      rotateX(0)
-      rotateY(0)
-    }
+    })
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
     window.addEventListener('blur', resetTilt)
@@ -266,7 +414,11 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       gsap.killTweensOf(stage, ['rotationX', 'rotationY'])
       tiltReady.current = false
     }
-  }, [mode])
+  }, {
+    scope: cardMotion,
+    dependencies: [mode],
+    revertOnUpdate: true,
+  })
 
   const requestClose = useCallback(() => {
     if (
@@ -345,11 +497,15 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     if (appRoot) appRoot.inert = true
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') requestClose()
+      if (event.key === 'Escape') {
+        if (whatsappPanel.current) setWhatsappOpen(false)
+        else requestClose()
+      }
 
       if (event.key === 'Tab' && overlay.current) {
+        const focusRoot = whatsappPanel.current ?? overlay.current
         const focusable = Array.from(
-          overlay.current.querySelectorAll<HTMLElement>('button, [href]'),
+          focusRoot.querySelectorAll<HTMLElement>('button, [href]'),
         ).filter((element) => !element.hasAttribute('disabled'))
         const first = focusable[0]
         const last = focusable.at(-1)
@@ -376,6 +532,13 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       previouslyFocused?.focus({ preventScroll: true })
     }
   }, [mode, requestClose])
+
+  useEffect(() => {
+    if (!whatsappOpen) return
+
+    const firstContact = whatsappPanel.current?.querySelector<HTMLElement>('a')
+    firstContact?.focus({ preventScroll: true })
+  }, [whatsappOpen])
 
   const handleCopy = async (id: string, value: string) => {
     try {
@@ -530,18 +693,32 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           <div className="contact-card__details">
             {contactDetails.map((detail) => {
               const copied = copiedId === detail.id
+              const isWhatsapp = detail.id === 'whatsapp'
 
               return (
                 <button
-                  className="contact-card__datum contact-card__reveal"
+                  className={`contact-card__datum contact-card__reveal${isWhatsapp ? ' is-whatsapp' : ''}`}
                   type="button"
                   key={detail.id}
-                  onClick={() => handleCopy(detail.id, detail.value)}
-                  aria-label={`Copiar ${detail.label}: ${detail.value}`}
+                  onClick={() => {
+                    if (isWhatsapp) setWhatsappOpen(true)
+                    else void handleCopy(detail.id, detail.value)
+                  }}
+                  aria-label={isWhatsapp
+                    ? 'Elegir contacto de WhatsApp'
+                    : `Copiar ${detail.label}: ${detail.value}`}
+                  aria-haspopup={isWhatsapp ? 'dialog' : undefined}
+                  aria-expanded={isWhatsapp ? whatsappOpen : undefined}
+                  title={`${detail.label}: ${detail.value}`}
                 >
-                  <span className="contact-card__datum-label">{detail.label}</span>
-                  <strong>{detail.display}</strong>
-                  {copied && (
+                  <span className="contact-card__datum-icon">
+                    <ContactDetailIcon id={detail.id} />
+                  </span>
+                  <span className="contact-card__datum-content">
+                    <span className="contact-card__datum-label">{detail.label}</span>
+                    <strong>{detail.display}</strong>
+                  </span>
+                  {copied && !isWhatsapp && (
                     <span
                       className="contact-card__copy-icon"
                       role="status"
@@ -582,6 +759,63 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
             ))}
           </nav>
         </footer>
+
+        {whatsappOpen && (
+          <div
+            className="contact-card__whatsapp-panel"
+            ref={whatsappPanel}
+            data-export-exclude="true"
+            onClick={() => setWhatsappOpen(false)}
+          >
+            <div
+              className="contact-card__whatsapp-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="contact-card-whatsapp-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <header className="contact-card__whatsapp-header">
+                <div>
+                  <span>WhatsApp</span>
+                  <strong id="contact-card-whatsapp-title">¿Con quién deseas hablar?</strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWhatsappOpen(false)}
+                  aria-label="Cerrar contactos de WhatsApp"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6 6 18" />
+                  </svg>
+                </button>
+              </header>
+
+              <div className="contact-card__whatsapp-list">
+                {whatsappContacts.map((contact) => (
+                  <a
+                    href={`https://wa.me/${contact.whatsapp}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setWhatsappOpen(false)}
+                    key={contact.whatsapp}
+                    aria-label={`Abrir WhatsApp con ${contact.name}, ${contact.number}`}
+                  >
+                    <span className="contact-card__whatsapp-avatar" aria-hidden="true">
+                      {contact.name.charAt(0)}
+                    </span>
+                    <span>
+                      <strong>{contact.name}</strong>
+                      <small>{contact.number}</small>
+                    </span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M8 12h8M13 8l4 4-4 4" />
+                    </svg>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         </article>
       </div>
