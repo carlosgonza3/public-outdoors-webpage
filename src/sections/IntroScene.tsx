@@ -12,6 +12,22 @@ type IntroSceneProps = {
   onMobileNavigationGapChange?: (hidden: boolean) => void
 }
 
+const PublicWordmark = () => (
+  <svg
+    className="brand-intro__wordmark"
+    viewBox="53 15 114 22"
+    role="img"
+    aria-label="Public"
+  >
+    <path d="M164.245 36.2883C162.985 36.7353 161.614 36.9588 160.128 36.9588C157.754 36.9588 155.692 36.4743 153.937 35.5026C152.183 34.5323 150.842 33.2261 149.913 31.5854C148.985 29.9446 148.521 28.1439 148.521 26.1831C148.521 24.0277 148.985 22.1058 149.913 20.4161C150.842 18.7264 152.141 17.4115 153.813 16.47C155.485 15.5286 157.414 15.0571 159.602 15.0571C160.984 15.0571 162.264 15.2316 163.44 15.5819C164.617 15.9308 165.649 16.3677 166.536 16.8925L164.771 20.8832C163.14 19.7183 161.468 19.1358 159.757 19.1358C158.601 19.1358 157.518 19.4372 156.507 20.0384C155.496 20.641 154.691 21.4614 154.092 22.4994C153.493 23.5389 153.194 24.6895 153.194 25.951C153.194 27.3293 153.473 28.5389 154.029 29.577C154.587 30.6165 155.381 31.4268 156.413 32.0092C157.445 32.5917 158.652 32.8829 160.034 32.8829C161.148 32.8829 162.149 32.7128 163.037 32.374C163.925 32.0337 164.626 31.6315 165.143 31.1658L167 34.9518C166.422 35.3988 165.503 35.8457 164.245 36.2912V36.2883Z" />
+    <path d="M143.045 15.0571V36.9588H138.939V15.0571H143.045Z" />
+    <path d="M122.854 15.0571V32.7929H133.463V36.9588H118.406V15.0571H122.852H122.854Z" />
+    <path d="M111.956 27.5105C112.605 28.3737 112.93 29.371 112.93 30.5008C112.93 32.7222 112.195 34.3544 110.725 35.3958C109.256 36.4373 107.422 36.9588 105.221 36.9588H97.873V15.0571H104.351C106.691 15.0571 108.531 15.5285 109.87 16.4713C111.21 17.414 111.879 18.7781 111.879 20.5635C111.879 21.655 111.649 22.6125 111.189 23.4345C110.728 24.2579 110.08 24.9179 109.239 25.4128C110.399 25.949 111.303 26.6473 111.953 27.5105H111.956ZM102.224 24.0134H104.863C105.664 24.0134 106.283 23.7703 106.724 23.2842C107.163 22.7981 107.383 22.1986 107.383 21.4841C107.383 20.7697 107.132 20.1893 106.633 19.8034C106.133 19.4159 105.444 19.223 104.564 19.223H102.224V24.0134ZM107.487 32.3304C108.117 31.9238 108.431 31.3139 108.431 30.5008C108.431 28.9541 107.192 28.1793 104.712 28.1793H102.222V32.9402H105.012C106.032 32.9402 106.856 32.7369 107.487 32.3304Z" />
+    <path d="M77.6968 30.6885C78.1312 31.3165 78.7098 31.8265 79.4327 32.2185C80.1556 32.6119 80.9307 32.8072 81.758 32.8072C82.6467 32.8072 83.4632 32.6119 84.2076 32.2185C84.952 31.8265 85.5353 31.3165 85.9589 30.6885C86.3825 30.0604 86.5943 29.4032 86.5943 28.7169V15.0571H91.0285V28.8043C91.0285 30.3548 90.614 31.7537 89.7883 32.9996C88.961 34.2455 87.839 35.2174 86.4239 35.9139C85.0073 36.6105 83.4525 36.9588 81.758 36.9588C80.0635 36.9588 78.5118 36.6105 77.1074 35.9139C75.7015 35.2174 74.5903 34.2469 73.7738 32.9996C72.9572 31.7537 72.549 30.3548 72.549 28.8043V15.0571H77.0445V28.7154C77.0445 29.4032 77.2624 30.0604 77.6953 30.687L77.6968 30.6885Z" />
+    <path d="M66.2404 17.0356C67.7091 18.3556 68.4426 20.1558 68.4426 22.4362C68.4426 23.7459 68.1893 24.9716 67.684 26.1118C67.1773 27.2535 66.3539 28.1904 65.2137 28.9241C64.0721 29.6577 62.6006 30.0245 60.7946 30.0245H57.6998V36.9588H53.3853V15.0571H60.0213C62.6993 15.0571 64.7718 15.7171 66.2404 17.0356ZM62.7287 25.2795C63.2251 24.9126 63.5816 24.481 63.7996 23.9845C64.0176 23.4896 64.1266 23.0123 64.1266 22.5556C64.1266 21.7822 63.8983 21.0338 63.4417 20.309C62.985 19.5857 62.1027 19.2233 60.7931 19.2233H57.6983V25.8304H60.7637C61.5768 25.8304 62.2323 25.6478 62.7272 25.2795H62.7287Z" />
+  </svg>
+)
+
 export function IntroScene({
   onMaskStateChange,
   onMobileNavigationGapChange,
@@ -27,6 +43,7 @@ export function IntroScene({
   const colorMarkPulse = useRef<SVGGElement>(null)
   const veil = useRef<SVGSVGElement>(null)
   const content = useRef<HTMLDivElement>(null)
+  const brandCopy = useRef<HTMLDivElement>(null)
   const copy = useRef<HTMLDivElement>(null)
   const sloganGlow = useRef<HTMLDivElement>(null)
   const ambient = useRef<HTMLDivElement>(null)
@@ -54,6 +71,9 @@ export function IntroScene({
 
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
+        gsap.set(content.current, { autoAlpha: 1 })
+        gsap.set(brandCopy.current, { autoAlpha: 0 })
+        gsap.set(copy.current, { autoAlpha: 1 })
         updateMaskState(true)
         setPageTone('#07080b')
         return
@@ -167,6 +187,15 @@ export function IntroScene({
         renderMobileMask()
         gsap.set(colorMark.current, { autoAlpha: 1 })
         gsap.set(content.current, { autoAlpha: 1 })
+        gsap.set(ambient.current, {
+          autoAlpha: 1,
+          xPercent: -18,
+          yPercent: 14,
+          rotation: -7,
+          scale: 1.28,
+          transformOrigin: '50% 50%',
+        })
+        gsap.set(brandCopy.current, { autoAlpha: 0, y: 24, scale: 0.92 })
         gsap.set(copy.current, { autoAlpha: 0, y: 24 })
         gsap.set(sloganLines, { yPercent: 34 })
         gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.84 })
@@ -175,7 +204,7 @@ export function IntroScene({
             id: 'intro-scene-mobile',
             trigger: section.current,
             start: 'top top',
-            end: '+=125%',
+            end: '+=225%',
             pin: true,
             pinType: 'fixed',
             scrub: true,
@@ -238,21 +267,46 @@ export function IntroScene({
             0.16,
           )
           .to(
+            brandCopy.current,
+            { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: 'power3.out' },
+            0.22,
+          )
+          .to({}, { duration: 0.32 })
+          .to(brandCopy.current, {
+            autoAlpha: 0,
+            yPercent: -16,
+            scale: 1.04,
+            duration: 0.2,
+            ease: 'power2.inOut',
+          })
+          .to(
+            ambient.current,
+            {
+              xPercent: 15,
+              yPercent: -12,
+              rotation: 5,
+              scale: 1.12,
+              duration: 0.65,
+              ease: 'power3.inOut',
+            },
+            '<',
+          )
+          .to(
             sloganGlow.current,
-            { autoAlpha: 0.72, scale: 1, duration: 0.25, ease: 'power2.out' },
-            0.2,
+            { autoAlpha: 0.72, scale: 1, duration: 0.28, ease: 'power2.out' },
+            '<.06',
           )
           .to(
             copy.current,
             { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
-            0.22,
+            '<',
           )
           .to(
             sloganLines,
             { yPercent: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out' },
-            0.22,
+            '<',
           )
-          .to({}, { duration: 0.28 })
+          .to({}, { duration: 0.34 })
           .to(copy.current, {
             autoAlpha: 0,
             yPercent: -16,
@@ -267,7 +321,7 @@ export function IntroScene({
           )
           .to(
             ambient.current,
-            { autoAlpha: 0, duration: 0.22, ease: 'power2.inOut' },
+            { autoAlpha: 0, scale: 1.1, duration: 0.22, ease: 'power2.inOut' },
             '<',
           )
 
@@ -486,7 +540,7 @@ export function IntroScene({
           id: 'intro-scene',
           trigger: section.current,
           start: 'top top',
-          end: '+=180%',
+          end: '+=290%',
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
           scrub: 0.18,
@@ -537,7 +591,20 @@ export function IntroScene({
 
       renderMark()
       gsap.set(content.current, { autoAlpha: 0, scale: 1.04 })
-      gsap.set(ambient.current, { autoAlpha: 1, scale: 1 })
+      gsap.set(ambient.current, {
+        autoAlpha: 1,
+        xPercent: -18,
+        yPercent: 14,
+        rotation: -7,
+        scale: 1.28,
+        transformOrigin: '50% 50%',
+      })
+      gsap.set(brandCopy.current, {
+        autoAlpha: 0,
+        y: 34,
+        scale: 0.88,
+        filter: 'blur(12px)',
+      })
       gsap.set(copy.current, {
         autoAlpha: 0,
         y: 34,
@@ -588,14 +655,51 @@ export function IntroScene({
         .to(scrollCue.current, { autoAlpha: 0, y: -12, duration: 0.12 }, 0.78)
         .to(content.current, { autoAlpha: 1, scale: 1, duration: 0.2, ease: 'power2.out' }, 0.8)
         .to(
+          brandCopy.current,
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.38,
+            ease: 'power3.out',
+          },
+          0.82,
+        )
+        .addLabel('outside', 1.08)
+        .to({}, { duration: 0.16 })
+        .to(
+          brandCopy.current,
+          {
+            autoAlpha: 0,
+            yPercent: -22,
+            scale: 1.08,
+            filter: 'blur(12px)',
+            duration: 0.34,
+            ease: 'power3.inOut',
+          },
+        )
+        .to(
+          ambient.current,
+          {
+            xPercent: 15,
+            yPercent: -12,
+            rotation: 5,
+            scale: 1.12,
+            duration: 0.85,
+            ease: 'power3.inOut',
+          },
+          '<',
+        )
+        .to(
           sloganGlow.current,
           {
             autoAlpha: 0.82,
             scale: 1,
-            duration: 0.42,
+            duration: 0.44,
             ease: 'power3.out',
           },
-          0.82,
+          '<.08',
         )
         .to(
           copy.current,
@@ -607,7 +711,7 @@ export function IntroScene({
             duration: 0.38,
             ease: 'power3.out',
           },
-          0.84,
+          '<.02',
         )
         .to(
           sloganLines,
@@ -617,10 +721,9 @@ export function IntroScene({
             stagger: 0.045,
             ease: 'power4.out',
           },
-          0.86,
+          '<',
         )
-        .addLabel('outside', 1.08)
-        .to({}, { duration: 0.18 })
+        .to({}, { duration: 0.5 })
         .to(
           copy.current,
           {
@@ -695,10 +798,20 @@ export function IntroScene({
       <div className="reveal-content" ref={content}>
         <AmbientField variant="intro" fieldRef={ambient} />
         <div className="slogan-glow" ref={sloganGlow} aria-hidden="true" />
+        <div
+          className="scene-copy scene-copy--brand"
+          ref={brandCopy}
+          aria-hidden="true"
+        >
+          <div className="brand-intro-lockup">
+            <span className="brand-intro__prefix">Somos</span>
+            <PublicWordmark />
+          </div>
+        </div>
         <div className="scene-copy scene-copy--intro" ref={copy}>
           <h1>
             <span className="slogan-line">
-              <span>Espacios únicos para</span>
+              <span>Creamos espacios únicos para</span>
             </span>
             <span className="slogan-line">
               <span>elevar tu marca</span>

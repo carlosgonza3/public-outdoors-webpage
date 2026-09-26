@@ -175,6 +175,36 @@
   will-change: transform, opacity, filter;
 }
 
+.scene-copy--brand {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.brand-intro-lockup {
+  width: min(100%, 58rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 2.25vw, 2.25rem);
+  color: #f7f5ef;
+  line-height: 1;
+}
+
+.brand-intro__prefix {
+  flex: 0 0 auto;
+  font-size: clamp(3rem, 5.8vw, 5.8rem);
+  font-weight: 520;
+  letter-spacing: -.065em;
+}
+
+.brand-intro__wordmark {
+  width: clamp(16rem, 31vw, 31rem);
+  height: auto;
+  display: block;
+  overflow: visible;
+  fill: currentColor;
+}
+
 .eyebrow {
   margin: 0 0 ;
   font-size: .72rem;
