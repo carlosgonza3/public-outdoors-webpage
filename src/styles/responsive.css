@@ -260,6 +260,10 @@
   }
 
   .logo-veil { display: block; }
+  .logo-veil {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
   .logo-play-button { display: none; }
 
   .reveal-content,

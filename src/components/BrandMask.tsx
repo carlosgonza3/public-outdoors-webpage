@@ -8,6 +8,7 @@ interface BrandMaskProps {
   colorMarkPressRef: React.Ref<SVGGElement>
   markPulseRef: React.Ref<SVGGElement>
   colorMarkPulseRef: React.Ref<SVGGElement>
+  mobileRevealRef: React.Ref<SVGCircleElement>
 }
 
 const MarkPaths = ({ color }: { color: string }) => (
@@ -28,6 +29,7 @@ export function BrandMask({
   colorMarkPressRef,
   markPulseRef,
   colorMarkPulseRef,
+  mobileRevealRef,
 }: BrandMaskProps) {
   return (
     <svg
@@ -40,6 +42,14 @@ export function BrandMask({
       <defs>
         <mask id="mark-cutout">
           <rect width="1000" height="1000" fill="white" />
+          <circle
+            ref={mobileRevealRef}
+            className="brand-mask__mobile-reveal"
+            cx="500"
+            cy="500"
+            r="0"
+            fill="black"
+          />
           <g transform="translate(500 500)">
             <g className="brand-mark brand-mark--cutout" ref={markRef}>
               <g ref={markPerspectiveRef}>

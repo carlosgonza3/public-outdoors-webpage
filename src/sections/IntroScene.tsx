@@ -42,6 +42,7 @@ export function IntroScene({
   const colorMarkPress = useRef<SVGGElement>(null)
   const markPulse = useRef<SVGGElement>(null)
   const colorMarkPulse = useRef<SVGGElement>(null)
+  const mobileReveal = useRef<SVGCircleElement>(null)
   const veil = useRef<SVGSVGElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const brandCopy = useRef<HTMLDivElement>(null)
@@ -201,15 +202,9 @@ export function IntroScene({
           '.slogan-line > span',
         )
         let darkToneActive = false
-        const maskFlight = { scale: 3.2, rotation: 0 }
-        const renderMobileMask = () => {
-          const transform =
-            `rotate(${maskFlight.rotation}) scale(${maskFlight.scale})`
-          mark.current?.setAttribute('transform', transform)
-          colorMark.current?.setAttribute('transform', transform)
-        }
-
-        renderMobileMask()
+        mark.current?.setAttribute('transform', 'scale(3.2)')
+        colorMark.current?.setAttribute('transform', 'scale(3.2)')
+        mobileReveal.current?.setAttribute('r', '0')
         gsap.set(colorMark.current, { autoAlpha: 1 })
         gsap.set(content.current, { autoAlpha: 1 })
         gsap.set(ambient.current, {
@@ -254,13 +249,20 @@ export function IntroScene({
 
         mobileTimeline
           .to(
-            maskFlight,
+            mobileReveal.current,
             {
-              scale: 34,
-              rotation: 0,
+              attr: { r: 760 },
               duration: 0.28,
               ease: 'power3.inOut',
-              onUpdate: renderMobileMask,
+            },
+            0,
+          )
+          .to(
+            colorMark.current,
+            {
+              attr: { transform: 'scale(10)' },
+              duration: 0.2,
+              ease: 'power3.in',
             },
             0,
           )
@@ -947,6 +949,7 @@ export function IntroScene({
         colorMarkPressRef={colorMarkPress}
         markPulseRef={markPulse}
         colorMarkPulseRef={colorMarkPulse}
+        mobileRevealRef={mobileReveal}
       />
 
       <button
