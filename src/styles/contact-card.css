@@ -647,7 +647,12 @@
     font-size: clamp(2.35rem, 10.5vw, 5.4rem);
   }
 
-  .contact-card__actions { gap: .55rem; }
+  .contact-card__actions {
+    position: relative;
+    z-index: 6;
+    gap: .55rem;
+    transform: translateZ(32px);
+  }
   .contact-card__share,
   .contact-card__close,
   .contact-card__motion-access {
@@ -661,15 +666,17 @@
   .contact-card__motion-access > span { display: none; }
 
   .contact-card__motion-access {
-    right: clamp(.65rem, 2.2vw, 1rem);
-    bottom: clamp(.5rem, 1.8vw, .8rem);
+    right: clamp(.55rem, 2vw, .85rem);
+    bottom: clamp(.3rem, 1.2vw, .5rem);
+    width: 1.55rem;
+    height: 1.55rem;
     border-radius: 50%;
     background: rgb(9 11 13 / 7%);
   }
 
   .contact-card__motion-access svg {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: .9rem;
+    height: .9rem;
   }
   .contact-card__share svg { width: 1.05rem; height: 1.05rem; }
   .contact-card__close svg { width: 1.35rem; height: 1.35rem; }

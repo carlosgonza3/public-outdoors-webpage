@@ -323,6 +323,8 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       const requiredCalibrationSamples = 12
       let listening = false
       let permissionRequested = false
+      let tiltSuspended = false
+      let resumeTimer: number | undefined
 
       const resetCalibration = safe(() => {
         initialBeta = null
@@ -337,6 +339,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
         if (
           !tiltReady.current ||
           closing.current ||
+          tiltSuspended ||
           event.beta === null ||
           event.gamma === null
         ) return
@@ -428,14 +431,36 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
         startListening()
       }
 
+      const suspendTiltForInteraction = safe(() => {
+        tiltSuspended = true
+        window.clearTimeout(resumeTimer)
+        gsap.getTweensOf(stage).forEach((tween) => tween.pause())
+      })
+
+      const resumeTiltAfterInteraction = safe(() => {
+        window.clearTimeout(resumeTimer)
+        resumeTimer = window.setTimeout(() => {
+          gsap.getTweensOf(stage).forEach((tween) => tween.play())
+          resetCalibration()
+          tiltSuspended = false
+        }, 180)
+      })
+
       screen.orientation?.addEventListener('change', resetCalibration)
       window.addEventListener('blur', resetCalibration)
+      stage.addEventListener('pointerdown', suspendTiltForInteraction, true)
+      window.addEventListener('pointerup', resumeTiltAfterInteraction, true)
+      window.addEventListener('pointercancel', resumeTiltAfterInteraction, true)
 
       return () => {
+        window.clearTimeout(resumeTimer)
         requestMotionAccess.current = () => undefined
         window.removeEventListener('deviceorientation', handleOrientation)
         screen.orientation?.removeEventListener('change', resetCalibration)
         window.removeEventListener('blur', resetCalibration)
+        stage.removeEventListener('pointerdown', suspendTiltForInteraction, true)
+        window.removeEventListener('pointerup', resumeTiltAfterInteraction, true)
+        window.removeEventListener('pointercancel', resumeTiltAfterInteraction, true)
         gsap.killTweensOf(stage, ['rotationX', 'rotationY', 'x', 'y'])
         tiltReady.current = false
       }
