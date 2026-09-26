@@ -39,6 +39,7 @@ export function GalleryScene() {
       if (prefersReducedMotion()) return
 
       const mobile = isMobileExperience()
+      let removePointerTracker: (() => void) | undefined
       const heading = section.current?.querySelector<HTMLElement>('.grid-heading')
       const headingLines = heading
         ? gsap.utils.toArray<HTMLElement>('.grid-heading__line > span', heading)
@@ -124,6 +125,211 @@ export function GalleryScene() {
             duration: 0.46,
             ease: 'power3.out',
           }, 0.16)
+
+        const [indoorSignal, outdoorSignal, innovationsSignal] = headingSignals
+        const ambient = galleryAmbient.current
+        const ambientOrb = ambient?.querySelector<HTMLElement>(
+          '.gallery-ambient__orb',
+        )
+        const canHandOffToCursor = Boolean(
+          !mobile &&
+          ambient &&
+          ambientOrb &&
+          window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+        )
+
+        if (indoorSignal && outdoorSignal && innovationsSignal) {
+          const pauseTyping = () => typingTimeline.pause()
+          const resumeTyping = () => typingTimeline.restart()
+
+          if (canHandOffToCursor && ambient && ambientOrb) {
+            const pointerPosition = {
+              x: window.innerWidth * 0.52,
+              y: window.innerHeight * 0.7,
+            }
+            const trackPointer = (event: PointerEvent) => {
+              if (event.pointerType === 'touch') return
+              pointerPosition.x = event.clientX
+              pointerPosition.y = event.clientY
+            }
+            window.addEventListener('pointermove', trackPointer, { passive: true })
+            removePointerTracker = () => {
+              window.removeEventListener('pointermove', trackPointer)
+            }
+
+            const cursorX = () => pointerPosition.x
+            const cursorY = () => pointerPosition.y
+            const cursorScale = () =>
+              ambientOrb.offsetWidth / indoorSignal.offsetWidth
+
+            const indoorTravelX = () => {
+              const bounds = indoorSignal.getBoundingClientRect()
+              return cursorX() - (bounds.left + bounds.width / 2)
+            }
+            const indoorTravelY = () => {
+              const bounds = indoorSignal.getBoundingClientRect()
+              const documentCenter =
+                bounds.top + window.scrollY + bounds.height / 2
+              const endScroll =
+                handoffTimeline.scrollTrigger?.end ??
+                window.scrollY + window.innerHeight * 0.52
+
+              return cursorY() - (documentCenter - endScroll)
+            }
+
+            const handoffTimeline = gsap.timeline({
+              scrollTrigger: {
+                trigger: heading,
+                start: 'bottom 68%',
+                end: 'bottom 16%',
+                scrub: 0.65,
+                invalidateOnRefresh: true,
+                onEnter: () => {
+                  pauseTyping()
+                  handoffTimeline.invalidate()
+                },
+                onEnterBack: pauseTyping,
+                onLeaveBack: resumeTyping,
+              },
+            })
+
+            handoffTimeline
+              .set(ambientOrb, {
+                x: cursorX,
+                y: cursorY,
+                xPercent: -50,
+                yPercent: -50,
+                scaleX: 1,
+                scaleY: 1,
+                color: '#ff0109',
+              }, 0)
+              .fromTo(outdoorSignal, {
+                x: 0,
+                y: 0,
+                scale: 0.74,
+                autoAlpha: 0.42,
+              }, {
+                x: () => -window.innerWidth * 0.18,
+                y: () => window.innerHeight * 0.34,
+                scale: 0.28,
+                autoAlpha: 0,
+                duration: 0.68,
+                ease: 'power3.in',
+                immediateRender: false,
+              }, 0.04)
+              .fromTo(innovationsSignal, {
+                x: 0,
+                y: 0,
+                scale: 0.74,
+                autoAlpha: 0.42,
+              }, {
+                x: () => window.innerWidth * 0.18,
+                y: () => window.innerHeight * 0.4,
+                scale: 0.24,
+                autoAlpha: 0,
+                duration: 0.72,
+                ease: 'power3.in',
+                immediateRender: false,
+              }, 0.08)
+              .fromTo(indoorSignal, {
+                x: 0,
+                y: 0,
+                scale: 0.74,
+                autoAlpha: 0.42,
+              }, {
+                x: indoorTravelX,
+                y: indoorTravelY,
+                scale: cursorScale,
+                autoAlpha: 0,
+                duration: 0.82,
+                ease: 'power2.inOut',
+                immediateRender: false,
+              }, 0)
+              .fromTo(ambient, {
+                autoAlpha: 0,
+              }, {
+                autoAlpha: 1,
+                duration: 0.56,
+                ease: 'power2.inOut',
+                immediateRender: false,
+              }, 0.2)
+              .to(headingSignal, {
+                autoAlpha: 0,
+                duration: 0.18,
+                ease: 'power2.out',
+              }, 0.74)
+          } else {
+            const touchExitTimeline = gsap.timeline({
+              scrollTrigger: {
+                trigger: heading,
+                start: 'bottom 76%',
+                end: 'bottom 42%',
+                scrub: 0.45,
+                invalidateOnRefresh: true,
+                onEnter: pauseTyping,
+                onEnterBack: pauseTyping,
+                onLeaveBack: resumeTyping,
+              },
+            })
+
+            if (mobile) {
+              touchExitTimeline.to(headingBottom, {
+                y: 10,
+                autoAlpha: 0,
+                duration: 0.34,
+                ease: 'power2.out',
+              }, 0)
+            }
+
+            touchExitTimeline
+              .fromTo(indoorSignal, {
+                x: 0,
+                y: 0,
+                scale: 0.74,
+                autoAlpha: 0.42,
+              }, {
+                x: () => -window.innerWidth * 0.08,
+                y: () => window.innerHeight * 0.22,
+                scale: 0.38,
+                autoAlpha: 0,
+                duration: 0.72,
+                ease: 'power3.in',
+                immediateRender: false,
+              }, 0)
+              .fromTo(outdoorSignal, {
+                x: 0,
+                y: 0,
+                scale: 0.74,
+                autoAlpha: 0.42,
+              }, {
+                y: () => window.innerHeight * 0.27,
+                scale: 0.32,
+                autoAlpha: 0,
+                duration: 0.7,
+                ease: 'power3.in',
+                immediateRender: false,
+              }, 0.04)
+              .fromTo(innovationsSignal, {
+                x: 0,
+                y: 0,
+                scale: 0.74,
+                autoAlpha: 0.42,
+              }, {
+                x: () => window.innerWidth * 0.08,
+                y: () => window.innerHeight * 0.31,
+                scale: 0.28,
+                autoAlpha: 0,
+                duration: 0.72,
+                ease: 'power3.in',
+                immediateRender: false,
+              }, 0.08)
+              .to(headingSignal, {
+                autoAlpha: 0,
+                duration: 0.2,
+                ease: 'power2.out',
+              }, 0.72)
+          }
+        }
       }
 
       collections.forEach((collection) => {
@@ -167,6 +373,8 @@ export function GalleryScene() {
             ease: 'power3.out',
           }, 0.28)
       })
+
+      return () => removePointerTracker?.()
     },
     { scope: section },
   )

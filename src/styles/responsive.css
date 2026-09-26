@@ -100,6 +100,29 @@
 
   .ambient-glow { filter: none; }
 
+  .intro .ambient-field {
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .intro .ambient-glow--red {
+    width: 96%;
+    left: -2%;
+    top: 18%;
+  }
+
+  .intro .ambient-glow--blue {
+    width: 68%;
+    left: 46%;
+    top: -2%;
+  }
+
+  .intro .ambient-glow--green {
+    width: 62%;
+    left: -10%;
+    top: 56%;
+  }
+
   .slogan-glow { filter: none; }
 
   .site-nav__butterfly {
@@ -259,7 +282,24 @@
   }
   .scroll-cue i { height: 2rem; }
   .scene-copy { padding-inline: 1.25rem; }
-  .reveal-content h1 { font-size: clamp(3.5rem, 18vw, 6rem); }
+  .scene-copy--intro h1 {
+    width: min(100%, 45rem);
+    font-size: clamp(2.55rem, 11.8vw, 4rem);
+    line-height: .9;
+    letter-spacing: -.065em;
+  }
+  .scene-copy--intro .slogan-line {
+    width: 100%;
+    max-width: 100%;
+  }
+  .scene-copy--intro .slogan-line > span {
+    text-wrap: balance;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+  .brand-intro-lockup { gap: clamp(.7rem, 3vw, 1rem); }
+  .brand-intro__prefix { font-size: clamp(2rem, 10.5vw, 3rem); }
+  .brand-intro__wordmark { width: min(52vw, 15rem); }
   .purpose-stage { padding-inline: 1.25rem; }
   .purpose-question h2 { font-size: clamp(3.2rem, 14vw, 5rem); }
   .purpose-statement h2 { font-size: clamp(3rem, 13vw, 4.8rem); }
@@ -286,6 +326,7 @@
     border-radius: 0;
   }
   .collection-page__header { min-height: 82svh; }
+  .collection-page--innovations .innovations-hero { min-height: 0; }
   .collection-page__intro {
     align-items: stretch;
     gap: 2rem;
@@ -296,7 +337,7 @@
     text-align: left;
   }
   .collection-page--innovations .collection-page__intro h1 {
-    font-size: clamp(2.65rem, 10.4vw, 4.25rem);
+    font-size: clamp(3rem, 14.5vw, 5.25rem);
   }
   .collection-page__projects {
     display: block;
@@ -697,6 +738,24 @@
 }
 
 @media (max-width: 600px) {
+  .intro .ambient-glow--red {
+    width: 118%;
+    left: -18%;
+    top: 19%;
+  }
+
+  .intro .ambient-glow--blue {
+    width: 82%;
+    left: 42%;
+    top: -4%;
+  }
+
+  .intro .ambient-glow--green {
+    width: 78%;
+    left: -20%;
+    top: 55%;
+  }
+
   .project-grid-section {
     margin-top: -45svh;
   }
