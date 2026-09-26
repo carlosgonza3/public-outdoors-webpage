@@ -60,21 +60,52 @@ const formats = {
 
 const coverageSteps = [
   {
-    number: '01',
+    icon: 'location',
     title: 'Ubicación',
     description: 'Puntos estratégicos e intersecciones de alta circulación.',
   },
   {
-    number: '02',
+    icon: 'format',
     title: 'Formato',
     description: 'El medio correcto para el objetivo y ritmo de tu campaña.',
   },
   {
-    number: '03',
+    icon: 'exposure',
     title: 'Exposición',
     description: 'Presencia sostenida para que tu marca se vea y se recuerde.',
   },
 ] as const
+
+function CoverageIcon({
+  icon,
+}: {
+  icon: (typeof coverageSteps)[number]['icon']
+}) {
+  if (icon === 'location') {
+    return (
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M38 20c0 10-14 23-14 23S10 30 10 20a14 14 0 1 1 28 0Z" />
+        <circle cx="24" cy="20" r="4.5" />
+      </svg>
+    )
+  }
+
+  if (icon === 'format') {
+    return (
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <rect x="7" y="9" width="34" height="30" rx="3" />
+        <path d="M7 19h34M20 19v20" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M5 24s7-12 19-12 19 12 19 12-7 12-19 12S5 24 5 24Z" />
+      <circle cx="24" cy="24" r="5" />
+    </svg>
+  )
+}
 
 export function OutdoorPage({ modal = false }: OutdoorPageProps) {
   const page = useRef<HTMLDivElement>(null)
@@ -507,15 +538,11 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
           >
             <div className="indoor-strategy__sticky">
               <div className="indoor-strategy__lead">
-                <p className="indoor-kicker indoor-strategy__eyebrow">
-                  Cobertura estratégica
-                </p>
                 <h2 id="outdoor-strategy-title">
-                  No solo mostramos
-                  <br />
-                  tu marca. La ponemos
-                  <br />
-                  en movimiento.
+                  No solo mostramos tu marca.
+                </h2>
+                <h2>
+                  La ponemos en movimiento.
                 </h2>
               </div>
 
@@ -528,8 +555,8 @@ export function OutdoorPage({ modal = false }: OutdoorPageProps) {
                 <ol aria-label="Nuestra cobertura">
                   {coverageSteps.map((step) => (
                     <li className="indoor-strategy__step" key={step.title}>
-                      <span className="outdoor-strategy__number">
-                        {step.number}
+                      <span className="indoor-strategy__icon">
+                        <CoverageIcon icon={step.icon} />
                       </span>
                       <span className="indoor-strategy__step-copy">
                         <strong>{step.title}</strong>

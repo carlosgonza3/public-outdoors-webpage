@@ -59,19 +59,6 @@
   opacity: 1;
 }
 
-.outdoor-strategy__number {
-  width: 2.25rem;
-  height: 2.25rem;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgb(247 245 239 / 28%);
-  border-radius: 50%;
-  color: rgb(247 245 239 / 72%);
-  font-size: .58rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-}
-
 .outdoor-formats .indoor-formats__header {
   justify-content: flex-start;
 }
@@ -131,7 +118,7 @@
 .outdoor-formats .indoor-formats__copy-layer h3 {
   max-width: 12ch;
   margin: 0 0 1.5rem;
-  font-size: clamp(3rem, 4.5vw, 5.4rem);
+  font-size: clamp(2.6rem, 3.4vw, 4.2rem);
   line-height: .92;
 }
 
@@ -141,7 +128,7 @@
   align-items: flex-start;
   gap: .55rem;
   padding: 0;
-  margin: clamp(2.5rem, 4.5vw, 5rem) 0 0;
+  margin: clamp(1.35rem, 2vw, 2.25rem) 0 0;
   list-style: none;
 }
 
@@ -331,7 +318,7 @@
 
   .outdoor-formats .indoor-formats__copy-layer ul {
     gap: .45rem;
-    margin-top: 2.5rem;
+    margin-top: 1.5rem;
   }
 
   .outdoor-formats .indoor-formats__copy-layer li {

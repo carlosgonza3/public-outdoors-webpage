@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import { gsap, useGSAP } from '../animation/gsap'
+import { useRef, useState } from 'react'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
 import { setPageTone } from '../animation/pageTone'
@@ -12,13 +12,15 @@ const statementWords = ['No', 'dejes', 'que', 'pase', 'de', 'nuevo.']
 const actionWords = ['¡Anúnciate', 'con', 'nosotros!']
 
 export function PurposeScene() {
+  const [mobileStage, setMobileStage] = useState<
+    'question' | 'statement' | 'contact'
+  >('question')
   const section = useRef<HTMLElement>(null)
   const story = useRef<HTMLDivElement>(null)
   const ambient = useRef<HTMLDivElement>(null)
   const question = useRef<HTMLDivElement>(null)
   const statement = useRef<HTMLDivElement>(null)
   const action = useRef<HTMLDivElement>(null)
-  const mobileAction = useRef<HTMLDivElement>(null)
   const contact = useRef<HTMLDivElement>(null)
   const contactBackdrop = useRef<HTMLDivElement>(null)
 
@@ -36,7 +38,6 @@ export function PurposeScene() {
       const contactMotion = contactContainer?.querySelector<HTMLElement>(
         '.contact-card__motion',
       )
-      const mobileActionContainer = mobileAction.current
       const mobile = isMobileExperience()
       const iosSafari = isIOSSafari()
 
@@ -44,8 +45,7 @@ export function PurposeScene() {
         !contactContainer ||
         !backdrop ||
         !contactMotion ||
-        !storyContainer ||
-        !mobileActionContainer
+        !storyContainer
       ) return
 
       if (prefersReducedMotion()) {
@@ -72,10 +72,6 @@ export function PurposeScene() {
           autoAlpha: 1,
           clearProps: 'transform,filter,clipPath',
         })
-        gsap.set(mobileActionContainer, {
-          autoAlpha: mobile ? 1 : 0,
-          clearProps: 'transform,filter',
-        })
         if (mobile) {
           gsap.set(question.current, { autoAlpha: 0 })
         }
@@ -85,35 +81,36 @@ export function PurposeScene() {
 
       if (mobile) {
         const sectionElement = section.current
-        const toneObserver = new IntersectionObserver(
-          ([entry]) => {
-            if (entry.isIntersecting) {
-              setPageTone('#07110f', true)
-            } else if (entry.boundingClientRect.top > 0) {
-              setPageTone('#080b0a', true)
-            }
-          },
-          { threshold: 0.02 },
-        )
-        const contactObserver = new IntersectionObserver(
-          ([entry]) => {
-            sectionElement.classList.toggle(
-              'is-mobile-contact-visible',
-              entry.isIntersecting,
-            )
-          },
-          {
-            threshold: 0,
-            rootMargin: '0px 0px -48% 0px',
-          },
-        )
+        const mobileStages = ['question', 'statement', 'contact'] as const
+        let activeStage = -1
 
-        toneObserver.observe(sectionElement)
-        contactObserver.observe(contactContainer)
+        const selectStage = (progress: number) => {
+          const nextStage = progress < 0.32 ? 0 : progress < 0.68 ? 1 : 2
+          if (nextStage === activeStage) return
+
+          activeStage = nextStage
+          const stage = mobileStages[nextStage]
+          sectionElement.dataset.mobileStage = stage
+          setMobileStage(stage)
+        }
+
+        const stageTrigger = ScrollTrigger.create({
+          id: 'purpose-mobile-stages',
+          trigger: sectionElement,
+          start: 'top top',
+          end: 'bottom bottom',
+          invalidateOnRefresh: true,
+          onEnter: () => setPageTone('#07110f', true),
+          onEnterBack: () => setPageTone('#07110f', true),
+          onLeaveBack: () => setPageTone('#080b0a', true),
+          onUpdate: ({ progress }) => selectStage(progress),
+        })
+
+        selectStage(stageTrigger.progress)
+
         return () => {
-          toneObserver.disconnect()
-          contactObserver.disconnect()
-          sectionElement.classList.remove('is-mobile-contact-visible')
+          stageTrigger.kill()
+          sectionElement.dataset.mobileStage = 'question'
         }
       }
 
@@ -435,59 +432,69 @@ export function PurposeScene() {
   )
 
   return (
-    <section className="purpose-section" ref={section} data-scene-id="purpose">
-      <AmbientField variant="purpose" fieldRef={ambient} />
+    <section
+      className="purpose-section"
+      ref={section}
+      data-scene-id="purpose"
+      data-mobile-stage="question"
+    >
+      <div className="purpose-viewport">
+        <AmbientField variant="purpose" fieldRef={ambient} />
 
-      <div className="purpose-story" ref={story}>
-        <div className="purpose-stage purpose-question" ref={question}>
-          <h2 aria-label="¿No viste tu marca?">
-            {questionWords.map((word) => (
-              <span className="purpose-stage__word" key={word}>
-                <span>{word}</span>
-              </span>
-            ))}
-          </h2>
+        <div className="purpose-story" ref={story}>
+          <div className="purpose-stage purpose-question" ref={question}>
+            <h2 aria-label="¿No viste tu marca?">
+              {questionWords.map((word) => (
+                <span className="purpose-stage__word" key={word}>
+                  <span>{word}</span>
+                </span>
+              ))}
+            </h2>
+          </div>
+
+          <div className="purpose-stage purpose-statement" ref={statement}>
+            <h2 aria-label="No dejes que pase de nuevo.">
+              {statementWords.map((word) => (
+                <span className="purpose-statement__clip" key={word}>
+                  <span className="purpose-statement__word">{word}</span>
+                </span>
+              ))}
+            </h2>
+          </div>
         </div>
 
-        <div className="purpose-stage purpose-statement" ref={statement}>
-          <h2 aria-label="No dejes que pase de nuevo.">
-            {statementWords.map((word) => (
-              <span className="purpose-statement__clip" key={word}>
-                <span className="purpose-statement__word">{word}</span>
-              </span>
-            ))}
-          </h2>
+        <div className="purpose-final">
+          <div className="purpose-stage purpose-action" ref={action}>
+            <h2 aria-label="¡Anúnciate con nosotros!">
+              {actionWords.map((word, index) => (
+                <span
+                  className={`purpose-action__word ${
+                    index === 0
+                      ? 'purpose-action__word--lead'
+                      : 'purpose-action__word--support'
+                  }`}
+                  key={word}
+                >
+                  <span>{word}</span>
+                </span>
+              ))}
+            </h2>
+          </div>
+
+          <div className="purpose-contact" ref={contact}>
+            <div
+              className="purpose-contact__backdrop"
+              ref={contactBackdrop}
+              aria-hidden="true"
+            />
+            <ContactCard
+              mode="scroll"
+              motionActive={
+                !isMobileExperience() || mobileStage === 'contact'
+              }
+            />
+          </div>
         </div>
-
-        <div className="purpose-stage purpose-action" ref={action}>
-          <h2 aria-label="¡Anúnciate con nosotros!">
-            {actionWords.map((word, index) => (
-              <span
-                className={`purpose-action__word ${
-                  index === 0
-                    ? 'purpose-action__word--lead'
-                    : 'purpose-action__word--support'
-                }`}
-                key={word}
-              >
-                <span>{word}</span>
-              </span>
-            ))}
-          </h2>
-        </div>
-      </div>
-
-      <div className="purpose-contact" ref={contact}>
-        <div
-          className="purpose-contact__backdrop"
-          ref={contactBackdrop}
-          aria-hidden="true"
-        />
-        <ContactCard mode="scroll" />
-      </div>
-
-      <div className="purpose-mobile-action" ref={mobileAction}>
-        <h2>¡Anúnciate con nosotros!</h2>
       </div>
     </section>
   )

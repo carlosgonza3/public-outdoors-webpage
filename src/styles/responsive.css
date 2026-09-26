@@ -1518,27 +1518,6 @@
     will-change: auto;
   }
 
-  .purpose-mobile-action {
-    position: relative;
-    inset: auto;
-    order: 2;
-    min-height: 14svh;
-    align-items: flex-end;
-    margin-top: -70svh;
-    padding: 0 1.25rem 2rem;
-    opacity: 0;
-    transform: translateY(.75rem);
-    transition: opacity .24s ease-out, transform .24s ease-out;
-  }
-
-  .purpose-section.is-mobile-contact-visible .purpose-question {
-    opacity: 0;
-  }
-
-  .purpose-section.is-mobile-contact-visible .purpose-mobile-action {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 @media (max-width: 700px) and (prefers-reduced-motion: reduce) {
@@ -1614,15 +1593,6 @@
     height: 0;
   }
 
-  .purpose-mobile-action {
-    min-height: 0;
-    margin-top: 0;
-    padding: 5rem 1.25rem 2.5rem;
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
   .purpose-contact {
     padding: 1rem .75rem 5rem;
   }
@@ -1644,11 +1614,12 @@
   }
 
   .impact-track__end {
-    width: min(78%, 19rem);
+    width: 100%;
     min-height: 0;
-    align-self: flex-end;
+    align-self: stretch;
     justify-content: flex-end;
-    padding: 2rem 1.25rem 2.5rem;
+    padding: 2rem 1rem 2.5rem;
+    font-size: clamp(4rem, 17vw, 6rem);
     line-height: .96;
     text-align: right;
   }
@@ -1663,5 +1634,48 @@
 
   .team-profile h3 {
     font-size: clamp(2rem, 9vw, 3.1rem);
+  }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .purpose-section {
+    height: auto;
+    min-height: 0;
+    display: block;
+  }
+
+  .purpose-viewport {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .purpose-story {
+    display: none;
+    height: 0;
+  }
+
+  .purpose-final {
+    position: relative;
+    inset: auto;
+    min-height: 100svh;
+    display: flex;
+    padding: 5rem .75rem;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
+  }
+
+  .purpose-final .purpose-action {
+    display: flex;
+  }
+
+  .purpose-contact {
+    min-height: 0;
+    padding: 0;
   }
 }

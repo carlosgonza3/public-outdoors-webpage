@@ -12,6 +12,7 @@ import whatsappIcon from '../assets/whatsapp-streamline.svg'
 type ContactCardProps = {
   onClose?: () => void
   mode?: 'modal' | 'scroll'
+  motionActive?: boolean
 }
 
 type ShareState = 'idle' | 'exporting' | 'shared' | 'error'
@@ -171,7 +172,11 @@ function ContactDetailIcon({ id }: { id: string }) {
   )
 }
 
-export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
+export function ContactCard({
+  onClose,
+  mode = 'modal',
+  motionActive = true,
+}: ContactCardProps) {
   const overlay = useRef<HTMLDivElement>(null)
   const cardMotion = useRef<HTMLDivElement>(null)
   const cardStage = useRef<HTMLDivElement>(null)
@@ -303,6 +308,11 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     ).matches
     const mobileExperience = isMobileExperience()
     const deferEmbeddedTilt = mode === 'scroll' && mobileExperience
+
+    if (!motionActive) {
+      tiltReady.current = false
+      return
+    }
 
     if (!stage || prefersReducedMotion()) {
       setMotionAccess('unavailable')
@@ -550,7 +560,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     }
   }, {
     scope: cardMotion,
-    dependencies: [mode],
+    dependencies: [mode, motionActive],
     revertOnUpdate: true,
   })
 
