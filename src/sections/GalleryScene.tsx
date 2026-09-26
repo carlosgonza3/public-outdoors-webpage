@@ -259,19 +259,29 @@ export function GalleryScene() {
                 ease: 'power2.out',
               }, 0.74)
           } else {
-            gsap
-              .timeline({
-                scrollTrigger: {
-                  trigger: heading,
-                  start: 'bottom 76%',
-                  end: 'bottom 42%',
-                  scrub: 0.45,
-                  invalidateOnRefresh: true,
-                  onEnter: pauseTyping,
-                  onEnterBack: pauseTyping,
-                  onLeaveBack: resumeTyping,
-                },
-              })
+            const touchExitTimeline = gsap.timeline({
+              scrollTrigger: {
+                trigger: heading,
+                start: 'bottom 76%',
+                end: 'bottom 42%',
+                scrub: 0.45,
+                invalidateOnRefresh: true,
+                onEnter: pauseTyping,
+                onEnterBack: pauseTyping,
+                onLeaveBack: resumeTyping,
+              },
+            })
+
+            if (mobile) {
+              touchExitTimeline.to(headingBottom, {
+                y: 10,
+                autoAlpha: 0,
+                duration: 0.34,
+                ease: 'power2.out',
+              }, 0)
+            }
+
+            touchExitTimeline
               .fromTo(indoorSignal, {
                 x: 0,
                 y: 0,
@@ -285,7 +295,7 @@ export function GalleryScene() {
                 duration: 0.72,
                 ease: 'power3.in',
                 immediateRender: false,
-              })
+              }, 0)
               .fromTo(outdoorSignal, {
                 x: 0,
                 y: 0,

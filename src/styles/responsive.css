@@ -100,6 +100,11 @@
 
   .ambient-glow { filter: none; }
 
+  .intro .ambient-field {
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
   .intro .ambient-glow--red {
     width: 96%;
     left: -2%;
@@ -277,7 +282,21 @@
   }
   .scroll-cue i { height: 2rem; }
   .scene-copy { padding-inline: 1.25rem; }
-  .reveal-content h1 { font-size: clamp(3.5rem, 18vw, 6rem); }
+  .scene-copy--intro h1 {
+    width: min(100%, 45rem);
+    font-size: clamp(2.55rem, 11.8vw, 4rem);
+    line-height: .9;
+    letter-spacing: -.065em;
+  }
+  .scene-copy--intro .slogan-line {
+    width: 100%;
+    max-width: 100%;
+  }
+  .scene-copy--intro .slogan-line > span {
+    text-wrap: balance;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
   .brand-intro-lockup { gap: clamp(.7rem, 3vw, 1rem); }
   .brand-intro__prefix { font-size: clamp(2rem, 10.5vw, 3rem); }
   .brand-intro__wordmark { width: min(52vw, 15rem); }

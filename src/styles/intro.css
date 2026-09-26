@@ -28,6 +28,7 @@
   z-index: 0;
   inset: -15%;
   overflow: hidden;
+  backface-visibility: hidden;
   will-change: transform;
 }
 
@@ -68,6 +69,15 @@
   top: 65%;
   background: radial-gradient(circle, rgb(56 212 48 / 31%) 0, rgb(56 212 48 / 8%) 40%, transparent 72%);
   animation: drift-green 13s cubic-bezier(.45, 0, .55, 1) -4s infinite alternate;
+}
+
+/* The intro pans the complete field as one cached compositor layer. Keeping
+   independent blur/drift layers active here forces a full high-resolution
+   repaint on every scroll frame. The gradients already provide the softness. */
+.intro .ambient-glow {
+  filter: none;
+  animation: none;
+  will-change: auto;
 }
 
 .purpose-glow {
@@ -162,6 +172,10 @@
   will-change: transform, opacity;
 }
 
+.intro .slogan-glow {
+  filter: none;
+}
+
 .scene-copy {
   position: absolute;
   z-index: 1;
@@ -172,7 +186,8 @@
   justify-content: center;
   padding: clamp(2rem, 7vw, 7rem);
   box-sizing: border-box;
-  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 .scene-copy--brand {
@@ -229,6 +244,8 @@
   overflow: hidden;
   padding: .06em .08em .1em;
   margin: -.06em -.08em -.1em;
+  font-weight: 500;
+  width: 45rem;
 }
 
 .slogan-line > span {

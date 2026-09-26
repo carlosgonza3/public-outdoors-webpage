@@ -194,6 +194,7 @@ export function IntroScene({
           rotation: -7,
           scale: 1.28,
           transformOrigin: '50% 50%',
+          force3D: true,
         })
         gsap.set(brandCopy.current, { autoAlpha: 0, y: 24, scale: 0.92 })
         gsap.set(copy.current, { autoAlpha: 0, y: 24 })
@@ -272,6 +273,7 @@ export function IntroScene({
             0.22,
           )
           .to({}, { duration: 0.32 })
+          .addLabel('sloganTransition')
           .to(brandCopy.current, {
             autoAlpha: 0,
             yPercent: -16,
@@ -288,23 +290,24 @@ export function IntroScene({
               scale: 1.12,
               duration: 0.65,
               ease: 'power3.inOut',
+              force3D: true,
             },
-            '<',
+            'sloganTransition-=0.325',
           )
           .to(
             sloganGlow.current,
             { autoAlpha: 0.72, scale: 1, duration: 0.28, ease: 'power2.out' },
-            '<.06',
+            'sloganTransition+=0.06',
           )
           .to(
             copy.current,
             { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
-            '<',
+            'sloganTransition+=0.06',
           )
           .to(
             sloganLines,
             { yPercent: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out' },
-            '<',
+            'sloganTransition+=0.06',
           )
           .to({}, { duration: 0.34 })
           .to(copy.current, {
@@ -543,7 +546,7 @@ export function IntroScene({
           end: '+=290%',
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
-          scrub: 0.18,
+          scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -598,18 +601,17 @@ export function IntroScene({
         rotation: -7,
         scale: 1.28,
         transformOrigin: '50% 50%',
+        force3D: true,
       })
       gsap.set(brandCopy.current, {
         autoAlpha: 0,
         y: 34,
         scale: 0.88,
-        filter: 'blur(12px)',
       })
       gsap.set(copy.current, {
         autoAlpha: 0,
         y: 34,
         scale: 0.86,
-        filter: 'blur(12px)',
       })
       gsap.set(sloganLines, { yPercent: 42 })
       gsap.set(sloganGlow.current, { autoAlpha: 0, scale: 0.72 })
@@ -660,7 +662,6 @@ export function IntroScene({
             autoAlpha: 1,
             y: 0,
             scale: 1,
-            filter: 'blur(0px)',
             duration: 0.38,
             ease: 'power3.out',
           },
@@ -668,13 +669,13 @@ export function IntroScene({
         )
         .addLabel('outside', 1.08)
         .to({}, { duration: 0.16 })
+        .addLabel('sloganTransition')
         .to(
           brandCopy.current,
           {
             autoAlpha: 0,
             yPercent: -22,
             scale: 1.08,
-            filter: 'blur(12px)',
             duration: 0.34,
             ease: 'power3.inOut',
           },
@@ -686,10 +687,11 @@ export function IntroScene({
             yPercent: -12,
             rotation: 5,
             scale: 1.12,
-            duration: 0.85,
+            duration: 0.65,
             ease: 'power3.inOut',
+            force3D: true,
           },
-          '<',
+          'sloganTransition-=0.145',
         )
         .to(
           sloganGlow.current,
@@ -699,7 +701,7 @@ export function IntroScene({
             duration: 0.44,
             ease: 'power3.out',
           },
-          '<.08',
+          'sloganTransition+=0.08',
         )
         .to(
           copy.current,
@@ -707,11 +709,10 @@ export function IntroScene({
             autoAlpha: 1,
             y: 0,
             scale: 1,
-            filter: 'blur(0px)',
             duration: 0.38,
             ease: 'power3.out',
           },
-          '<.02',
+          'sloganTransition+=0.1',
         )
         .to(
           sloganLines,
@@ -721,7 +722,7 @@ export function IntroScene({
             stagger: 0.045,
             ease: 'power4.out',
           },
-          '<',
+          'sloganTransition+=0.1',
         )
         .to({}, { duration: 0.5 })
         .to(
@@ -730,7 +731,6 @@ export function IntroScene({
             autoAlpha: 0,
             yPercent: -24,
             scale: 1.1,
-            filter: 'blur(14px)',
             duration: 0.46,
             ease: 'power3.inOut',
           },
