@@ -48,10 +48,6 @@ body {
   pointer-events: none;
 }
 
-.is-ios-safari .safari-tint-rail--top {
-  top: 0;
-}
-
 .is-ios-safari .safari-tint-rail--bottom {
   bottom: 0;
 }
