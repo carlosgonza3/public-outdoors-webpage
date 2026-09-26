@@ -171,6 +171,9 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
       if (isMobileExperience()) {
         tiltReady.current = false
+        const reveals = cardMotion.current.querySelectorAll<HTMLElement>(
+          '.contact-card__reveal',
+        )
         const timeline = gsap
           .timeline({
             onComplete: () => {
@@ -180,25 +183,42 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           .set(overlay.current, { autoAlpha: 0 })
           .set(cardMotion.current, {
             autoAlpha: 0,
-            y: 24,
-            scale: 0.98,
-            transformOrigin: 'center center',
+            yPercent: 42,
+            rotationX: -14,
+            rotationZ: -1.4,
+            scale: 0.92,
+            transformOrigin: 'center bottom',
+            force3D: true,
           })
+          .set(reveals, { autoAlpha: 0, y: 12 })
           .to(overlay.current, {
             autoAlpha: 1,
-            duration: 0.28,
+            duration: 0.32,
             ease: 'power2.out',
           })
           .to(
             cardMotion.current,
             {
               autoAlpha: 1,
-              y: 0,
+              yPercent: 0,
+              rotationX: 0,
+              rotationZ: 0,
               scale: 1,
-              duration: 0.48,
-              ease: 'power3.out',
+              duration: 0.72,
+              ease: 'back.out(1.18)',
             },
             0.04,
+          )
+          .to(
+            reveals,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.34,
+              stagger: 0.035,
+              ease: 'power3.out',
+            },
+            0.22,
           )
 
         return () => timeline.kill()
@@ -257,23 +277,33 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     if (mode === 'scroll') tiltReady.current = true
 
     gsap.set(stage, {
-      transformPerspective: 1400,
+      transformPerspective: 900,
       transformOrigin: 'center center',
     })
 
     const rotateX = gsap.quickTo(stage, 'rotationX', {
-      duration: 0.58,
-      ease: 'power3.out',
+      duration: 0.28,
+      ease: 'power2.out',
     })
     const rotateY = gsap.quickTo(stage, 'rotationY', {
-      duration: 0.58,
-      ease: 'power3.out',
+      duration: 0.28,
+      ease: 'power2.out',
+    })
+    const shiftX = gsap.quickTo(stage, 'x', {
+      duration: 0.32,
+      ease: 'power2.out',
+    })
+    const shiftY = gsap.quickTo(stage, 'y', {
+      duration: 0.32,
+      ease: 'power2.out',
     })
 
     const resetTilt = safe(() => {
       if (!tiltReady.current || closing.current) return
       rotateX(0)
       rotateY(0)
+      shiftX(0)
+      shiftY(0)
     })
 
     if (isMobileExperience() || !canPointerTilt) {
@@ -312,7 +342,10 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
         const beta = event.beta - initialBeta
         const gamma = event.gamma - initialGamma
-        const angle = screen.orientation?.angle ?? 0
+        const legacyAngle = typeof window.orientation === 'number'
+          ? window.orientation
+          : 0
+        const angle = screen.orientation?.angle ?? legacyAngle
 
         let horizontal = gamma
         let vertical = beta
@@ -328,8 +361,13 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           vertical = gamma
         }
 
-        rotateX(gsap.utils.clamp(-4, 4, (vertical / 18) * -4))
-        rotateY(gsap.utils.clamp(-5.5, 5.5, (horizontal / 18) * 5.5))
+        const tiltX = gsap.utils.clamp(-9, 9, (vertical / 14) * -9)
+        const tiltY = gsap.utils.clamp(-12, 12, (horizontal / 14) * 12)
+
+        rotateX(tiltX)
+        rotateY(tiltY)
+        shiftX(gsap.utils.clamp(-5, 5, horizontal * 0.32))
+        shiftY(gsap.utils.clamp(-3.5, 3.5, vertical * 0.22))
       })
 
       const startListening = () => {
@@ -375,7 +413,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
         window.removeEventListener('deviceorientation', handleOrientation)
         screen.orientation?.removeEventListener('change', resetCalibration)
         window.removeEventListener('blur', resetCalibration)
-        gsap.killTweensOf(stage, ['rotationX', 'rotationY'])
+        gsap.killTweensOf(stage, ['rotationX', 'rotationY', 'x', 'y'])
         tiltReady.current = false
       }
     }
@@ -402,7 +440,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('blur', resetTilt)
       document.documentElement.removeEventListener('pointerleave', resetTilt)
-      gsap.killTweensOf(stage, ['rotationX', 'rotationY'])
+      gsap.killTweensOf(stage, ['rotationX', 'rotationY', 'x', 'y'])
       tiltReady.current = false
     }
   }, {
