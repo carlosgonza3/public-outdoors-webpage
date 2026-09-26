@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { toPng } from 'html-to-image'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { isMobileExperience } from '../animation/mobile'
+import facebookIcon from '../assets/facebook-streamline.svg'
+import instagramIcon from '../assets/instagram-streamline.svg'
+import linkedinIcon from '../assets/linkedin-streamline.svg'
 import butterflyLogo from '../assets/public-butterfly.svg'
+import whatsappIcon from '../assets/whatsapp-streamline.svg'
 
 type ContactCardProps = {
   onClose?: () => void
@@ -12,6 +15,7 @@ type ContactCardProps = {
 }
 
 type ShareState = 'idle' | 'exporting' | 'shared' | 'error'
+type MotionAccessState = 'idle' | 'needs-permission' | 'active' | 'denied' | 'unavailable'
 
 type DeviceOrientationEventWithPermission = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'granted' | 'denied'>
@@ -30,24 +34,42 @@ const contactDetails = [
     ),
     value:
       'Condominio Balam Quitze, segundo nivel, local 2-31, Paseo General Escalón, San Salvador, El Salvador',
+    href: 'https://www.google.com/maps/search/?api=1&query=Condominio%20Balam%20Quitze%2C%20Paseo%20General%20Escal%C3%B3n%2C%20San%20Salvador%2C%20El%20Salvador',
+    actionLabel: 'Abrir la oficina en Google Maps',
+    external: true,
   },
   {
     id: 'phone',
     label: 'Teléfono',
     display: '+503 2264-5458',
     value: '+503 2264-5458',
+    href: 'tel:+50322645458',
+    actionLabel: 'Llamar al +503 2264-5458',
+    external: false,
   },
   {
     id: 'email',
     label: 'Email',
     display: 'marketing@publicsv.net',
     value: 'marketing@publicsv.net',
+    href: 'mailto:marketing@publicsv.net',
+    actionLabel: 'Escribir a marketing@publicsv.net',
+    external: false,
   },
   {
     id: 'whatsapp',
     label: 'WhatsApp',
-    display: 'Elige tu contacto',
+    display: (
+      <>
+        <span>Iris · +503 7840 0641</span>
+        <span>Zayda · +503 7607 9725</span>
+        <span>Rosemary · +503 7855 7192</span>
+      </>
+    ),
     value: 'Seleccionar contacto de WhatsApp',
+    href: '',
+    actionLabel: 'Elegir contacto de WhatsApp',
+    external: false,
   },
 ]
 
@@ -63,29 +85,15 @@ const socialLinks = [
   { id: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/publicoutdoors1/' },
 ]
 
+const socialIconAssets: Record<string, string> = {
+  facebook: facebookIcon,
+  instagram: instagramIcon,
+  linkedin: linkedinIcon,
+}
+
 function SocialIcon({ id }: { id: string }) {
-  if (id === 'instagram') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle className="contact-card__social-dot" cx="17.4" cy="6.7" r="1" />
-      </svg>
-    )
-  }
-
-  if (id === 'linkedin') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6.2 9.4v8.4M6.2 6.2v.1M10.3 17.8V9.4m0 3.4c.7-2.1 6.9-3.1 6.9 1.9v3.1" />
-      </svg>
-    )
-  }
-
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M14.5 20v-7h2.7l.4-3h-3.1V8.1c0-.9.3-1.6 1.7-1.6H18V3.8c-.5-.1-1.4-.2-2.5-.2-2.5 0-4.2 1.5-4.2 4.3V10H8.5v3h2.8v7" />
-    </svg>
+    <img src={socialIconAssets[id]} alt="" aria-hidden="true" />
   )
 }
 
@@ -118,10 +126,7 @@ function ContactDetailIcon({ id }: { id: string }) {
 
   if (id === 'whatsapp') {
     return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M20.4 11.8a8.4 8.4 0 0 1-12.5 7.3L3.5 20.5l1.4-4.3a8.4 8.4 0 1 1 15.5-4.4Z" />
-        <path d="M8.1 7.3c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l1 2.3c.1.3 0 .5-.1.7l-.7.9c-.2.2-.1.4 0 .6.8 1.4 1.9 2.5 3.4 3.2.2.1.4.1.6-.1l.9-1.1c.2-.2.4-.3.7-.2l2.2 1c.3.1.4.3.4.5 0 .3-.2 1.5-.8 2.1-.6.6-1.5.9-2.4.7-1.1-.2-2.5-.7-4.2-1.8-2.5-1.6-4.1-4-4.5-5.4-.4-1.3 0-2.7.6-3.3.3-.3.7-.5 1.1-.5" />
-      </svg>
+      <img src={whatsappIcon} alt="" aria-hidden="true" />
     )
   }
 
@@ -133,34 +138,6 @@ function ContactDetailIcon({ id }: { id: string }) {
   )
 }
 
-async function copyText(value: string) {
-  if (navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(value)
-      return
-    } catch {
-      // Safari and embedded browsers can expose the Clipboard API while still
-      // rejecting it. Fall through to the selection-based copy path.
-    }
-  }
-
-  const textarea = document.createElement('textarea')
-  const previouslyFocused = document.activeElement as HTMLElement | null
-  textarea.value = value
-  textarea.style.position = 'fixed'
-  textarea.style.opacity = '0'
-  textarea.style.pointerEvents = 'none'
-  textarea.setAttribute('readonly', '')
-  document.body.appendChild(textarea)
-  textarea.focus({ preventScroll: true })
-  textarea.select()
-  const copied = document.execCommand('copy')
-  textarea.remove()
-  previouslyFocused?.focus({ preventScroll: true })
-
-  if (!copied) throw new Error('Copy command was rejected')
-}
-
 export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
   const overlay = useRef<HTMLDivElement>(null)
   const cardMotion = useRef<HTMLDivElement>(null)
@@ -169,15 +146,14 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
   const whatsappPanel = useRef<HTMLDivElement>(null)
   const closing = useRef(false)
   const tiltReady = useRef(false)
-  const copiedTimer = useRef<ReturnType<typeof window.setTimeout> | undefined>(
-    undefined,
-  )
+  const requestMotionAccess = useRef<() => void>(() => undefined)
   const shareTimer = useRef<ReturnType<typeof window.setTimeout> | undefined>(
     undefined,
   )
-  const [copiedId, setCopiedId] = useState<string | null>(null)
   const [shareState, setShareState] = useState<ShareState>('idle')
+  const [motionAccess, setMotionAccess] = useState<MotionAccessState>('idle')
   const [whatsappOpen, setWhatsappOpen] = useState(false)
+  const useWhatsappSheet = whatsappOpen && window.matchMedia('(max-width: 829px)').matches
 
   useGSAP(
     () => {
@@ -273,7 +249,10 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       '(any-hover: hover) and (any-pointer: fine)',
     ).matches
 
-    if (!stage || prefersReducedMotion()) return
+    if (!stage || prefersReducedMotion()) {
+      setMotionAccess('unavailable')
+      return
+    }
 
     if (mode === 'scroll') tiltReady.current = true
 
@@ -298,7 +277,13 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     })
 
     if (isMobileExperience() || !canPointerTilt) {
-      if (typeof window.DeviceOrientationEvent === 'undefined') return
+      if (
+        !window.isSecureContext ||
+        typeof window.DeviceOrientationEvent === 'undefined'
+      ) {
+        setMotionAccess('unavailable')
+        return
+      }
 
       let initialBeta: number | null = null
       let initialGamma: number | null = null
@@ -350,6 +335,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       const startListening = () => {
         if (listening) return
         listening = true
+        setMotionAccess('active')
         window.addEventListener('deviceorientation', handleOrientation, {
           passive: true,
         })
@@ -364,14 +350,19 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
         try {
           const permission = await orientationEvent.requestPermission?.()
-          if (permission === 'granted') startListening()
+          if (permission === 'granted') {
+            startListening()
+          } else {
+            setMotionAccess('denied')
+          }
         } catch {
-          // Sensor permission was declined or is unavailable in this context.
+          setMotionAccess('denied')
         }
       })
 
       if (orientationEvent.requestPermission) {
-        stage.addEventListener('pointerdown', requestOrientationAccess)
+        requestMotionAccess.current = requestOrientationAccess
+        setMotionAccess('needs-permission')
       } else {
         startListening()
       }
@@ -380,7 +371,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       window.addEventListener('blur', resetCalibration)
 
       return () => {
-        stage.removeEventListener('pointerdown', requestOrientationAccess)
+        requestMotionAccess.current = () => undefined
         window.removeEventListener('deviceorientation', handleOrientation)
         screen.orientation?.removeEventListener('change', resetCalibration)
         window.removeEventListener('blur', resetCalibration)
@@ -524,7 +515,6 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
     return () => {
       window.clearTimeout(focusTimer)
-      window.clearTimeout(copiedTimer.current)
       window.clearTimeout(shareTimer.current)
       window.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = previousOverflow
@@ -540,48 +530,54 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     firstContact?.focus({ preventScroll: true })
   }, [whatsappOpen])
 
-  const handleCopy = async (id: string, value: string) => {
-    try {
-      await copyText(value)
-      window.clearTimeout(copiedTimer.current)
-      setCopiedId(id)
-      copiedTimer.current = window.setTimeout(() => setCopiedId(null), 2000)
-    } catch {
-      setCopiedId(null)
+  useEffect(() => {
+    if (!useWhatsappSheet || mode !== 'scroll') return
+
+    const previousOverflow = document.body.style.overflow
+    const handleSheetKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setWhatsappOpen(false)
+        return
+      }
+
+      if (event.key !== 'Tab' || !whatsappPanel.current) return
+
+      const focusable = Array.from(
+        whatsappPanel.current.querySelectorAll<HTMLElement>('button, [href]'),
+      )
+      const first = focusable[0]
+      const last = focusable.at(-1)
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last?.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first?.focus()
+      }
     }
-  }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleSheetKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleSheetKeyDown)
+    }
+  }, [mode, useWhatsappSheet])
 
   const handleShare = async () => {
-    const stage = cardStage.current
-    if (!stage || shareState === 'exporting') return
+    if (shareState === 'exporting') return
 
     setShareState('exporting')
     window.clearTimeout(shareTimer.current)
 
     try {
-      await document.fonts.ready
+      const assetUrl = `${import.meta.env.BASE_URL}public-contacto.png`
+      const response = await fetch(assetUrl)
+      if (!response.ok) throw new Error('Could not load the contact card image')
 
-      const exportTarget =
-        stage.querySelector<HTMLElement>('.contact-card') ?? stage
-
-      const dataUrl = await toPng(exportTarget, {
-        cacheBust: false,
-        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-        backgroundColor: '#f5f2eb',
-        style: {
-          transform: 'none',
-          transformOrigin: 'center',
-          filter: 'none',
-          clipPath: 'none',
-          overflow: 'visible',
-        },
-        filter: (node) =>
-          !(
-            node instanceof HTMLElement &&
-            node.dataset.exportExclude === 'true'
-          ),
-      })
-      const blob = await fetch(dataUrl).then((response) => response.blob())
+      const blob = await response.blob()
       const file = new File([blob], 'public-contacto.png', {
         type: 'image/png',
       })
@@ -593,12 +589,14 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           files: [file],
         })
       } else {
+        const downloadUrl = URL.createObjectURL(blob)
         const download = document.createElement('a')
-        download.href = dataUrl
+        download.href = downloadUrl
         download.download = file.name
         document.body.appendChild(download)
         download.click()
         download.remove()
+        window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 0)
       }
 
       setShareState('shared')
@@ -631,6 +629,63 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     ? 'contact-card-title'
     : 'purpose-contact-card-title'
 
+  const whatsappChooser = whatsappOpen ? (
+    <div
+      className={`contact-card__whatsapp-panel${useWhatsappSheet ? ' is-viewport-sheet' : ''}`}
+      ref={whatsappPanel}
+      data-export-exclude="true"
+      onClick={() => setWhatsappOpen(false)}
+    >
+      <div
+        className="contact-card__whatsapp-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contact-card-whatsapp-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="contact-card__whatsapp-header">
+          <div>
+            <span>WhatsApp</span>
+            <strong id="contact-card-whatsapp-title">¿Con quién deseas hablar?</strong>
+          </div>
+          <button
+            type="button"
+            onClick={() => setWhatsappOpen(false)}
+            aria-label="Cerrar contactos de WhatsApp"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </header>
+
+        <div className="contact-card__whatsapp-list">
+          {whatsappContacts.map((contact) => (
+            <a
+              href={`https://wa.me/${contact.whatsapp}`}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setWhatsappOpen(false)}
+              key={contact.whatsapp}
+              aria-label={`Abrir WhatsApp con ${contact.name}, ${contact.number}`}
+            >
+              <span className="contact-card__whatsapp-avatar" aria-hidden="true">
+                {contact.name.charAt(0)}
+              </span>
+              <span>
+                <strong>{contact.name}</strong>
+                <small>{contact.number}</small>
+              </span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 12h8M13 8l4 4-4 4" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  ) : null
+
   const cardContent = (
     <div
       className="contact-card__motion"
@@ -650,6 +705,20 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
             className="contact-card__actions"
             data-export-exclude="true"
           >
+            {motionAccess === 'needs-permission' && (
+              <button
+                className="contact-card__motion-access"
+                type="button"
+                onClick={() => requestMotionAccess.current()}
+                aria-label="Activar movimiento de la tarjeta"
+              >
+                <span>Activar movimiento</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="7.5" y="3" width="9" height="18" rx="2" />
+                  <path d="M4.5 8.5a8 8 0 0 0 0 7M19.5 8.5a8 8 0 0 1 0 7" />
+                </svg>
+              </button>
+            )}
             <button
               className={`contact-card__share is-${shareState}`}
               type="button"
@@ -692,25 +761,9 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
           <div className="contact-card__details">
             {contactDetails.map((detail) => {
-              const copied = copiedId === detail.id
               const isWhatsapp = detail.id === 'whatsapp'
-
-              return (
-                <button
-                  className={`contact-card__datum contact-card__reveal${isWhatsapp ? ' is-whatsapp' : ''}`}
-                  type="button"
-                  key={detail.id}
-                  onClick={() => {
-                    if (isWhatsapp) setWhatsappOpen(true)
-                    else void handleCopy(detail.id, detail.value)
-                  }}
-                  aria-label={isWhatsapp
-                    ? 'Elegir contacto de WhatsApp'
-                    : `Copiar ${detail.label}: ${detail.value}`}
-                  aria-haspopup={isWhatsapp ? 'dialog' : undefined}
-                  aria-expanded={isWhatsapp ? whatsappOpen : undefined}
-                  title={`${detail.label}: ${detail.value}`}
-                >
+              const detailContent = (
+                <>
                   <span className="contact-card__datum-icon">
                     <ContactDetailIcon id={detail.id} />
                   </span>
@@ -718,19 +771,36 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
                     <span className="contact-card__datum-label">{detail.label}</span>
                     <strong>{detail.display}</strong>
                   </span>
-                  {copied && !isWhatsapp && (
-                    <span
-                      className="contact-card__copy-icon"
-                      role="status"
-                      aria-label={`${detail.label} copiado`}
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M9 5H7.5A2.5 2.5 0 0 0 5 7.5v11A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5v-11A2.5 2.5 0 0 0 16.5 5H15" />
-                        <path d="M9 3.5h6v3H9zM8.5 14l2.2 2.2 4.8-5" />
-                      </svg>
-                    </span>
-                  )}
+                </>
+              )
+
+              if (isWhatsapp) return (
+                <button
+                  className="contact-card__datum contact-card__reveal is-whatsapp"
+                  type="button"
+                  key={detail.id}
+                  onClick={() => setWhatsappOpen(true)}
+                  aria-label={detail.actionLabel}
+                  aria-haspopup="dialog"
+                  aria-expanded={whatsappOpen}
+                  title={`${detail.label}: ${detail.value}`}
+                >
+                  {detailContent}
                 </button>
+              )
+
+              return (
+                <a
+                  className="contact-card__datum contact-card__reveal"
+                  href={detail.href}
+                  target={detail.external ? '_blank' : undefined}
+                  rel={detail.external ? 'noreferrer' : undefined}
+                  aria-label={detail.actionLabel}
+                  title={`${detail.label}: ${detail.value}`}
+                  key={detail.id}
+                >
+                  {detailContent}
+                </a>
               )
             })}
           </div>
@@ -760,62 +830,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           </nav>
         </footer>
 
-        {whatsappOpen && (
-          <div
-            className="contact-card__whatsapp-panel"
-            ref={whatsappPanel}
-            data-export-exclude="true"
-            onClick={() => setWhatsappOpen(false)}
-          >
-            <div
-              className="contact-card__whatsapp-dialog"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="contact-card-whatsapp-title"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <header className="contact-card__whatsapp-header">
-                <div>
-                  <span>WhatsApp</span>
-                  <strong id="contact-card-whatsapp-title">¿Con quién deseas hablar?</strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setWhatsappOpen(false)}
-                  aria-label="Cerrar contactos de WhatsApp"
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M6 6l12 12M18 6 6 18" />
-                  </svg>
-                </button>
-              </header>
-
-              <div className="contact-card__whatsapp-list">
-                {whatsappContacts.map((contact) => (
-                  <a
-                    href={`https://wa.me/${contact.whatsapp}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setWhatsappOpen(false)}
-                    key={contact.whatsapp}
-                    aria-label={`Abrir WhatsApp con ${contact.name}, ${contact.number}`}
-                  >
-                    <span className="contact-card__whatsapp-avatar" aria-hidden="true">
-                      {contact.name.charAt(0)}
-                    </span>
-                    <span>
-                      <strong>{contact.name}</strong>
-                      <small>{contact.number}</small>
-                    </span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M8 12h8M13 8l4 4-4 4" />
-                    </svg>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        {!useWhatsappSheet && whatsappChooser}
 
         </article>
       </div>
@@ -823,20 +838,28 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
   )
 
   if (mode === 'scroll') {
-    return <div className="contact-card-embed">{cardContent}</div>
+    return (
+      <>
+        <div className="contact-card-embed">{cardContent}</div>
+        {useWhatsappSheet && createPortal(whatsappChooser, document.body)}
+      </>
+    )
   }
 
   return createPortal(
-    <div
-      className="contact-overlay"
-      ref={overlay}
-      role="presentation"
-      onPointerDown={(event) => {
-        if (event.target === event.currentTarget) requestClose()
-      }}
-    >
-      {cardContent}
-    </div>,
+    <>
+      <div
+        className="contact-overlay"
+        ref={overlay}
+        role="presentation"
+        onPointerDown={(event) => {
+          if (event.target === event.currentTarget) requestClose()
+        }}
+      >
+        {cardContent}
+      </div>
+      {useWhatsappSheet && whatsappChooser}
+    </>,
     document.body,
   )
 }
