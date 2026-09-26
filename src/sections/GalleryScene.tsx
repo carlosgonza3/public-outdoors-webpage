@@ -365,15 +365,17 @@ export function GalleryScene() {
 
         if (!label || !title || !details || !actions || !carousel) return
 
+        // The collection reveal adds noticeable scroll jank on mobile. Keep the
+        // gallery content immediately visible there and avoid creating the
+        // associated timelines and ScrollTriggers altogether.
+        if (mobile) return
+
         const revealTimeline = gsap.timeline({
             scrollTrigger: {
               trigger: collection,
               start: 'top 76%',
               end: 'top 28%',
-              toggleActions: mobile
-                ? 'play none none none'
-                : 'play none none reverse',
-              once: mobile,
+              toggleActions: 'play none none reverse',
             },
           })
           .from(label, {
