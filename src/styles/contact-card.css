@@ -681,6 +681,7 @@
     width: clamp(4.3rem, 11vw, 6.5rem);
     min-width: 0;
     aspect-ratio: 2.1 / 1;
+    box-sizing: content-box;
     display: flex;
     flex-direction: row;
     align-items: center;
