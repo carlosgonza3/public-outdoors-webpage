@@ -21,6 +21,9 @@ type DeviceOrientationEventWithPermission = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'granted' | 'denied'>
 }
 
+const officeAddress =
+  'Condominio Balam Quitze, segundo nivel, local 2-31, Paseo General Escalón, San Salvador, El Salvador'
+
 const contactDetails = [
   {
     id: 'address',
@@ -32,8 +35,7 @@ const contactDetails = [
         Paseo General Escalón, San Salvador, El Salvador
       </>
     ),
-    value:
-      'Condominio Balam Quitze, segundo nivel, local 2-31, Paseo General Escalón, San Salvador, El Salvador',
+    value: officeAddress,
     href: 'https://www.google.com/maps/search/?api=1&query=Condominio%20Balam%20Quitze%2C%20Paseo%20General%20Escal%C3%B3n%2C%20San%20Salvador%2C%20El%20Salvador',
     actionLabel: 'Abrir la oficina en Google Maps',
     external: true,
@@ -72,6 +74,37 @@ const contactDetails = [
     external: false,
   },
 ]
+
+function getOfficeMapTarget() {
+  const encodedAddress = encodeURIComponent(officeAddress)
+  const { maxTouchPoints, platform, userAgent } = navigator
+  const isAndroid = /Android/i.test(userAgent)
+  const isIOS =
+    /iPad|iPhone|iPod/i.test(userAgent) ||
+    (platform === 'MacIntel' && maxTouchPoints > 1)
+
+  if (isAndroid) {
+    return {
+      href: `geo:0,0?q=${encodedAddress}`,
+      external: false,
+      actionLabel: 'Abrir la oficina con una aplicación de mapas',
+    }
+  }
+
+  if (isIOS) {
+    return {
+      href: `geo-navigation://place?address=${encodedAddress}`,
+      external: false,
+      actionLabel: 'Abrir la oficina con la aplicación de navegación seleccionada',
+    }
+  }
+
+  return {
+    href: `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
+    external: true,
+    actionLabel: 'Abrir la oficina en Google Maps',
+  }
+}
 
 const whatsappContacts = [
   { name: 'Iris Cisneros', number: '+503 7840 0641', whatsapp: '50378400641' },
@@ -834,6 +867,9 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
           <div className="contact-card__details">
             {contactDetails.map((detail) => {
               const isWhatsapp = detail.id === 'whatsapp'
+              const officeMapTarget = detail.id === 'address'
+                ? getOfficeMapTarget()
+                : null
               const detailContent = (
                 <>
                   <span className="contact-card__datum-icon">
@@ -864,10 +900,10 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
               return (
                 <a
                   className="contact-card__datum contact-card__reveal"
-                  href={detail.href}
-                  target={detail.external ? '_blank' : undefined}
-                  rel={detail.external ? 'noreferrer' : undefined}
-                  aria-label={detail.actionLabel}
+                  href={officeMapTarget?.href ?? detail.href}
+                  target={(officeMapTarget?.external ?? detail.external) ? '_blank' : undefined}
+                  rel={(officeMapTarget?.external ?? detail.external) ? 'noreferrer' : undefined}
+                  aria-label={officeMapTarget?.actionLabel ?? detail.actionLabel}
                   title={`${detail.label}: ${detail.value}`}
                   key={detail.id}
                 >
