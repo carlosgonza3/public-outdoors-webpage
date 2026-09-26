@@ -286,6 +286,7 @@
     border-radius: 0;
   }
   .collection-page__header { min-height: 82svh; }
+  .collection-page--innovations .innovations-hero { min-height: 0; }
   .collection-page__intro {
     align-items: stretch;
     gap: 2rem;
@@ -296,7 +297,7 @@
     text-align: left;
   }
   .collection-page--innovations .collection-page__intro h1 {
-    font-size: clamp(2.65rem, 10.4vw, 4.25rem);
+    font-size: clamp(3rem, 14.5vw, 5.25rem);
   }
   .collection-page__projects {
     display: block;

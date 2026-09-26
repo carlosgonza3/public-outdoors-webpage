@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { CollectionPage } from './CollectionPage'
 import { ContactCard } from '../components/ContactCard'
 import { LightboxImage } from '../components/ImageLightbox'
 import { projectCollections } from '../data/projects'
+import { prefersReducedMotion } from '../animation/motion'
+import { gsap, useGSAP } from '../animation/gsap'
 
 interface InnovationsPageProps {
   modal?: boolean
@@ -12,11 +14,71 @@ const innovationsCollection = projectCollections.find(
   ({ id }) => id === 'innovations',
 )!
 
+const ideaRecommendations = [
+  'un mupi en una experiencia interactiva para presentar un producto',
+  'una valla digital en una campaña que cambie según la hora del día',
+  'una parada de bus en un espacio de marca con sombra y carga para el celular',
+]
+
 export function InnovationsPage({ modal = false }: InnovationsPageProps) {
   const [idea, setIdea] = useState('')
   const [contactOpen, setContactOpen] = useState(false)
   const [ideaError, setIdeaError] = useState(false)
+  const [recommendationIndex, setRecommendationIndex] = useState(0)
+  const [recommendationText, setRecommendationText] = useState('')
+  const [ideaHovered, setIdeaHovered] = useState(false)
+  const [ideaFocused, setIdeaFocused] = useState(false)
+  const ideaForm = useRef<HTMLFormElement>(null)
+  const recommendationTimeline = useRef<gsap.core.Timeline | null>(null)
   const project = innovationsCollection.projects[0]
+
+  useGSAP(
+    (_, contextSafe) => {
+      const recommendation = ideaRecommendations[recommendationIndex]
+
+      if (idea || prefersReducedMotion()) {
+        setRecommendationText(recommendation)
+        return
+      }
+
+      const typewriter = { characters: 0 }
+      const renderRecommendation = contextSafe!(() => {
+        setRecommendationText(
+          recommendation.slice(0, Math.round(typewriter.characters)),
+        )
+      })
+      const showNextRecommendation = contextSafe!(() => {
+        setRecommendationIndex(
+          (current) => (current + 1) % ideaRecommendations.length,
+        )
+      })
+
+      setRecommendationText('')
+      recommendationTimeline.current = gsap
+        .timeline({ onComplete: showNextRecommendation })
+        .to(typewriter, {
+          characters: recommendation.length,
+          duration: Math.min(3.2, Math.max(1.8, recommendation.length * 0.035)),
+          ease: 'none',
+          onUpdate: renderRecommendation,
+          snap: { characters: 1 },
+        })
+        .to({}, { duration: 7 })
+
+      return () => {
+        recommendationTimeline.current = null
+      }
+    },
+    {
+      scope: ideaForm,
+      dependencies: [idea, recommendationIndex],
+      revertOnUpdate: true,
+    },
+  )
+
+  useEffect(() => {
+    recommendationTimeline.current?.paused(ideaHovered || ideaFocused)
+  }, [ideaFocused, ideaHovered])
 
   const prepareIdeaEmail = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -45,15 +107,15 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
         <div className="innovations-page">
           <header className="collection-page__header innovations-hero">
             <div className="collection-page__intro innovations-hero__intro">
-              <p>
-                Tecnología, creatividad y producción para ideas que todavía no
-                tienen formato.
-              </p>
               <h1 aria-label={innovationsCollection.label}>
                 <span className="collection-page__title-line">
                   <span>{innovationsCollection.label}</span>
                 </span>
               </h1>
+              <p>
+                Tecnología, creatividad y producción para ideas que todavía no
+                tienen formato.
+              </p>
             </div>
 
             <div className="innovations-hero__statement">
@@ -86,32 +148,41 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
             </div>
 
             <div className="innovations-proof__caption">
-              <p>Una muestra, no un catálogo.</p>
-              <h2 id="innovations-proof-title">
-                Cada innovación empieza con una conversación.
-              </h2>
+              <div className="innovations-proof__message">
+                <h2 id="innovations-proof-title">
+                  Cada innovación empieza con una conversación.
+                </h2>
+                <p>
+                  Cuéntanos qué quieres transformar, activar o hacer visible.
+                  Puede ser una idea apenas empezando o un reto que todavía no
+                  tiene solución.
+                </p>
+              </div>
             </div>
           </section>
 
           <section
             className="innovations-invite"
-            aria-labelledby="innovations-invite-title"
+            aria-label="Comparte tu idea"
           >
-            <div className="innovations-invite__heading">
-              <span>Tu turno</span>
-              <h2 id="innovations-invite-title">
-                Cuéntanos lo que tienes en mente.
-              </h2>
-            </div>
-
-            <form className="innovations-idea" onSubmit={prepareIdeaEmail}>
-              <label htmlFor="innovation-idea">Quiero convertir…</label>
+            <form
+              ref={ideaForm}
+              className="innovations-idea"
+              onSubmit={prepareIdeaEmail}
+              onMouseEnter={() => setIdeaHovered(true)}
+              onMouseLeave={() => setIdeaHovered(false)}
+              onFocusCapture={() => setIdeaFocused(true)}
+              onBlurCapture={() => setIdeaFocused(false)}
+            >
+              <div className="innovations-idea__label-row">
+                <label htmlFor="innovation-idea">Quiero convertir…</label>
+              </div>
               <textarea
                 id="innovation-idea"
                 name="idea"
                 rows={2}
                 value={idea}
-                placeholder="una calle, un espacio o una experiencia"
+                placeholder={recommendationText}
                 aria-describedby={ideaError ? 'innovation-idea-error' : undefined}
                 aria-invalid={ideaError || undefined}
                 onChange={(event) => {
