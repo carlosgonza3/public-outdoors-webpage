@@ -43,6 +43,9 @@ export function IntroScene({
   const markPulse = useRef<SVGGElement>(null)
   const colorMarkPulse = useRef<SVGGElement>(null)
   const mobileReveal = useRef<SVGCircleElement>(null)
+  const mobileMask = useRef<HTMLDivElement>(null)
+  const mobileWipe = useRef<HTMLDivElement>(null)
+  const mobileLogo = useRef<HTMLImageElement>(null)
   const veil = useRef<SVGSVGElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const brandCopy = useRef<HTMLDivElement>(null)
@@ -74,6 +77,7 @@ export function IntroScene({
 
       if (prefersReducedMotion()) {
         gsap.set(veil.current, { autoAlpha: 0 })
+        gsap.set(mobileMask.current, { autoAlpha: 0 })
         gsap.set(content.current, { autoAlpha: 1, clearProps: 'transform' })
         gsap.set(ambient.current, { autoAlpha: 1, clearProps: 'transform' })
         gsap.set([brandCopy.current, copy.current], {
@@ -198,20 +202,32 @@ export function IntroScene({
       }
 
       if (mobile) {
+        pulseTimeline.kill()
+        pulseActive = false
         const sloganLines = gsap.utils.toArray<HTMLElement>(
           '.slogan-line > span',
         )
         let darkToneActive = false
-        mark.current?.setAttribute('transform', 'scale(3.2)')
-        colorMark.current?.setAttribute('transform', 'scale(3.2)')
-        mobileReveal.current?.setAttribute('r', '0')
-        gsap.set(colorMark.current, { autoAlpha: 1 })
+        gsap.set(veil.current, { autoAlpha: 0 })
+        gsap.set(mobileMask.current, { autoAlpha: 1 })
+        gsap.set(mobileWipe.current, {
+          autoAlpha: 0,
+          scale: 0,
+          transformOrigin: '50% 50%',
+          force3D: true,
+        })
+        gsap.set(mobileLogo.current, {
+          autoAlpha: 1,
+          scale: 1,
+          transformOrigin: '50% 50%',
+          force3D: true,
+        })
         gsap.set(content.current, { autoAlpha: 1 })
         gsap.set(ambient.current, {
           autoAlpha: 1,
           xPercent: -18,
           yPercent: 14,
-          rotation: -7,
+          rotation: 0,
           scale: 1.28,
           transformOrigin: '50% 50%',
           force3D: true,
@@ -232,7 +248,6 @@ export function IntroScene({
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
-              setPulseActive(self.progress <= 0.001)
               const duration = mobileTimeline.duration()
               const timelineTime = self.progress * duration
               updateMobileNavigationGap(
@@ -248,41 +263,36 @@ export function IntroScene({
         })
 
         mobileTimeline
+          .set(mobileWipe.current, { autoAlpha: 1 }, 0.001)
           .to(
-            mobileReveal.current,
+            mobileWipe.current,
             {
-              attr: { r: 760 },
+              scale: 1.7,
               duration: 0.28,
               ease: 'power3.inOut',
+              force3D: true,
             },
             0,
           )
           .to(
-            colorMark.current,
+            mobileLogo.current,
             {
-              attr: { transform: 'scale(10)' },
+              scale: 5.5,
+              autoAlpha: 0,
               duration: 0.2,
               ease: 'power3.in',
+              force3D: true,
             },
             0,
           )
           .to(
-            colorMark.current,
-            {
-              autoAlpha: 0,
-              duration: 0.16,
-              ease: 'power2.inOut',
-            },
-            0.08,
-          )
-          .to(
-            veil.current,
+            mobileMask.current,
             {
               autoAlpha: 0,
               duration: 0.08,
               ease: 'power2.inOut',
             },
-            0.1,
+            0.28,
           )
           .to(
             scrollCue.current,
@@ -313,7 +323,7 @@ export function IntroScene({
             {
               xPercent: 15,
               yPercent: -12,
-              rotation: 5,
+              rotation: 0,
               scale: 1.12,
               duration: 0.65,
               ease: 'power3.inOut',
@@ -951,6 +961,16 @@ export function IntroScene({
         colorMarkPulseRef={colorMarkPulse}
         mobileRevealRef={mobileReveal}
       />
+
+      <div className="intro-mobile-mask" ref={mobileMask} aria-hidden="true">
+        <div className="intro-mobile-mask__wipe" ref={mobileWipe} />
+        <img
+          className="intro-mobile-mask__logo"
+          ref={mobileLogo}
+          src={butterfly}
+          alt=""
+        />
+      </div>
 
       <button
         className="logo-play-button"

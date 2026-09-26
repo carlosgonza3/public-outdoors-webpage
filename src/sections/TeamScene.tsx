@@ -199,9 +199,9 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
             const reveal = gsap.timeline({
               scrollTrigger: {
                 trigger: profile,
-                start: 'top 95%',
-                end: 'top 65%',
-                scrub: 0.45,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+                once: true,
               },
             })
 

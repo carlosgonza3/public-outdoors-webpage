@@ -12,6 +12,10 @@
   display: none;
 }
 
+.intro-mobile-mask {
+  display: none;
+}
+
 .reveal-content {
   position: absolute;
   inset: 0;

@@ -607,7 +607,7 @@
   }
 
   .contact-card__motion {
-    width: min(calc(100vw - 1rem), calc((100dvh - 1rem) * 1.72));
+    width: min(calc(100vw - 1rem), calc((100svh - 1rem) * 1.72));
     height: auto;
     min-height: 0;
     aspect-ratio: 1.72 / 1;
@@ -703,7 +703,7 @@
     align-items: center;
     justify-content: center;
     gap: clamp(.24rem, .7vw, .45rem);
-    padding: clamp(.28rem, .7vw, .45rem);
+    padding: clamp(.18rem, .5vw, .3rem);
     border: 1px solid rgb(9 11 13 / 20%);
     border-radius: clamp(.55rem, 1.3vw, .85rem);
   }
@@ -878,7 +878,7 @@
   .contact-card__datum {
     width: clamp(6rem, 14vw, 7rem);
     gap: clamp(.38rem, .9vw, .55rem);
-    padding: clamp(.42rem, .9vw, .58rem);
+    padding: clamp(.25rem, .65vw, .4rem);
     border-radius: clamp(.65rem, 1.4vw, .9rem);
   }
 
@@ -906,7 +906,7 @@
   .contact-card__datum {
     width: clamp(2.4rem, 11vw, 3rem);
     aspect-ratio: 1;
-    padding: clamp(.18rem, 1vw, .28rem);
+    padding: clamp(.1rem, .55vw, .16rem);
   }
 
   .contact-card__datum-label {
@@ -926,7 +926,7 @@
 
   .contact-card__datum {
     width: clamp(2rem, 10vw, 2.2rem);
-    padding: .16rem;
+    padding: .08rem;
   }
 
   .contact-card__datum-icon {

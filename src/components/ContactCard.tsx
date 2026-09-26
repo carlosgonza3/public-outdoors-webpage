@@ -93,9 +93,9 @@ function getOfficeMapTarget() {
 
   if (isIOS) {
     return {
-      href: `geo-navigation://place?address=${encodedAddress}`,
-      external: false,
-      actionLabel: 'Abrir la oficina con la aplicación de navegación seleccionada',
+      href: `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
+      external: true,
+      actionLabel: 'Abrir la oficina en Google Maps',
     }
   }
 
@@ -301,13 +301,15 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
     const canPointerTilt = window.matchMedia(
       '(any-hover: hover) and (any-pointer: fine)',
     ).matches
+    const mobileExperience = isMobileExperience()
+    const deferEmbeddedTilt = mode === 'scroll' && mobileExperience
 
     if (!stage || prefersReducedMotion()) {
       setMotionAccess('unavailable')
       return
     }
 
-    if (mode === 'scroll') tiltReady.current = true
+    if (mode === 'scroll') tiltReady.current = !deferEmbeddedTilt
 
     gsap.set(stage, {
       transformPerspective: 1050,
@@ -339,7 +341,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       shiftY(0)
     })
 
-    if (isMobileExperience() || !canPointerTilt) {
+    if (mobileExperience || !canPointerTilt) {
       if (
         !window.isSecureContext ||
         typeof window.DeviceOrientationEvent === 'undefined'
@@ -358,6 +360,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       let permissionRequested = false
       let tiltSuspended = false
       let resumeTimer: number | undefined
+      let visibilityObserver: IntersectionObserver | undefined
 
       const resetCalibration = safe(() => {
         initialBeta = null
@@ -441,6 +444,26 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
       const orientationEvent = window.DeviceOrientationEvent as
         DeviceOrientationEventWithPermission
 
+      if (deferEmbeddedTilt) {
+        visibilityObserver = new IntersectionObserver(
+          ([entry]) => {
+            const cardIsSettled = entry.intersectionRatio >= 0.82
+            if (cardIsSettled) {
+              tiltReady.current = true
+              return
+            }
+
+            rotateX(0)
+            rotateY(0)
+            shiftX(0)
+            shiftY(0)
+            tiltReady.current = false
+          },
+          { threshold: [0, 0.82, 1] },
+        )
+        visibilityObserver.observe(stage)
+      }
+
       const requestOrientationAccess = safe(async () => {
         if (permissionRequested) return
         permissionRequested = true
@@ -487,6 +510,7 @@ export function ContactCard({ onClose, mode = 'modal' }: ContactCardProps) {
 
       return () => {
         window.clearTimeout(resumeTimer)
+        visibilityObserver?.disconnect()
         requestMotionAccess.current = () => undefined
         window.removeEventListener('deviceorientation', handleOrientation)
         screen.orientation?.removeEventListener('change', resetCalibration)
