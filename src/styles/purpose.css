@@ -197,8 +197,8 @@
 
 @media (max-width: 900px) {
   .purpose-section {
-    height: 300svh;
-    min-height: 300svh;
+    height: 340svh;
+    min-height: 340svh;
     display: block;
     padding: 0;
     perspective: none;
@@ -286,7 +286,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(1.25rem, 3svh, 2rem);
+    gap: clamp(2rem, 4svh, 2.75rem);
     padding:
       clamp(1.75rem, 6svh, 4rem)
       .75rem
@@ -332,11 +332,27 @@
   .purpose-final .purpose-action h2 {
     max-width: 12ch;
     margin: 0;
-    font-size: clamp(2.15rem, 10.5vw, 4.5rem);
-    font-weight: 470;
+    text-wrap: balance;
+  }
+
+  .purpose-question h2,
+  .purpose-statement h2,
+  .purpose-final .purpose-action h2 {
+    width: min(100%, 12ch);
+    max-width: 12ch;
+    font-size: clamp(3rem, 13vw, 4.8rem);
+    font-weight: 450;
     line-height: .94;
     letter-spacing: -.055em;
     text-wrap: balance;
+  }
+
+  .purpose-final .purpose-action__word--lead {
+    display: inline-block;
+    margin: 0 .18em -.12em 0;
+    font-size: 1em;
+    font-weight: inherit;
+    letter-spacing: inherit;
   }
 
   .purpose-contact {
