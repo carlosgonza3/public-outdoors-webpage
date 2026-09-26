@@ -385,6 +385,9 @@ export function IntroScene({
         })
         gsap.set(mobileLogo.current, {
           autoAlpha: 1,
+          x: 0,
+          y: 0,
+          rotation: 0,
           scale: 1,
           transformOrigin: '50% 50%',
           force3D: true,
@@ -438,31 +441,7 @@ export function IntroScene({
         })
 
         mobileTimeline
-          .to(mobileLogo.current, {
-            x: -3,
-            y: -8,
-            rotation: -3,
-            scale: 1.1,
-            duration: 0.14,
-            ease: 'sine.inOut',
-          })
-          .to(mobileLogo.current, {
-            x: 4,
-            y: -22,
-            rotation: 3,
-            scale: 1.28,
-            duration: 0.14,
-            ease: 'sine.inOut',
-          })
-          .to(mobileLogo.current, {
-            x: -3,
-            y: -46,
-            rotation: -2,
-            scale: 1.58,
-            duration: 0.14,
-            ease: 'sine.inOut',
-          })
-          .addLabel('maskStart')
+          .addLabel('maskStart', 0)
           .set(mobileWipe.current, { autoAlpha: 1 }, 'maskStart')
           .to(
             mobileWipe.current,
