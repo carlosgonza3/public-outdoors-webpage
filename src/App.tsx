@@ -94,6 +94,7 @@ function App() {
           <Route path="/indoor" element={<IndoorPage modal />} />
           <Route path="/outdoor" element={<OutdoorPage modal />} />
           <Route path="/innovations" element={<InnovationsPage modal />} />
+          <Route path="/disponibilidad" element={<AvailabilityPage modal />} />
         </Routes>
       )}
     </>

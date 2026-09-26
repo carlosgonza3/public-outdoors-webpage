@@ -327,12 +327,12 @@ export function IntroScene({
           .to(
             copy.current,
             { autoAlpha: 1, y: 0, duration: 0.24, ease: 'power3.out' },
-            'sloganTransition+=0.06',
+            'sloganTransition+=0.24',
           )
           .to(
             sloganLines,
             { yPercent: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out' },
-            'sloganTransition+=0.06',
+            'sloganTransition+=0.24',
           )
           .to({}, { duration: 0.34 })
           .to(copy.current, {
@@ -820,7 +820,7 @@ export function IntroScene({
             duration: 0.38,
             ease: 'power3.out',
           },
-          'sloganTransition+=0.1',
+          'sloganTransition+=0.38',
         )
         .to(
           sloganLines,
@@ -830,7 +830,7 @@ export function IntroScene({
             stagger: 0.045,
             ease: 'power4.out',
           },
-          'sloganTransition+=0.1',
+          'sloganTransition+=0.38',
         )
         .to({}, { duration: 0.5 })
         .to(
@@ -917,17 +917,21 @@ export function IntroScene({
           aria-hidden="true"
         >
           <div className="brand-intro-lockup">
-            <span className="brand-intro__prefix">Somos</span>
+            <span className="brand-intro__phrase">
+              <span className="brand-intro__punctuation">¡</span>
+              <span className="brand-intro__prefix">Somos</span>
+            </span>
             <PublicWordmark />
+            <span className="brand-intro__punctuation brand-intro__punctuation--closing">!</span>
           </div>
         </div>
         <div className="scene-copy scene-copy--intro" ref={copy}>
           <h1>
             <span className="slogan-line">
-              <span>Creamos espacios únicos para</span>
+              <span>Creamos espacios únicos</span>
             </span>
             <span className="slogan-line">
-              <span>elevar tu marca</span>
+              <span>para elevar tu marca</span>
             </span>
           </h1>
         </div>

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
@@ -31,8 +31,18 @@ export function GalleryScene() {
     outdoor: 0,
     innovations: 0,
   })
+  const [railRevision, setRailRevision] = useState(0)
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const restoreRails = () => setRailRevision((revision) => revision + 1)
+
+    window.addEventListener('public:restore-gallery-rails', restoreRails)
+    return () => {
+      window.removeEventListener('public:restore-gallery-rails', restoreRails)
+    }
+  }, [])
 
   const { contextSafe } = useGSAP(
     () => {
@@ -339,11 +349,23 @@ export function GalleryScene() {
         const actions = label?.querySelector<HTMLElement>(
           '.collection-heading__actions',
         )
+        const carousel = collection.querySelector<HTMLElement>(
+          '.collection-carousel',
+        )
+        const pagination = collection.querySelector<HTMLElement>(
+          '.collection-carousel__pagination',
+        )
+        const collectionId = collection.dataset.sceneId
+        const isInnovations = collectionId === 'innovations'
+        const horizontalDirection = collectionId === 'indoor'
+          ? -1
+          : collectionId === 'outdoor'
+            ? 1
+            : 0
 
-        if (!title || !details || !actions) return
+        if (!label || !title || !details || !actions || !carousel) return
 
-        gsap
-          .timeline({
+        const revealTimeline = gsap.timeline({
             scrollTrigger: {
               trigger: collection,
               start: 'top 76%',
@@ -354,29 +376,128 @@ export function GalleryScene() {
               once: mobile,
             },
           })
+          .from(label, {
+            x: () => horizontalDirection * Math.min(120, window.innerWidth * 0.12),
+            y: isInnovations ? 32 : 0,
+            scale: isInnovations ? 0.97 : 1,
+            autoAlpha: 0,
+            duration: 0.72,
+            ease: 'power3.out',
+          })
           .from(title, {
             yPercent: 80,
             autoAlpha: 0,
             duration: 0.58,
             ease: 'power4.out',
-          })
+          }, 0.08)
           .from(details, {
             y: 12,
             autoAlpha: 0,
             duration: 0.36,
             ease: 'power3.out',
-          }, 0.18)
+          }, 0.24)
           .from(actions, {
             y: 8,
             autoAlpha: 0,
             duration: 0.3,
             ease: 'power3.out',
-          }, 0.28)
+          }, 0.34)
+          .from(carousel, {
+            x: () => horizontalDirection * Math.min(90, window.innerWidth * 0.085),
+            y: isInnovations ? 42 : 0,
+            scale: isInnovations ? 0.965 : 1,
+            autoAlpha: 0,
+            duration: 0.78,
+            ease: 'power3.out',
+          }, 0.16)
+
+        if (pagination) {
+          revealTimeline.from(pagination, {
+            y: 8,
+            autoAlpha: 0,
+            duration: 0.32,
+            ease: 'power2.out',
+          }, 0.5)
+        }
       })
 
       return () => removePointerTracker?.()
     },
     { scope: section },
+  )
+
+  useGSAP(
+    () => {
+      const railMedia = gsap.matchMedia()
+
+      railMedia.add(
+        '(min-width: 901px) and (prefers-reduced-motion: no-preference)',
+        () => {
+          const railCollections = gsap.utils.toArray<HTMLElement>(
+            '.collection--indoor, .collection--outdoor',
+          )
+
+          railCollections.forEach((collection) => {
+            const stage = collection.querySelector<HTMLElement>(
+              '.project-collection__stage',
+            )
+            const carousel = collection.querySelector<HTMLElement>(
+              '.collection-carousel',
+            )
+            const track = carousel?.querySelector<HTMLElement>(
+              '.collection-carousel__track',
+            )
+            const cards = track
+              ? gsap.utils.toArray<HTMLElement>('.project-card', track)
+              : []
+
+            if (!stage || !carousel || !track || cards.length < 2) return
+
+            const cardEntryY = () => carousel.clientHeight * 0.92
+
+            gsap.set(track, { y: 0 })
+            gsap.set(cards, {
+              y: (index) => index === 0 ? 0 : cardEntryY(),
+              zIndex: (index) => index + 1,
+              force3D: true,
+            })
+
+            const railTimeline = gsap.timeline({
+              scrollTrigger: {
+                id: `collection-rail-${collection.dataset.sceneId}`,
+                trigger: collection,
+                start: 'top top',
+                end: () =>
+                  `+=${(cards.length - 1) * window.innerHeight * 0.82 + window.innerHeight * 0.5}`,
+                pin: stage,
+                scrub: 0.65,
+                anticipatePin: 1,
+                refreshPriority: 0,
+                invalidateOnRefresh: true,
+              },
+            })
+
+            cards.slice(1).forEach((card, index) => {
+              railTimeline.to(card, {
+                y: 0,
+                duration: 1,
+                ease: 'none',
+                force3D: true,
+              }, index)
+            })
+
+            railTimeline.to({}, { duration: 0.45 })
+          })
+        },
+      )
+
+      return () => railMedia.revert()
+    },
+    {
+      dependencies: [railRevision],
+      scope: section,
+      revertOnUpdate: true,
+    },
   )
 
   useGSAP(
@@ -820,6 +941,34 @@ export function GalleryScene() {
     })
   }
 
+  const openAvailability = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return
+    }
+
+    event.preventDefault()
+    const sourceBounds = event.currentTarget.getBoundingClientRect()
+
+    navigate('/disponibilidad', {
+      state: {
+        backgroundLocation: location,
+        backgroundScrollY: window.scrollY,
+        transitionOrigin: {
+          x: sourceBounds.x,
+          y: sourceBounds.y,
+          width: sourceBounds.width,
+          height: sourceBounds.height,
+        },
+      },
+    })
+  }
+
   const renderHeadingActions = (
     collection: (typeof projectCollections)[number],
   ) => {
@@ -851,6 +1000,7 @@ export function GalleryScene() {
           <Link
             className="collection-heading__availability"
             to="/disponibilidad"
+            onClick={openAvailability}
             onPointerEnter={handleCtaPointerEnter}
             onPointerLeave={handleCtaPointerLeave}
             onFocus={handleCtaFocus}

@@ -172,6 +172,8 @@
   position: relative;
   z-index: 1;
   width: min(72rem, 100%);
+  display: grid;
+  place-items: center;
   pointer-events: none;
 }
 
@@ -227,7 +229,9 @@
   }
   .purpose-contact .contact-card-embed { width: 100%; }
   .purpose-contact .contact-card__motion {
-    height: calc(100svh - 1.5rem);
+    width: min(100%, calc((100svh - 1.5rem) * 1.72));
+    height: auto;
+    aspect-ratio: 1.72 / 1;
   }
 
   .purpose-contact__backdrop {

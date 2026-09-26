@@ -1,18 +1,60 @@
 import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import butterfly from '../assets/public-butterfly.svg'
-import { gsap, useGSAP } from '../animation/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
 import { setPageTone } from '../animation/pageTone'
 
-export function AvailabilityPage() {
+interface AvailabilityPageProps {
+  modal?: boolean
+}
+
+export function AvailabilityPage({ modal = false }: AvailabilityPageProps) {
   const page = useRef<HTMLElement>(null)
+  const modalPanel = useRef<HTMLDivElement>(null)
   const mark = useRef<HTMLImageElement>(null)
+  const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
+    if (modal) return
+
     window.scrollTo({ top: 0, behavior: 'instant' })
     setPageTone('#07080b', true)
-  }, [])
+  }, [modal])
+
+  useEffect(() => {
+    if (!modal) return
+
+    const previousOverflow = document.body.style.overflow
+    const backgroundScrollY = location.state?.backgroundScrollY as
+      | number
+      | undefined
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') navigate(-1)
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', closeOnEscape)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+
+      if (typeof backgroundScrollY === 'number') {
+        window.requestAnimationFrame(() => {
+          window.scrollTo({ top: backgroundScrollY, behavior: 'instant' })
+          window.dispatchEvent(new Event('public:restore-gallery-rails'))
+
+          window.requestAnimationFrame(() => {
+            ScrollTrigger.refresh()
+            window.scrollTo({ top: backgroundScrollY, behavior: 'instant' })
+            ScrollTrigger.update()
+          })
+        })
+      }
+    }
+  }, [location.state, modal, navigate])
 
   useGSAP(
     () => {
@@ -99,8 +141,9 @@ export function AvailabilityPage() {
     { scope: page },
   )
 
-  return (
-    <main className="availability-page" ref={page}>
+  const Root = modal ? 'section' : 'main'
+  const pageContent = (
+    <Root className="availability-page" ref={page}>
       <div className="availability-page__glow" aria-hidden="true" />
 
       <section className="availability-page__content">
@@ -120,11 +163,43 @@ export function AvailabilityPage() {
         <p className="availability-page__copy">
           Estamos preparando una nueva forma de descubrir nuestros espacios.
         </p>
-          <Link className="availability-page__back" to="/">
-              <span aria-hidden="true">←</span>
-              Volver
-          </Link>
+        <button
+          className="availability-page__back"
+          type="button"
+          onClick={() => {
+            if (modal || location.state?.backgroundLocation) {
+              navigate(-1)
+              return
+            }
+
+            navigate('/')
+          }}
+        >
+          <span aria-hidden="true">←</span>
+          Volver
+        </button>
       </section>
-    </main>
+    </Root>
+  )
+
+  if (!modal) return pageContent
+
+  return (
+    <div
+      className="route-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Disponibilidad"
+    >
+      <button
+        className="route-modal__backdrop"
+        type="button"
+        aria-label="Cerrar"
+        onClick={() => navigate(-1)}
+      />
+      <div className="route-modal__panel availability-route-modal__panel" ref={modalPanel}>
+        {pageContent}
+      </div>
+    </div>
   )
 }
