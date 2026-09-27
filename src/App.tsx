@@ -12,6 +12,7 @@ import { IndoorPage } from './pages/IndoorPage'
 import { InnovationsPage } from './pages/InnovationsPage'
 import { OutdoorPage } from './pages/OutdoorPage'
 import { GalleryScene } from './sections/GalleryScene'
+import { HistoryScene } from './sections/HistoryScene'
 import { ImpactScene } from './sections/ImpactScene'
 import { IntroScene } from './sections/IntroScene'
 import { PurposeScene } from './sections/PurposeScene'
@@ -67,6 +68,7 @@ function HomePage() {
         <ImpactScene />
         <PurposeScene />
         <TeamScene />
+        <HistoryScene onContact={() => setContactOpen(true)} />
       </main>
 
       {contactOpen && <ContactCard onClose={() => setContactOpen(false)} />}

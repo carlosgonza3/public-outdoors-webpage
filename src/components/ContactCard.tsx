@@ -8,6 +8,7 @@ import instagramIcon from '../assets/instagram-streamline.svg'
 import linkedinIcon from '../assets/linkedin-streamline.svg'
 import butterflyLogo from '../assets/public-butterfly.svg'
 import whatsappIcon from '../assets/whatsapp-streamline.svg'
+import { isSafari } from '../platform/iosSafari'
 
 type ContactCardProps = {
   onClose?: () => void
@@ -262,6 +263,33 @@ export function ContactCard({
         return () => timeline.kill()
       }
 
+      if (isSafari()) {
+        tiltReady.current = false
+        const timeline = gsap
+          .timeline()
+          .set(overlay.current, { autoAlpha: 0 })
+          .set(cardMotion.current, {
+            autoAlpha: 0,
+            clearProps: 'transform,filter,clipPath',
+          })
+          .to(overlay.current, {
+            autoAlpha: 1,
+            duration: 0.32,
+            ease: 'power2.out',
+          })
+          .to(
+            cardMotion.current,
+            {
+              autoAlpha: 1,
+              duration: 0.42,
+              ease: 'power2.out',
+            },
+            0.04,
+          )
+
+        return () => timeline.kill()
+      }
+
       gsap
         .timeline({
           onComplete: () => {
@@ -303,10 +331,8 @@ export function ContactCard({
   useGSAP((_, contextSafe) => {
     const stage = cardStage.current
     const safe = contextSafe!
-    const canPointerTilt = window.matchMedia(
-      '(any-hover: hover) and (any-pointer: fine)',
-    ).matches
     const mobileExperience = isMobileExperience()
+    const desktopSafari = !mobileExperience && isSafari()
     const deferEmbeddedTilt = mode === 'scroll' && mobileExperience
 
     if (!motionActive) {
@@ -316,6 +342,21 @@ export function ContactCard({
 
     if (!stage || prefersReducedMotion()) {
       setMotionAccess('unavailable')
+      return
+    }
+
+    if (mobileExperience) {
+      tiltReady.current = false
+      setMotionAccess('unavailable')
+      requestMotionAccess.current = () => undefined
+      gsap.set(stage, { clearProps: 'transform' })
+      return
+    }
+
+    if (desktopSafari) {
+      tiltReady.current = false
+      setMotionAccess('unavailable')
+      gsap.set(stage, { clearProps: 'transform' })
       return
     }
 
@@ -351,7 +392,7 @@ export function ContactCard({
       shiftY(0)
     })
 
-    if (mobileExperience || !canPointerTilt) {
+    if (mobileExperience) {
       if (
         !window.isSecureContext ||
         typeof window.DeviceOrientationEvent === 'undefined'
@@ -598,6 +639,26 @@ export function ContactCard({
             ease: 'power2.in',
           },
           0.06,
+        )
+      return
+    }
+
+    if (isSafari()) {
+      gsap
+        .timeline({ onComplete: onClose })
+        .to(cardMotion.current, {
+          autoAlpha: 0,
+          duration: 0.28,
+          ease: 'power2.in',
+        })
+        .to(
+          overlay.current,
+          {
+            autoAlpha: 0,
+            duration: 0.24,
+            ease: 'power2.in',
+          },
+          0.04,
         )
       return
     }

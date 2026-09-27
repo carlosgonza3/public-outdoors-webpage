@@ -1,0 +1,128 @@
+.section-ambient {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.section-ambient__orb {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  opacity: var(--ambient-opacity, .12);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.section-ambient__glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    118deg,
+    rgb(255 255 255 / 2.5%),
+    transparent 38%,
+    rgb(255 255 255 / 1.5%)
+  );
+}
+
+.section-ambient--team {
+  --ambient-opacity: .105;
+}
+
+.section-ambient--team .section-ambient__orb--red {
+  top: -24%;
+  left: -14%;
+  width: min(54rem, 58vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(255 1 9 / 68%) 0, rgb(255 1 9 / 20%) 34%, transparent 70%);
+}
+
+.section-ambient--team .section-ambient__orb--blue {
+  top: 12%;
+  right: -18%;
+  width: min(48rem, 52vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(0 176 244 / 72%) 0, rgb(0 176 244 / 19%) 36%, transparent 70%);
+}
+
+.section-ambient--team .section-ambient__orb--green {
+  bottom: -30%;
+  left: 24%;
+  width: min(42rem, 46vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(56 212 48 / 66%) 0, rgb(56 212 48 / 18%) 36%, transparent 70%);
+}
+
+.section-ambient--team .section-ambient__glass {
+  background-color: rgb(247 245 239 / 38%);
+  background-blend-mode: normal;
+}
+
+.section-ambient--history {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  height: 100dvh;
+  margin-bottom: -100svh;
+  margin-bottom: -100dvh;
+  --ambient-opacity: .16;
+}
+
+.section-ambient--history .section-ambient__orb--red {
+  top: -25%;
+  left: -18%;
+  width: min(58rem, 66vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(255 1 9 / 62%) 0, rgb(255 1 9 / 16%) 36%, transparent 71%);
+}
+
+.section-ambient--history .section-ambient__orb--blue {
+  top: 8%;
+  right: -24%;
+  width: min(56rem, 62vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(0 176 244 / 62%) 0, rgb(0 176 244 / 15%) 38%, transparent 72%);
+}
+
+.section-ambient--history .section-ambient__orb--green {
+  bottom: -35%;
+  left: 22%;
+  width: min(50rem, 55vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgb(56 212 48 / 56%) 0, rgb(56 212 48 / 13%) 38%, transparent 72%);
+}
+
+.section-ambient--history .section-ambient__glass {
+  background-color: rgb(8 11 10 / 26%);
+  background-blend-mode: soft-light;
+}
+
+@media (max-width: 900px) {
+  .section-ambient--team {
+    --ambient-opacity: .09;
+  }
+
+  .section-ambient--team .section-ambient__orb--red,
+  .section-ambient--team .section-ambient__orb--blue,
+  .section-ambient--team .section-ambient__orb--green {
+    width: 110vw;
+  }
+
+  .section-ambient--history {
+    --ambient-opacity: .135;
+  }
+
+  .section-ambient--history .section-ambient__orb--red,
+  .section-ambient--history .section-ambient__orb--blue,
+  .section-ambient--history .section-ambient__orb--green {
+    width: 120vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-ambient__orb {
+    transform: none !important;
+    will-change: auto;
+  }
+}
