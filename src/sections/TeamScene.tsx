@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { setPageTone } from '../animation/pageTone'
+import { SectionAmbient } from '../components/SectionAmbient'
 
 type TeamSceneProps = {
   onSurfaceChange?: (light: boolean) => void
@@ -235,6 +236,30 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
             onRefresh: (self) => syncSurface(self.progress > 0),
           })
         }
+
+        if (!reducedMotion) {
+          const ambientOrbs = gsap.utils.toArray<HTMLElement>(
+            '.section-ambient__orb',
+            root,
+          )
+
+          gsap.to(ambientOrbs, {
+            xPercent: (index) => [12, -15, 9][index],
+            yPercent: (index) => [18, -12, -16][index],
+            rotation: (index) => [8, -10, 6][index],
+            scale: (index) => [1.08, 1.12, 1.06][index],
+            ease: 'none',
+            scrollTrigger: {
+              trigger: root,
+              start: 'top top',
+              end: desktop
+                ? () => `+=${root.clientHeight * profiles.length}`
+                : 'bottom top',
+              scrub: 1.2,
+              invalidateOnRefresh: true,
+            },
+          })
+        }
       })
 
       return () => {
@@ -249,10 +274,13 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
   return (
     <section
       className="team-section"
+      id="team"
       ref={section}
       aria-labelledby="team-title"
       data-scene-id="team"
     >
+      <SectionAmbient variant="team" />
+
       <h2 className="team-section__title" id="team-title">
         Nuestro Equipo
       </h2>
