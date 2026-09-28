@@ -55,7 +55,7 @@ const historyMilestones = [
   },
   {
     date: '2026',
-    description: 'Expansion a las Ramblas San'
+    description: 'Expansion a las Ramblas San Miguel'
  }
 ]
 
