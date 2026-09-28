@@ -4,7 +4,7 @@ The `production/coming-soon` branch publishes a standalone white page with the P
 
 ## Local preview
 
-Run `npm ci`, then `npm run dev:coming-soon`. To inspect the production artifact, run `npm run build:coming-soon` and `npm run preview`. Netlify runs `npm run lint && npm run build:coming-soon` and publishes `dist`.
+Run `npm ci`, then `npm run dev`. To inspect the production artifact, run `npm run build` and `npm run preview`. Netlify runs `npm run lint && npm run build` and publishes `dist`.
 
 The separate Vite root deliberately excludes the full application, its generated route HTML, and its public assets. All non-file URLs, including former routes, serve the placeholder. The page works without JavaScript (static logo and text). Indexing is disabled. There is no scheduled or date-driven release.
 
@@ -20,7 +20,7 @@ The separate Vite root deliberately excludes the full application, its generated
 
 1. Finish, commit, and push the full website on `development` (or the agreed full-site release branch). Current uncommitted development work was intentionally left untouched when this branch was created.
 2. Preview that branch and run its release checks. Confirm the production site URL and indexing environment settings.
-3. Switch Netlify's production branch to the approved full-site branch. Its configuration must build the full site with `npm run build`, not `build:coming-soon`.
+3. Switch Netlify's production branch to the approved full-site branch. Verify its Vite configuration targets the full application, rather than the standalone coming-soon root.
 4. Trigger a production deploy and verify the home page, routes, contact interactions, and domain HTTPS. DNS remains unchanged.
 5. If necessary, restore the previous coming-soon deploy in Netlify and switch the production branch back to `production/coming-soon` to keep later builds on the placeholder.
 

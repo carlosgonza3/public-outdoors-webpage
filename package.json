@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "check:release": "node scripts/check-release.mjs",
-    "dev:coming-soon": "vite --config coming-soon/vite.config.ts",
-    "build:coming-soon": "vite build --config coming-soon/vite.config.ts"
+    "dev:coming-soon": "npm run dev",
+    "build:coming-soon": "npm run build"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
