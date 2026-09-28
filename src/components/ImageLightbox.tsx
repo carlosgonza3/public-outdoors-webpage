@@ -1,3 +1,4 @@
+import { usePageTone } from '../hooks/usePageTone'
 import {
   createContext,
   useCallback,
@@ -40,6 +41,7 @@ export function ImageLightboxProvider({
   children,
 }: ImageLightboxProviderProps) {
   const [activeImage, setActiveImage] = useState<LightboxImageData | null>(null)
+  usePageTone('#020404', true, activeImage !== null)
   const closeButton = useRef<HTMLButtonElement>(null)
   const openingTrigger = useRef<HTMLButtonElement | null>(null)
 

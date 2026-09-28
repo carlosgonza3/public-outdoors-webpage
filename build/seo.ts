@@ -47,7 +47,9 @@ export function seoPlugin(siteUrl: string, indexable: boolean, base: string, ana
       for (const [path, page] of Object.entries(pages)) {
         if (path === '/') continue
         this.emitFile({ type: 'asset', fileName: `${path.slice(1)}/index.html`,
-          source: html.replace(/<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, head(page, path)) })
+          source: html.replace(/<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, head(page, path))
+            .replaceAll('#f7f5ef', path === '/disponibilidad' ? '#07080b' : '#0b0d0c')
+            .replace('name="color-scheme" content="light"', 'name="color-scheme" content="dark"') })
       }
       this.emitFile({ type: 'asset', fileName: '404.html', source: `<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">${head(notFound, '/404')}</head><body style="font-family:system-ui;background:#f7f5ef;color:#151515;padding:10vw"><h1>Página no encontrada</h1><p>La página que buscas no está disponible.</p><a href="${escape(base)}">Volver al inicio de PUBLIC</a></body></html>` })
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: indexable

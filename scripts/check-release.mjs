@@ -18,6 +18,10 @@ try {
   for (const route of ['', 'indoor/', 'outdoor/', 'innovations/', 'disponibilidad/']) {
     const html = read(`${route}index.html`)
     assert.match(html, /lang="es"/)
+    const tone = !route ? '#f7f5ef' : route === 'disponibilidad/' ? '#07080b' : '#0b0d0c'
+    assert.ok(html.includes(`name="theme-color" content="${tone}"`))
+    assert.ok(html.includes(`background-color: ${tone}`))
+    assert.ok(html.includes(`name="color-scheme" content="${!route ? 'light' : 'dark'}"`))
     assert.equal((html.match(/<title>/g) || []).length, 1)
     titles.add(html.match(/<title>(.*?)<\/title>/)[1])
     assert.match(html, /property="og:image" content="https:\/\/publicoutdoors.com\/public-contacto.png"/)
