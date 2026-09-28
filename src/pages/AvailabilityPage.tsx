@@ -3,13 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import butterfly from '../assets/public-butterfly.svg'
 import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
-import { setPageTone } from '../animation/pageTone'
+import { usePageTone } from '../hooks/usePageTone'
 
 interface AvailabilityPageProps {
   modal?: boolean
 }
 
 export function AvailabilityPage({ modal = false }: AvailabilityPageProps) {
+  usePageTone('#07080b', modal)
   const page = useRef<HTMLElement>(null)
   const modalPanel = useRef<HTMLDivElement>(null)
   const mark = useRef<HTMLImageElement>(null)
@@ -20,7 +21,6 @@ export function AvailabilityPage({ modal = false }: AvailabilityPageProps) {
     if (modal) return
 
     window.scrollTo({ top: 0, behavior: 'instant' })
-    setPageTone('#07080b', true)
   }, [modal])
 
   useEffect(() => {

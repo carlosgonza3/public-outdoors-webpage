@@ -1,3 +1,4 @@
+import { usePageTone } from '../hooks/usePageTone'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { gsap, useGSAP } from '../animation/gsap'
@@ -178,6 +179,7 @@ export function ContactCard({
   mode = 'modal',
   motionActive = true,
 }: ContactCardProps) {
+  usePageTone('#090b0d', true, mode === 'modal')
   const overlay = useRef<HTMLDivElement>(null)
   const cardMotion = useRef<HTMLDivElement>(null)
   const cardStage = useRef<HTMLDivElement>(null)

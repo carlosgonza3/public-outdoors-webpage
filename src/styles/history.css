@@ -169,6 +169,7 @@
   width: .9375rem;
   height: .9375rem;
   border-radius: 50%;
+  background-color: #414141;
   box-shadow: 0 0 0 .5rem var(--history-bg);
 }
 
@@ -267,6 +268,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .history-timeline__dot {
+    background-color: var(--history-paper) !important;
+  }
+
   .history-timeline__date,
   .history-timeline__body {
     opacity: 1 !important;

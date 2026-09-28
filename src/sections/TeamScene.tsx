@@ -16,31 +16,50 @@ type PortraitProps = {
 // the final portraits, names, roles, and biographies are available.
 const teamMembers = [
   {
-    name: 'Alex Rivera',
-    role: 'Dirección general',
+    name: 'Zayda Reyes',
+    role: 'Ejecutiva de Ventas',
     description:
-      'Conecta visión, estrategia y oportunidades para que cada proyecto tenga una dirección clara.',
+      'Soy una profesional de ventas con más de 12 años de experiencia en comercialización y\n' +
+        'desarrollo de negocios. Me apasiona conectar con las personas, construir relaciones de\n' +
+        'confianza y encontrar oportunidades que generen crecimiento. Disfruto los retos, aprender\n' +
+        'constantemente y todo lo relacionado con ventas, comunicación y marcas.',
     accent: '#ff4b43',
   },
   {
-    name: 'Sofía Méndez',
-    role: 'Estrategia y cuentas',
+    name: 'Iris Quinteros',
+    role: ' Ejecutiva de Ventas',
     description:
-      'Convierte objetivos de marca en planes cercanos, medibles y pensados para cada audiencia.',
+      'Soy creativa y amante de la publicidad. Me gusta construir relaciones cercanas y de\n' +
+        'confianza con cada cliente para alcanzar juntos objetivos alineados con la estrategia de su\n' +
+        'marca.',
     accent: '#00a7e8',
   },
   {
-    name: 'Mateo Cruz',
-    role: 'Operaciones',
+    name: 'Rosemary Daboub',
+    role: ' Ejecutiva de Ventas',
     description:
-      'Coordina equipos, ubicaciones y tiempos para que las ideas lleguen a la calle con precisión.',
+      'Tengo 13 años en PUBLIC y me enorgullece ser parte de esta familia. Me especializo en\n' +
+        'ventas directas y estoy aquí para ayudarte a encontrar el espacio ideal para elevar tu\n' +
+        'marca.\n' +
+        '“Un buen anuncio cuenta una historia; yo te ayudo a escribir la tuya."',
     accent: '#30c82f',
   },
   {
-    name: 'Valeria Santos',
-    role: 'Creatividad',
+    name: 'Erika Mendoza',
+    role: 'Gerente General',
     description:
-      'Da forma a experiencias visuales que hacen que las marcas se sientan vivas en el espacio público.',
+      'Como gerente general de PUBLIC, me apasiona trabajar junto a nuestro equipo para\n' +
+        'encontrar oportunidades creativas y novedosas que aporten valor a las marcas de nuestros\n' +
+        'clientes. Estamos siempre para elevar tu marca.',
+    accent: '#ffb629',
+  },
+  {
+    name: 'Eduardo Avendaño',
+    role: 'Founder & CEO',
+    description:
+        'Me enorgullece haber construido una empresa que impulsa el crecimiento de las marcas\n' +
+        'con las que trabajamos, mientras generamos empleos estables que sostienen a nuestras\n' +
+        'familias y aportan al desarrollo de nuestra comunidad.',
     accent: '#ffb629',
   },
 ]

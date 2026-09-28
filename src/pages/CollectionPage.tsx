@@ -1,3 +1,4 @@
+import { usePageTone } from '../hooks/usePageTone'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
@@ -17,6 +18,7 @@ export function CollectionPage({
   label,
   modal = false,
 }: CollectionPageProps) {
+  usePageTone('#0b0d0c', modal)
   const page = useRef<HTMLElement>(null)
   const modalPanel = useRef<HTMLDivElement>(null)
   const location = useLocation()

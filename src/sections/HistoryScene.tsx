@@ -45,6 +45,18 @@ const historyMilestones = [
     description:
       'PUBLIC crece y se hace un nombre en el mercado, consolidando una identidad propia y una presencia cada vez más reconocible.',
   },
+  {
+    date: '2024',
+    description: 'Expansion a las Ramblas Santa Tecla'
+  },
+  {
+    date: '2025',
+    description: 'Expansion a las Ramblas Santa Ana'
+  },
+  {
+    date: '2026',
+    description: 'Expansion a las Ramblas San'
+ }
 ]
 
 export function HistoryScene({ onContact }: { onContact: () => void }) {
@@ -158,9 +170,6 @@ export function HistoryScene({ onContact }: { onContact: () => void }) {
         )
         const dot = item.querySelector<HTMLElement>('.history-timeline__dot')
 
-        gsap.set(content, { opacity: 0.25 })
-        gsap.set(dot, { backgroundColor: '#414141' })
-
         const reveal = gsap.timeline({
           scrollTrigger: {
             trigger: item,
@@ -172,8 +181,13 @@ export function HistoryScene({ onContact }: { onContact: () => void }) {
         })
 
         reveal
-          .to(content, { opacity: 1, duration: 1, ease: 'none' })
-          .to(dot, { backgroundColor: '#f7f5ef', duration: 1, ease: 'none' }, '<')
+          .fromTo(content, { opacity: 0.25 }, { opacity: 1, duration: 1, ease: 'none' })
+          .fromTo(
+            dot,
+            { backgroundColor: '#414141' },
+            { backgroundColor: '#f7f5ef', duration: 1, ease: 'none' },
+            '<',
+          )
       })
 
       if (outroTitle) {
@@ -194,9 +208,15 @@ export function HistoryScene({ onContact }: { onContact: () => void }) {
         )
       }
 
-      return () => toneTrigger.kill()
+      // Recalculate after React commits the updated list and page layout settles.
+      const refreshCall = gsap.delayedCall(0, () => ScrollTrigger.refresh())
+
+      return () => {
+        refreshCall.kill()
+        toneTrigger.kill()
+      }
     },
-    { scope: section },
+    { scope: section, dependencies: [historyMilestones], revertOnUpdate: true },
   )
 
   return (

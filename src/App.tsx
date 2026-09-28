@@ -1,10 +1,11 @@
 import {
-  Navigate,
   Route,
   Routes,
   useLocation,
 } from 'react-router-dom'
 import { useCallback, useState } from 'react'
+import { PageMetadata } from './components/PageMetadata'
+import { Link } from 'react-router-dom'
 import { ContactCard } from './components/ContactCard'
 import { SiteNavigation } from './components/SiteNavigation'
 import { AvailabilityPage } from './pages/AvailabilityPage'
@@ -82,13 +83,14 @@ function App() {
 
   return (
     <>
+      <PageMetadata />
       <Routes location={backgroundLocation ?? location}>
         <Route path="/" element={<HomePage />} />
         <Route path="/indoor" element={<IndoorPage />} />
         <Route path="/outdoor" element={<OutdoorPage />} />
         <Route path="/innovations" element={<InnovationsPage />} />
         <Route path="/disponibilidad" element={<AvailabilityPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<main style={{ padding: '10vw' }}><h1>Página no encontrada</h1><Link to="/">Volver al inicio</Link></main>} />
       </Routes>
 
       {backgroundLocation && (
