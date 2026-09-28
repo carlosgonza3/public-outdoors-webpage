@@ -1,6 +1,6 @@
 # Coming-soon release
 
-The `production/coming-soon` branch publishes a standalone white page with the PUBLIC logo and “Coming soon”. The logo bounces on entry, every four seconds, and on click or keyboard activation. Reduced-motion preferences disable movement.
+The `production/coming-soon` branch publishes a standalone white page with the PUBLIC logo and “Próximamente”. The logo bounces on entry, every four seconds, and on click or keyboard activation. Reduced-motion preferences disable movement.
 
 ## Local preview
 
