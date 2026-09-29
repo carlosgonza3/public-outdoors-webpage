@@ -1,6 +1,10 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { setPageTone } from '../animation/pageTone'
+import zaydaPortrait from '../assets/images/1-zaida.JPG'
+import erikaPortrait from '../assets/images/erika-2.JPG'
+import irisPortrait from '../assets/images/iris-1.JPG'
+import rosemaryPortrait from '../assets/images/rosmery-1.JPG'
 import { SectionAmbient } from '../components/SectionAmbient'
 
 type TeamSceneProps = {
@@ -12,8 +16,16 @@ type PortraitProps = {
   variant: number
 }
 
-// Placeholder content: keep this array as the single replacement point when
-// the final portraits, names, roles, and biographies are available.
+type TeamMember = {
+  name: string
+  role: string
+  description: string
+  image: string
+  accent: string
+}
+
+// Import each portrait from src/assets above and assign it here. An empty path
+// keeps the illustrated placeholder visible until the portrait is available.
 const teamMembers = [
   {
     name: 'Zayda Reyes',
@@ -23,6 +35,7 @@ const teamMembers = [
         'desarrollo de negocios. Me apasiona conectar con las personas, construir relaciones de\n' +
         'confianza y encontrar oportunidades que generen crecimiento. Disfruto los retos, aprender\n' +
         'constantemente y todo lo relacionado con ventas, comunicación y marcas.',
+    image: zaydaPortrait,
     accent: '#ff4b43',
   },
   {
@@ -32,6 +45,7 @@ const teamMembers = [
       'Soy creativa y amante de la publicidad. Me gusta construir relaciones cercanas y de\n' +
         'confianza con cada cliente para alcanzar juntos objetivos alineados con la estrategia de su\n' +
         'marca.',
+    image: irisPortrait,
     accent: '#00a7e8',
   },
   {
@@ -42,6 +56,7 @@ const teamMembers = [
         'ventas directas y estoy aquí para ayudarte a encontrar el espacio ideal para elevar tu\n' +
         'marca.\n' +
         '“Un buen anuncio cuenta una historia; yo te ayudo a escribir la tuya."',
+    image: rosemaryPortrait,
     accent: '#30c82f',
   },
   {
@@ -51,18 +66,20 @@ const teamMembers = [
       'Como gerente general de PUBLIC, me apasiona trabajar junto a nuestro equipo para\n' +
         'encontrar oportunidades creativas y novedosas que aporten valor a las marcas de nuestros\n' +
         'clientes. Estamos siempre para elevar tu marca.',
+    image: erikaPortrait,
     accent: '#ffb629',
   },
-  {
-    name: 'Eduardo Avendaño',
-    role: 'Founder & CEO',
-    description:
-        'Me enorgullece haber construido una empresa que impulsa el crecimiento de las marcas\n' +
-        'con las que trabajamos, mientras generamos empleos estables que sostienen a nuestras\n' +
-        'familias y aportan al desarrollo de nuestra comunidad.',
-    accent: '#ffb629',
-  },
-]
+  // {
+  //   name: 'Eduardo Avendaño',
+  //   role: 'Founder & CEO',
+  //   description:
+  //       'Me enorgullece haber construido una empresa que impulsa el crecimiento de las marcas\n' +
+  //       'con las que trabajamos, mientras generamos empleos estables que sostienen a nuestras\n' +
+  //       'familias y aportan al desarrollo de nuestra comunidad.',
+  //   image: '',
+  //   accent: '#ffb629',
+  // },
+] satisfies TeamMember[]
 
 function PlaceholderPortrait({ accent, variant }: PortraitProps) {
   const faceShift = variant % 2 === 0 ? -8 : 9
@@ -131,8 +148,7 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
           const copies = gsap.utils.toArray<HTMLElement>('.team-profile__copy', root)
           const portraitStep = () => root.clientHeight * 0.68
           const horizontalStep = () => Math.min(root.clientWidth * 0.24, 340)
-          const copyStep = () => Math.max(root.clientHeight * 0.28,
-            ...copies.map((copy) => copy.offsetHeight + 40))
+          const copyStep = () => root.clientHeight * 0.68
           const distance = (offset: number) => Math.min(Math.abs(offset), 3)
           const angle = (offset: number) => offset === 0 ? 0 : offset < 0 ? 11 : -11
           const wheelTilt = (offset: number) => offset === 0 ? 0 : offset < 0 ? -18 : 18
@@ -309,13 +325,24 @@ export function TeamScene({ onSurfaceChange }: TeamSceneProps) {
           <li className="team-profile" key={member.name}>
             <article>
               <div className="team-profile__copy">
-                <h3>{member.name}</h3>
-                <p className="team-profile__role">{member.role}</p>
+                <div className="team-profile__identity">
+                  <h3>{member.name}</h3>
+                  <p className="team-profile__role">{member.role}</p>
+                </div>
                 <p className="team-profile__description">{member.description}</p>
               </div>
 
               <figure className="team-profile__portrait">
-                <PlaceholderPortrait accent={member.accent} variant={index} />
+                {member.image ? (
+                  <img
+                    src={member.image}
+                    alt={`Retrato de ${member.name}`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <PlaceholderPortrait accent={member.accent} variant={index} />
+                )}
               </figure>
             </article>
           </li>

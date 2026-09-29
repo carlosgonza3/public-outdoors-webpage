@@ -599,6 +599,12 @@
 
 .collection--outdoor .outdoor-card--two .card-visual--image img { object-position: 68% center; }
 
+.collection--outdoor .outdoor-card--three .card-visual--image img {
+  object-position: center 64%;
+  translate: 3% 0;
+  scale: 1.08;
+}
+
 .card-visual--image .image-card-title {
   position: absolute;
   z-index: 2;

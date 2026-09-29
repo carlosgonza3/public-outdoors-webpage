@@ -49,24 +49,27 @@ const formats = {
 
 const processSteps = [
   {
-    title: 'Estrategia',
-    description: 'Definamos tu audiencia, momento y ubicación.',
-    icon: 'strategy',
+    title: 'Briefing',
+    description:
+      'Cuéntanos tu campaña creativa y PUBLIC diseñará la estrategia perfecta.',
+    icon: 'briefing',
   },
   {
-    title: 'Producción',
-    description: 'Convirtamos tus ideas en piezas que destacan',
-    icon: 'production',
+    title: 'Innovación gráfica',
+    description:
+      'Envíanos tus elementos gráficos y PUBLIC diseñará el arte en el medio que mejor se adapte a tu campaña.',
+    icon: 'innovation',
   },
   {
-    title: 'Implementación',
-    description: 'Nosotros instalamos, supervisamos y cuidamos la ejecución',
-    icon: 'implementation',
+    title: 'Proofing, aprobación y ajustes finales',
+    description:
+      'PUBLIC te enviará la propuesta visual, los espacios y la oferta comercial. Tras tu aprobación y los ajustes finales, programaremos la pauta en los medios establecidos según los tiempos definidos en el briefing.',
+    icon: 'approval',
   },
 ] as const
 
 function ProcessIcon({ icon }: { icon: (typeof processSteps)[number]['icon'] }) {
-  if (icon === 'strategy') {
+  if (icon === 'briefing') {
     return (
       <svg viewBox="0 0 48 48" aria-hidden="true">
         <circle cx="24" cy="24" r="13" />
@@ -76,7 +79,7 @@ function ProcessIcon({ icon }: { icon: (typeof processSteps)[number]['icon'] }) 
     )
   }
 
-  if (icon === 'production') {
+  if (icon === 'innovation') {
     return (
       <svg viewBox="0 0 48 48" aria-hidden="true">
         <path d="m24 5 16 9-16 9L8 14l16-9Z" />
