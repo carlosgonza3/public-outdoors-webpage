@@ -11,7 +11,7 @@ interface InnovationsPageProps {
 }
 
 const innovationsCollection = projectCollections.find(
-  ({ id }) => id === 'innovations',
+  ({ id }) => id === 'innovaciones',
 )!
 
 const ideaRecommendations = [
@@ -26,7 +26,6 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
   const [ideaError, setIdeaError] = useState(false)
   const [recommendationIndex, setRecommendationIndex] = useState(0)
   const [recommendationText, setRecommendationText] = useState('')
-  const [ideaHovered, setIdeaHovered] = useState(false)
   const [ideaFocused, setIdeaFocused] = useState(false)
   const ideaForm = useRef<HTMLFormElement>(null)
   const recommendationTimeline = useRef<gsap.core.Timeline | null>(null)
@@ -77,8 +76,8 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
   )
 
   useEffect(() => {
-    recommendationTimeline.current?.paused(ideaHovered || ideaFocused)
-  }, [ideaFocused, ideaHovered])
+    recommendationTimeline.current?.paused(ideaFocused)
+  }, [ideaFocused])
 
   const prepareIdeaEmail = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -100,7 +99,7 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
   return (
     <>
       <CollectionPage
-        collectionId="innovations"
+        collectionId="innovaciones"
         label={innovationsCollection.label}
         modal={modal}
       >
@@ -134,13 +133,13 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
 
           <section
             className="collection-page__project innovations-proof"
-            aria-labelledby="innovations-proof-title"
+            aria-labelledby="innovaciones-proof-title"
           >
             <div className="innovations-proof__media">
               <LightboxImage
                 src={project.image!}
                 alt={project.alt ?? project.title}
-                caption="Innovations · Una idea hecha visible"
+                caption="Innovaciones · Una idea hecha visible"
                 triggerClassName="image-lightbox-trigger--fill"
                 loading="eager"
                 decoding="async"
@@ -149,7 +148,7 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
 
             <div className="innovations-proof__caption">
               <div className="innovations-proof__message">
-                <h2 id="innovations-proof-title">
+                <h2 id="innovaciones-proof-title">
                   Cada innovación empieza con una conversación.
                 </h2>
                 <p>
@@ -169,21 +168,19 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
               ref={ideaForm}
               className="innovations-idea"
               onSubmit={prepareIdeaEmail}
-              onMouseEnter={() => setIdeaHovered(true)}
-              onMouseLeave={() => setIdeaHovered(false)}
               onFocusCapture={() => setIdeaFocused(true)}
               onBlurCapture={() => setIdeaFocused(false)}
             >
               <div className="innovations-idea__label-row">
-                <label htmlFor="innovation-idea">Quiero convertir…</label>
+                <label htmlFor="innovacion-idea">Quiero convertir…</label>
               </div>
               <textarea
-                id="innovation-idea"
+                id="innovacion-idea"
                 name="idea"
                 rows={2}
                 value={idea}
                 placeholder={recommendationText}
-                aria-describedby={ideaError ? 'innovation-idea-error' : undefined}
+                aria-describedby={ideaError ? 'innovacion-idea-error' : undefined}
                 aria-invalid={ideaError || undefined}
                 onChange={(event) => {
                   setIdea(event.target.value)
@@ -191,7 +188,7 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
                 }}
               />
               {ideaError && (
-                <p className="innovations-idea__error" id="innovation-idea-error">
+                <p className="innovations-idea__error" id="innovacion-idea-error">
                   Escribe tu idea en una frase para preparar el correo.
                 </p>
               )}

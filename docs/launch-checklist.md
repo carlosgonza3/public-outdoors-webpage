@@ -76,7 +76,7 @@ Sources:
 
 - Run lint, build and `npm run check:release` against the release commit.
 - Run `npm audit` with registry access and address applicable production vulnerabilities.
-- Open home, indoor, outdoor, innovations and availability directly and refresh each. Verify unknown URLs return 404 from the host, not just an error-looking page with HTTP 200.
+- Open home, indoor, outdoor, innovaciones and availability directly and refresh each. Verify unknown URLs return 404 from the host, not just an error-looking page with HTTP 200.
 - Test mobile Safari, Chrome/Android, desktop, keyboard navigation and reduced motion. Check contact links, gallery modals, back navigation and image/card sharing.
 - Check PageSpeed Insights on the actual deployment. The current body depends on JavaScript; use Search Console URL Inspection to confirm rendered content is indexed. Full body prerendering is a possible follow-up if indexing or performance suffers.
 - Confirm the social preview image and published phone/email details are approved, and rights to project photos and client logos are cleared.

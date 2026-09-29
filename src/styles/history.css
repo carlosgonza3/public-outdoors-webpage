@@ -22,7 +22,7 @@
 .history-section__eyebrow {
   margin: 0 0 1.5rem;
   color: #32d53b;
-  font-size: .72rem;
+  font-size: .828rem;
   font-weight: 700;
   letter-spacing: .28em;
   text-transform: uppercase;
@@ -42,7 +42,7 @@
   max-width: 35rem;
   margin: 2rem auto 0;
   color: var(--history-muted);
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-size: clamp(1.15rem, 1.61vw, 1.438rem);
   line-height: 1.5;
 }
 
@@ -102,7 +102,9 @@
     to bottom,
     #ff0109 0%,
     #ff0109 33.333%,
+    #00a7e8 33.333%,
     #00a7e8 66.666%,
+    #30c82f 66.666%,
     #30c82f 100%
   );
   clip-path: inset(0 0 100% 0);

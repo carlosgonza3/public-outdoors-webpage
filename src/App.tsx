@@ -1,4 +1,5 @@
 import {
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -31,7 +32,7 @@ function HomePage() {
 
   const scrollToMedia = (
     event: React.MouseEvent<HTMLAnchorElement>,
-    collectionId: 'indoor' | 'outdoor' | 'innovations',
+    collectionId: 'indoor' | 'outdoor' | 'innovaciones',
   ) => {
     const collection = document.getElementById(`${collectionId}-gallery`)
 
@@ -88,7 +89,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/indoor" element={<IndoorPage />} />
         <Route path="/outdoor" element={<OutdoorPage />} />
-        <Route path="/innovations" element={<InnovationsPage />} />
+        <Route path="/innovaciones" element={<InnovationsPage />} />
+        <Route path="/innovations" element={<Navigate to="/innovaciones" replace />} />
         <Route path="/disponibilidad" element={<AvailabilityPage />} />
         <Route path="*" element={<main style={{ padding: '10vw' }}><h1>Página no encontrada</h1><Link to="/">Volver al inicio</Link></main>} />
       </Routes>
@@ -97,7 +99,7 @@ function App() {
         <Routes>
           <Route path="/indoor" element={<IndoorPage modal />} />
           <Route path="/outdoor" element={<OutdoorPage modal />} />
-          <Route path="/innovations" element={<InnovationsPage modal />} />
+          <Route path="/innovaciones" element={<InnovationsPage modal />} />
           <Route path="/disponibilidad" element={<AvailabilityPage modal />} />
         </Routes>
       )}

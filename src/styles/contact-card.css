@@ -142,7 +142,7 @@
 .contact-card__header > p {
   margin: 0;
   color: rgb(9 11 13 / 54%);
-  font-size: clamp(.58rem, .72vw, .72rem);
+  font-size: clamp(.667rem, .828vw, .828rem);
   font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
@@ -169,7 +169,7 @@
   background: transparent;
   color: #090b0d;
   font: inherit;
-  font-size: .62rem;
+  font-size: .713rem;
   font-weight: 750;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -235,9 +235,9 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(25rem, .92fr);
+  grid-template-columns: minmax(0, .86fr) minmax(28rem, 1.14fr);
   align-items: end;
-  gap: clamp(2rem, 5vw, 6rem);
+  gap: clamp(1.5rem, 3.5vw, 4.5rem);
   padding: clamp(3rem, 7vh, 6rem) 0 clamp(2.5rem, 5vh, 4rem);
 }
 
@@ -245,7 +245,7 @@
   max-width: 21rem;
   margin: 0 0 1.25rem;
   color: rgb(9 11 13 / 54%);
-  font-size: clamp(.78rem, 1vw, 1rem);
+  font-size: clamp(.897rem, 1.15vw, 1.15rem);
   font-weight: 650;
   letter-spacing: .05em;
 }
@@ -259,12 +259,56 @@
 
 .contact-card__statement h2 {
   max-width: 100%;
+  display: flex;
+  align-items: baseline;
   margin: 0;
-  font-size: clamp(4.75rem, 8vw, 8.25rem);
+  font-size: clamp(4.1rem, 6.6vw, 7.1rem);
   font-weight: 570;
   line-height: .76;
   letter-spacing: -.085em;
   white-space: nowrap;
+}
+
+.contact-card__title-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: .04em;
+  margin-left: .09em;
+  transform: translateY(-.02em);
+}
+
+.contact-card__title-dot {
+  width: .145em;
+  height: .145em;
+  display: block;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  transform-origin: center;
+  animation: contact-title-dot-dance 2.4s cubic-bezier(.45, 0, .2, 1) infinite;
+}
+
+.contact-card__title-dot--red {
+  background: #ff0109;
+  box-shadow: 0 0 .14em rgb(255 1 9 / 34%);
+}
+
+.contact-card__title-dot--blue {
+  background: #00b0f4;
+  box-shadow: 0 0 .14em rgb(0 176 244 / 30%);
+  animation-delay: .16s;
+}
+
+.contact-card__title-dot--green {
+  background: #38d430;
+  box-shadow: 0 0 .14em rgb(56 212 48 / 28%);
+  animation-delay: .32s;
+}
+
+@keyframes contact-title-dot-dance {
+  0%, 58%, 100% { transform: translateY(0) scale(1); }
+  18% { transform: translateY(-.18em) scale(1.16); }
+  34% { transform: translateY(.035em) scale(.92); }
+  46% { transform: translateY(-.045em) scale(1.03); }
 }
 
 .contact-card__details {
@@ -315,7 +359,7 @@
 }
 
 .contact-card__datum-label {
-  font-size: .56rem;
+  font-size: .78rem;
   font-weight: 750;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -335,13 +379,13 @@
 
 .contact-card__datum strong {
   max-width: 100%;
-  font-size: clamp(.82rem, 1.12vw, 1.08rem);
+  font-size: clamp(1rem, 1.32vw, 1.28rem);
   font-weight: 600;
   line-height: 1.3;
 }
 
 .contact-card__datum.is-whatsapp strong {
-  font-size: clamp(.68rem, .82vw, .82rem);
+  font-size: clamp(.84rem, 1vw, 1rem);
   line-height: 1.45;
 }
 
@@ -369,8 +413,8 @@
 }
 
 .contact-card__whatsapp-dialog {
-  width: min(24rem, 100%);
-  padding: clamp(.85rem, 2vw, 1.25rem);
+  width: min(30rem, 100%);
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
   border: 1px solid rgb(9 11 13 / 18%);
   border-radius: clamp(.85rem, 1.8vw, 1.2rem);
   background: rgb(250 248 243 / 96%);
@@ -383,7 +427,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: .75rem;
+  margin-bottom: 1rem;
 }
 
 .contact-card__whatsapp-header > div {
@@ -393,20 +437,20 @@
 
 .contact-card__whatsapp-header span {
   color: rgb(9 11 13 / 48%);
-  font-size: .52rem;
+  font-size: .713rem;
   font-weight: 750;
   letter-spacing: .14em;
   text-transform: uppercase;
 }
 
 .contact-card__whatsapp-header strong {
-  font-size: 1rem;
+  font-size: 1.35rem;
   line-height: 1.15;
 }
 
 .contact-card__whatsapp-header button {
-  width: 1.8rem;
-  height: 1.8rem;
+  width: 2.15rem;
+  height: 2.15rem;
   display: grid;
   flex: 0 0 auto;
   place-items: center;
@@ -431,16 +475,16 @@
 
 .contact-card__whatsapp-list {
   display: grid;
-  gap: .4rem;
+  gap: .55rem;
 }
 
 .contact-card__whatsapp-list a {
-  min-height: 3.15rem;
+  min-height: 3.8rem;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: .75rem;
-  padding: .45rem .65rem;
+  gap: .9rem;
+  padding: .6rem .8rem;
   border: 1px solid rgb(9 11 13 / 14%);
   border-radius: .75rem;
   color: #090b0d;
@@ -459,25 +503,25 @@
 }
 
 .contact-card__whatsapp-list a strong {
-  font-size: .78rem;
+  font-size: 1.05rem;
   line-height: 1.1;
 }
 
 .contact-card__whatsapp-list a small {
   color: rgb(9 11 13 / 52%);
-  font-size: .64rem;
+  font-size: .85rem;
   line-height: 1.1;
 }
 
 .contact-card__whatsapp-avatar {
-  width: 1.8rem;
-  height: 1.8rem;
+  width: 2.2rem;
+  height: 2.2rem;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: #25d366;
   color: #07160d;
-  font-size: .68rem;
+  font-size: .9rem;
   font-weight: 800;
 }
 
@@ -562,11 +606,11 @@
 }
 
 .contact-card__footer {
-  gap: 1rem;
-  padding-top: 1rem;
+  gap: 1.25rem;
+  padding-top: 1.25rem;
   border-top: 1px solid rgb(9 11 13 / 18%);
   color: rgb(9 11 13 / 44%);
-  font-size: .56rem;
+  font-size: clamp(.76rem, .9vw, .9rem);
   font-weight: 750;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -578,18 +622,18 @@
   align-items: center;
 }
 
-.contact-card__services { gap: clamp(1rem, 2.5vw, 2.5rem); }
+.contact-card__services { gap: clamp(1.25rem, 2.7vw, 2.75rem); }
 
 .contact-card__socials {
-  gap: .7rem;
+  gap: .85rem;
   margin-left: auto;
 }
 
-.contact-card__socials > span { margin-right: .2rem; }
+.contact-card__socials > span { margin-right: .3rem; }
 
 .contact-card__socials a {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.15rem;
+  height: 2.15rem;
   display: grid;
   place-items: center;
   border: 1px solid rgb(9 11 13 / 20%);
@@ -608,8 +652,8 @@
 .contact-card__socials a[aria-disabled='true'] { cursor: default; }
 
 .contact-card__socials svg {
-  width: 1rem;
-  height: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -618,8 +662,8 @@
 }
 
 .contact-card__socials img {
-  width: 1rem;
-  height: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
   display: block;
   transition: filter .25s ease;
 }
@@ -693,13 +737,13 @@
   }
 
   .contact-card__header > p {
-    font-size: clamp(.42rem, 1.4vw, .62rem);
+    font-size: clamp(.483rem, 1.61vw, .713rem);
   }
 
   .contact-card__statement > p { display: none; }
 
   .contact-card__statement h2 {
-    font-size: clamp(2.35rem, 10.5vw, 5.4rem);
+    font-size: clamp(2rem, 8.8vw, 4.55rem);
   }
 
   .contact-card__actions {
@@ -749,7 +793,7 @@
   }
 
   .contact-card__datum {
-    width: clamp(4.3rem, 11vw, 6.5rem);
+    width: clamp(5rem, 12.5vw, 7.4rem);
     min-width: 0;
     aspect-ratio: 2.1 / 1;
     box-sizing: content-box;
@@ -774,7 +818,7 @@
 
   .contact-card__datum-label {
     color: currentColor;
-    font-size: clamp(.42rem, 1vw, .55rem);
+    font-size: clamp(.58rem, 1.35vw, .75rem);
     line-height: 1;
     letter-spacing: .08em;
     white-space: nowrap;
@@ -817,33 +861,37 @@
   }
 
   .contact-card__footer {
-    gap: .65rem;
-    padding-top: clamp(.35rem, 1.2vw, .75rem);
-    font-size: .48rem;
+    gap: clamp(.45rem, 1.5vw, .85rem);
+    padding-top: clamp(.45rem, 1.4vw, .85rem);
+    font-size: clamp(.58rem, 1.4vw, .76rem);
   }
 
-  .contact-card__services { display: none; }
+  .contact-card__services {
+    display: flex;
+    gap: clamp(.55rem, 1.8vw, 1.1rem);
+  }
+
   .contact-card__socials {
-    width: 100%;
-    justify-content: flex-start;
-    gap: .2rem;
-    margin-left: 0;
+    width: auto;
+    justify-content: flex-end;
+    gap: clamp(.2rem, .7vw, .4rem);
+    margin-left: auto;
   }
   .contact-card__socials > span {
     display: inline;
     margin-right: clamp(.3rem, 1.2vw, .55rem);
   }
   .contact-card__socials a {
-    width: clamp(1.5rem, 4vw, 1.85rem);
-    height: clamp(1.5rem, 4vw, 1.85rem);
+    width: clamp(1.7rem, 4.5vw, 2.1rem);
+    height: clamp(1.7rem, 4.5vw, 2.1rem);
     border: 0;
     border-radius: 0;
     background: transparent;
   }
 
   .contact-card__socials img {
-    width: clamp(.85rem, 2.2vw, 1rem);
-    height: clamp(.85rem, 2.2vw, 1rem);
+    width: clamp(1rem, 2.7vw, 1.25rem);
+    height: clamp(1rem, 2.7vw, 1.25rem);
   }
 
   .contact-card__stage::before,
@@ -863,7 +911,7 @@
   }
 
   .contact-card__whatsapp-dialog {
-    width: min(28rem, 100%);
+    width: min(32rem, 100%);
     max-height: 100%;
     align-self: center;
     padding: clamp(.65rem, 2vw, 1rem);
@@ -877,11 +925,11 @@
   }
 
   .contact-card__whatsapp-header span {
-    font-size: clamp(.46rem, 1.25vw, .58rem);
+    font-size: clamp(.61rem, 1.65vw, .77rem);
   }
 
   .contact-card__whatsapp-header strong {
-    font-size: clamp(.78rem, 2.1vw, 1rem);
+    font-size: clamp(1.03rem, 2.78vw, 1.32rem);
   }
 
   .contact-card__whatsapp-header button {
@@ -899,24 +947,24 @@
   }
 
   .contact-card__whatsapp-list a {
-    min-height: clamp(2.75rem, 8vw, 3.75rem);
+    min-height: clamp(3.15rem, 9vw, 4.25rem);
     gap: clamp(.65rem, 1.8vw, .9rem);
     padding: clamp(.4rem, 1.2vw, .65rem) clamp(.55rem, 1.5vw, .8rem);
     border-radius: clamp(.6rem, 1.5vw, .85rem);
   }
 
   .contact-card__whatsapp-avatar {
-    width: clamp(1.7rem, 4.8vw, 2.25rem);
-    height: clamp(1.7rem, 4.8vw, 2.25rem);
-    font-size: clamp(.62rem, 1.8vw, .8rem);
+    width: clamp(1.95rem, 5.4vw, 2.55rem);
+    height: clamp(1.95rem, 5.4vw, 2.55rem);
+    font-size: clamp(.82rem, 2.35vw, 1.05rem);
   }
 
   .contact-card__whatsapp-list a strong {
-    font-size: clamp(.7rem, 1.9vw, .9rem);
+    font-size: clamp(.925rem, 2.5vw, 1.19rem);
   }
 
   .contact-card__whatsapp-list a small {
-    font-size: clamp(.58rem, 1.55vw, .72rem);
+    font-size: clamp(.767rem, 2.05vw, .952rem);
   }
 
   .contact-card__whatsapp-list > a > svg {
@@ -931,14 +979,14 @@
   }
 
   .contact-card__datum {
-    width: clamp(6rem, 14vw, 7rem);
+    width: clamp(6.5rem, 15vw, 8rem);
     gap: clamp(.38rem, .9vw, .55rem);
     padding: clamp(.25rem, .65vw, .4rem);
     border-radius: clamp(.65rem, 1.4vw, .9rem);
   }
 
   .contact-card__datum-label {
-    font-size: clamp(.5rem, 1.15vw, .64rem);
+    font-size: clamp(.69rem, 1.55vw, .85rem);
   }
 
   .contact-card__datum-icon {
@@ -950,6 +998,16 @@
 @media (max-width: 469px) {
   .contact-card__body {
     padding-bottom: clamp(.65rem, 3vw, .9rem);
+  }
+
+  .contact-card__services {
+    display: none;
+  }
+
+  .contact-card__socials {
+    width: 100%;
+    justify-content: flex-end;
+    margin-left: 0;
   }
 
   .contact-card__details {
@@ -1008,8 +1066,8 @@
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-dialog {
-    width: min(100%, 34rem);
-    max-height: min(82dvh, 42rem);
+    width: min(100%, 36rem);
+    max-height: min(86dvh, 46rem);
     align-self: end;
     padding: clamp(1rem, 4.5vw, 1.5rem);
     border-radius: clamp(1.25rem, 5vw, 1.75rem);
@@ -1022,11 +1080,11 @@
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-header span {
-    font-size: .62rem;
+    font-size: .82rem;
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-header strong {
-    font-size: clamp(1.05rem, 4.8vw, 1.35rem);
+    font-size: clamp(1.39rem, 6vw, 1.78rem);
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-header button {
@@ -1040,28 +1098,28 @@
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-list {
-    gap: .65rem;
+    gap: .75rem;
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-list a {
-    min-height: 4.5rem;
-    gap: .9rem;
-    padding: .7rem .9rem;
+    min-height: 5rem;
+    gap: 1rem;
+    padding: .8rem 1rem;
     border-radius: 1rem;
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-avatar {
-    width: 2.75rem;
-    height: 2.75rem;
-    font-size: 1rem;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.25rem;
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-list a strong {
-    font-size: 1rem;
+    font-size: 1.3rem;
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-list a small {
-    font-size: .8rem;
+    font-size: 1rem;
   }
 
   .contact-card__whatsapp-panel.is-viewport-sheet .contact-card__whatsapp-list > a > svg {
@@ -1083,7 +1141,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .contact-card__stage::before,
-  .contact-card__stage::after {
+  .contact-card__stage::after,
+  .contact-card__title-dot {
     animation: none;
   }
 

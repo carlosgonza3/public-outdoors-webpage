@@ -35,7 +35,7 @@
   padding: clamp(1.3rem, 2.5vw, 2.25rem) 0 1rem;
   border-bottom: 1px solid rgb(245 241 229 / 22%);
   color: rgb(245 241 229 / 62%);
-  font-size: clamp(.62rem, .75vw, .8rem);
+  font-size: clamp(.713rem, .863vw, .92rem);
   font-weight: 700;
   letter-spacing: .17em;
   text-transform: uppercase;
@@ -89,7 +89,7 @@
   max-width: 25rem;
   margin: clamp(1.75rem, 3vw, 3rem) 0 0;
   color: rgb(245 241 229 / 72%);
-  font-size: clamp(1rem, 1.35vw, 1.3rem);
+  font-size: clamp(1.15rem, 1.553vw, 1.495rem);
   font-weight: 580;
   line-height: 1.25;
 }
@@ -118,7 +118,7 @@
 .clients-intro p {
   margin: 0 0 1.5rem;
   color: rgb(245 241 229 / 54%);
-  font-size: .72rem;
+  font-size: .828rem;
   font-weight: 700;
   letter-spacing: .18em;
   text-transform: uppercase;

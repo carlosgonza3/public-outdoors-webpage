@@ -14,7 +14,7 @@
 .indoor-kicker {
   margin: 0;
   color: rgb(247 245 239 / 48%);
-  font-size: clamp(.62rem, .72vw, .76rem);
+  font-size: clamp(.713rem, .828vw, .874rem);
   font-weight: 700;
   letter-spacing: .18em;
   line-height: 1.4;
@@ -34,7 +34,7 @@
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--indoor-line);
   color: rgb(247 245 239 / 43%);
-  font-size: .64rem;
+  font-size: .736rem;
   font-weight: 700;
   letter-spacing: .18em;
   text-transform: uppercase;
@@ -88,7 +88,7 @@
   max-width: 23rem;
   margin: 1.65rem 0 0;
   color: var(--indoor-muted);
-  font-size: clamp(.95rem, 1.1vw, 1.16rem);
+  font-size: clamp(1.093rem, 1.265vw, 1.334rem);
   line-height: 1.55;
 }
 
@@ -123,7 +123,7 @@
   border-radius: 999px;
   background: rgb(5 8 7 / 34%);
   color: rgb(255 255 255 / 72%);
-  font-size: .62rem;
+  font-size: .713rem;
   font-weight: 700;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -172,7 +172,7 @@
 .indoor-strategy__body > p {
   margin: 0 0 clamp(2.5rem, 4vw, 4rem);
   color: var(--indoor-muted);
-  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  font-size: clamp(1.15rem, 1.495vw, 1.438rem);
   line-height: 1.58;
 }
 
@@ -226,7 +226,7 @@
 }
 
 .indoor-strategy__step-copy strong {
-  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+  font-size: clamp(1.208rem, 1.61vw, 1.553rem);
   font-weight: 480;
 }
 
@@ -235,7 +235,7 @@
   display: block;
   overflow: hidden;
   color: rgb(247 245 239 / 48%);
-  font-size: 0.95rem;
+  font-size: 1.093rem;
   line-height: 1.45;
   padding-top: 0.5rem;
   will-change: height, opacity, transform;
@@ -294,7 +294,7 @@
   color: rgb(247 245 239 / 38%);
   cursor: pointer;
   font: inherit;
-  font-size: clamp(.76rem, .95vw, .95rem);
+  font-size: clamp(.874rem, 1.093vw, 1.093rem);
   font-weight: 700;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -369,7 +369,7 @@
   border-radius: 999px;
   background: rgb(5 8 7 / 32%);
   color: rgb(255 255 255 / 72%);
-  font-size: .6rem;
+  font-size: .69rem;
   font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
@@ -384,7 +384,7 @@
 
 .indoor-formats__copy > span {
   color: rgb(247 245 239 / 34%);
-  font-size: .64rem;
+  font-size: .736rem;
   font-weight: 700;
   letter-spacing: .18em;
 }
@@ -406,7 +406,7 @@
 .indoor-formats__copy-layer p {
   margin: 0;
   color: var(--indoor-muted);
-  font-size: clamp(.95rem, 1.15vw, 1.15rem);
+  font-size: clamp(1.093rem, 1.323vw, 1.323rem);
   line-height: 1.58;
 }
 
@@ -420,7 +420,7 @@
   padding-block: .78rem;
   border-top: 1px solid var(--indoor-line);
   color: rgb(247 245 239 / 68%);
-  font-size: .72rem;
+  font-size: .828rem;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -454,7 +454,7 @@
   color: #f7f5ef;
   cursor: pointer;
   font: inherit;
-  font-size: clamp(.76rem, .95vw, .95rem);
+  font-size: clamp(.874rem, 1.093vw, 1.093rem);
   font-weight: 700;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -542,7 +542,7 @@
     padding: 3.25rem 0 0;
   }
 
-  .indoor-hero__eyebrow { font-size: .56rem; }
+  .indoor-hero__eyebrow { font-size: .644rem; }
   .indoor-hero__heading { padding-block: 3.2rem 2.25rem; }
 
   .indoor-hero h1 {
@@ -580,7 +580,7 @@
     width: fit-content;
     max-width: calc(100% - 1.8rem);
     padding: .6rem .7rem;
-    font-size: .51rem;
+    font-size: .587rem;
   }
 
   .indoor-strategy__sticky,
@@ -635,7 +635,7 @@
       gap: .25rem;
   }
 
-  .indoor-strategy__step-copy small { font-size: .72rem; }
+  .indoor-strategy__step-copy small { font-size: .828rem; }
 
   .indoor-formats { padding-block: 0; }
 

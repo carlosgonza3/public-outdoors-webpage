@@ -17,39 +17,13 @@ export interface Project {
 }
 
 export interface ProjectCollection {
-  id: 'indoor' | 'outdoor' | 'innovations'
+  id: 'indoor' | 'outdoor' | 'innovaciones'
   label: string
   description: string
   projects: Project[]
 }
 
 export const projectCollections: ProjectCollection[] = [
-  {
-    id: 'indoor',
-    label: 'INDOOR',
-    description:
-      'Presencia estratégica en espacios donde las personas esperan, compran y se conectan.',
-    projects: [
-      {
-        id: '01',
-        title: 'LED Ramblas',
-        image: indoorOne,
-        alt: 'Pantalla publicitaria digital dentro de un centro comercial',
-      },
-      {
-        id: '02',
-        title: 'Cilindro Digital Ramblas',
-        image: indoorTwo,
-        alt: 'Cilindro publicitario digital en un centro comercial',
-      },
-      {
-        id: '03',
-        title: 'Cilindro Fijo Ramblas',
-        image: indoorThree,
-        alt: 'Publicidad indoor de Public Outdoors en un centro comercial',
-      },
-    ],
-  },
   {
     id: 'outdoor',
     label: 'OUTDOOR',
@@ -77,14 +51,40 @@ export const projectCollections: ProjectCollection[] = [
     ],
   },
   {
-    id: 'innovations',
-    label: 'INNOVATIONS',
+    id: 'indoor',
+    label: 'INDOOR',
+    description:
+      'Presencia estratégica en espacios donde las personas esperan, compran y se conectan.',
+    projects: [
+      {
+        id: '01',
+        title: 'LED Ramblas',
+        image: indoorOne,
+        alt: 'Pantalla publicitaria digital dentro de un centro comercial',
+      },
+      {
+        id: '02',
+        title: 'Cilindro Digital Ramblas',
+        image: indoorTwo,
+        alt: 'Cilindro publicitario digital en un centro comercial',
+      },
+      {
+        id: '03',
+        title: 'Cilindro Fijo Ramblas',
+        image: indoorThree,
+        alt: 'Publicidad indoor de Public Outdoors en un centro comercial',
+      },
+    ],
+  },
+  {
+    id: 'innovaciones',
+    label: 'INNOVACIONES',
     description:
       'Experiencias fuera de lo común que transforman ideas audaces en conexiones memorables.',
     projects: [
       {
         id: '07',
-        title: 'Innovations 01',
+        title: 'Innovaciones 01',
         image: innovationsOne,
         alt: 'Instalación publicitaria innovadora de Burger King',
       },

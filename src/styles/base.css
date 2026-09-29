@@ -154,7 +154,7 @@ main {
   background: transparent;
   color: var(--site-nav-ink);
   font: inherit;
-  font-size: clamp(.68rem, .75vw, .78rem);
+  font-size: clamp(.782rem, .863vw, .897rem);
   font-weight: 700;
   letter-spacing: .115em;
   line-height: 1;
@@ -248,7 +248,7 @@ main {
   padding: .78rem .85rem;
   border-radius: .65rem;
   color: rgb(247 245 239 / 68%);
-  font-size: .66rem;
+  font-size: .759rem;
   font-weight: 700;
   letter-spacing: .13em;
   text-decoration: none;

@@ -12,14 +12,14 @@ type SiteNavigationProps = {
   onContact: () => void
   onMedia: (
     event: React.MouseEvent<HTMLAnchorElement>,
-    collectionId: 'indoor' | 'outdoor' | 'innovations',
+    collectionId: 'indoor' | 'outdoor' | 'innovaciones',
   ) => void
 }
 
 const mediaLinks = [
-  { id: 'indoor', label: 'Indoor' },
   { id: 'outdoor', label: 'Outdoor' },
-  { id: 'innovations', label: 'Innovations' },
+  { id: 'indoor', label: 'Indoor' },
+  { id: 'innovaciones', label: 'Innovaciones' },
 ] as const
 
 export function SiteNavigation({

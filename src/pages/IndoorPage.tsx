@@ -63,7 +63,7 @@ const processSteps = [
   {
     title: 'Proofing, aprobación y ajustes finales',
     description:
-      'PUBLIC te enviará la propuesta visual, los espacios y la oferta comercial. Tras tu aprobación y los ajustes finales, programaremos la pauta en los medios establecidos según los tiempos definidos en el briefing.',
+      'PUBLIC te enviará la propuesta visual y comercial. Tras tu aprobación, programaremos la pauta según el briefing.',
     icon: 'approval',
   },
 ] as const

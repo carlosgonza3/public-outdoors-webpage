@@ -118,7 +118,7 @@ Leave the analytics token empty if analytics is not ready at launch.
 | `/` | Main scroll-driven presentation | Indexable in production |
 | `/indoor/` | Indoor media collection | Indexable in production |
 | `/outdoor/` | Outdoor media collection | Indexable in production |
-| `/innovations/` | Innovation media collection | Indexable in production |
+| `/innovaciones/` | Colección de medios de innovación | Indexable in production |
 | `/disponibilidad/` | Phase 1 availability placeholder | Always `noindex`; omitted from sitemap |
 
 Collection routes can open as full pages or as modal-style routes over the home

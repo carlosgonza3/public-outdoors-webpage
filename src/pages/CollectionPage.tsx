@@ -7,7 +7,7 @@ import { isMobileExperience } from '../animation/mobile'
 
 interface CollectionPageProps {
   children: ReactNode
-  collectionId: 'indoor' | 'outdoor' | 'innovations'
+  collectionId: 'indoor' | 'outdoor' | 'innovaciones'
   label: string
   modal?: boolean
 }

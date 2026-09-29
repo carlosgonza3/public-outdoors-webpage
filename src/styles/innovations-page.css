@@ -1,4 +1,4 @@
-.collection-page--innovations {
+.collection-page--innovaciones {
   background:
     radial-gradient(circle at 86% 8%, rgb(255 1 9 / 9%), transparent 29rem),
     radial-gradient(circle at 12% 72%, rgb(0 176 244 / 7%), transparent 34rem),
@@ -49,7 +49,7 @@
 .innovations-hero__statement > span {
   display: block;
   color: rgb(247 245 239 / 46%);
-  font-size: .66rem;
+  font-size: .759rem;
   font-weight: 720;
   letter-spacing: .17em;
   text-transform: uppercase;
@@ -67,7 +67,7 @@
   max-width: 38rem;
   margin: 0;
   color: var(--innovations-muted);
-  font-size: clamp(1rem, 1.35vw, 1.3rem);
+  font-size: clamp(1.15rem, 1.553vw, 1.495rem);
   line-height: 1.6;
 }
 
@@ -102,7 +102,7 @@
   border-radius: 999px;
   background: rgb(5 8 7 / 46%);
   color: rgb(255 255 255 / 86%);
-  font-size: .58rem;
+  font-size: .667rem;
   font-weight: 700;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -135,7 +135,7 @@
   max-width: 38rem;
   margin: clamp(1.5rem, 2.5vw, 2.5rem) 0 0;
   color: var(--innovations-muted);
-  font-size: clamp(.95rem, 1.1vw, 1.08rem);
+  font-size: clamp(1.093rem, 1.265vw, 1.242rem);
   line-height: 1.6;
 }
 
@@ -170,7 +170,7 @@
 .innovations-idea__label-row > span {
   flex: 0 0 auto;
   color: rgb(247 245 239 / 38%);
-  font-size: .62rem;
+  font-size: .713rem;
   font-weight: 700;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -211,7 +211,7 @@
 .innovations-idea__error {
   margin: .75rem 0 0;
   color: #ff777b;
-  font-size: .78rem;
+  font-size: .897rem;
 }
 
 .innovations-idea__actions {
@@ -238,7 +238,7 @@
   border-radius: 999px;
   background: #f7f5ef;
   color: #090b0a;
-  font-size: .7rem;
+  font-size: .805rem;
   font-weight: 760;
   letter-spacing: .13em;
   text-transform: uppercase;
@@ -248,7 +248,7 @@
 .innovations-idea__contact {
   padding: .75rem 0;
   border-bottom: 1px solid rgb(247 245 239 / 34%);
-  font-size: .68rem;
+  font-size: .782rem;
   font-weight: 720;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -297,7 +297,7 @@
 }
 
 @media (max-width: 700px) {
-  .collection-page--innovations {
+  .collection-page--innovaciones {
     padding-inline: 1rem;
   }
 
@@ -320,7 +320,7 @@
   .innovations-hero__intro > p {
     max-width: 22rem;
     margin: 1.5rem 0 0;
-    font-size: .96rem;
+    font-size: 1.104rem;
   }
 
   .innovations-hero__statement {
@@ -335,7 +335,7 @@
 
   .innovations-hero__statement p {
     max-width: 24rem;
-    font-size: .96rem;
+    font-size: 1.104rem;
     line-height: 1.55;
   }
 
@@ -368,7 +368,7 @@
 
   .innovations-proof__message p {
     margin-top: 1.25rem;
-    font-size: .95rem;
+    font-size: 1.093rem;
     line-height: 1.55;
   }
 
@@ -400,12 +400,12 @@
 
   .innovations-idea__submit {
     padding: .8rem .9rem;
-    font-size: .65rem;
+    font-size: .748rem;
     white-space: nowrap;
   }
 
   .innovations-idea__contact {
-    font-size: .62rem;
+    font-size: .713rem;
     white-space: nowrap;
   }
 }
@@ -426,7 +426,7 @@
 
   .innovations-idea__submit,
   .innovations-idea__contact {
-    font-size: .58rem;
+    font-size: .667rem;
     letter-spacing: .08em;
   }
 }

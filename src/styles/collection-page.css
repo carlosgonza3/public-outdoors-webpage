@@ -89,7 +89,7 @@
     #0b0d0c;
 }
 
-.collection-page--innovations {
+.collection-page--innovaciones {
   background:
     radial-gradient(circle at 18% 2%, rgb(56 212 48 / 10%), transparent 30rem),
     radial-gradient(circle at 90% 36%, rgb(0 176 244 / 10%), transparent 36rem),
@@ -119,7 +119,7 @@
   cursor: pointer;
   backdrop-filter: blur(12px);
   font-family: inherit;
-  font-size: .72rem;
+  font-size: .828rem;
   font-weight: 700;
   letter-spacing: .14em;
   text-decoration: none;
@@ -161,7 +161,7 @@
   max-width: 20rem;
   margin: 0 0 .7rem;
   color: rgb(247 245 239 / 58%);
-  font-size: clamp(1rem, 1.35vw, 1.25rem);
+  font-size: clamp(1.15rem, 1.553vw, 1.438rem);
   line-height: 1.5;
 }
 
@@ -176,7 +176,7 @@
   text-align: right;
 }
 
-.collection-page--innovations .collection-page__intro h1 {
+.collection-page--innovaciones .collection-page__intro h1 {
   font-size: clamp(5.6rem, 12.6vw, 13.4rem);
 }
 
@@ -212,11 +212,11 @@
   grid-column: 2 / span 9;
 }
 
-.collection-page--innovations .collection-page__project:only-child {
+.collection-page--innovaciones .collection-page__project:only-child {
   grid-column: 1 / -1;
 }
 
-.collection-page--innovations
+.collection-page--innovaciones
   .collection-page__project:only-child
   .collection-page__visual {
   height: auto;
@@ -286,7 +286,7 @@
 
 .collection-page__project-meta > span {
   color: rgb(247 245 239 / 38%);
-  font-size: .68rem;
+  font-size: .782rem;
   font-weight: 700;
   letter-spacing: .16em;
 }

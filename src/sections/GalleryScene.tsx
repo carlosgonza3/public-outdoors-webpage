@@ -29,7 +29,7 @@ export function GalleryScene() {
   >({
     indoor: 0,
     outdoor: 0,
-    innovations: 0,
+    innovaciones: 0,
   })
   const [railRevision, setRailRevision] = useState(0)
   const location = useLocation()
@@ -136,7 +136,7 @@ export function GalleryScene() {
             ease: 'power3.out',
           }, 0.16)
 
-        const [indoorSignal, outdoorSignal, innovationsSignal] = headingSignals
+        const [outdoorSignal, indoorSignal, innovacionesSignal] = headingSignals
         const ambient = galleryAmbient.current
         const ambientOrb = ambient?.querySelector<HTMLElement>(
           '.gallery-ambient__orb',
@@ -148,7 +148,7 @@ export function GalleryScene() {
           window.matchMedia('(hover: hover) and (pointer: fine)').matches,
         )
 
-        if (indoorSignal && outdoorSignal && innovationsSignal) {
+        if (indoorSignal && outdoorSignal && innovacionesSignal) {
           const pauseTyping = () => typingTimeline.pause()
           const resumeTyping = () => typingTimeline.restart()
 
@@ -170,14 +170,14 @@ export function GalleryScene() {
             const cursorX = () => pointerPosition.x
             const cursorY = () => pointerPosition.y
             const cursorScale = () =>
-              ambientOrb.offsetWidth / indoorSignal.offsetWidth
+              ambientOrb.offsetWidth / outdoorSignal.offsetWidth
 
-            const indoorTravelX = () => {
-              const bounds = indoorSignal.getBoundingClientRect()
+            const outdoorTravelX = () => {
+              const bounds = outdoorSignal.getBoundingClientRect()
               return cursorX() - (bounds.left + bounds.width / 2)
             }
-            const indoorTravelY = () => {
-              const bounds = indoorSignal.getBoundingClientRect()
+            const outdoorTravelY = () => {
+              const bounds = outdoorSignal.getBoundingClientRect()
               const documentCenter =
                 bounds.top + window.scrollY + bounds.height / 2
               const endScroll =
@@ -213,7 +213,7 @@ export function GalleryScene() {
                 scaleY: 1,
                 color: '#ff0109',
               }, 0)
-              .fromTo(outdoorSignal, {
+              .fromTo(indoorSignal, {
                 x: 0,
                 y: 0,
                 scale: 0.74,
@@ -227,7 +227,7 @@ export function GalleryScene() {
                 ease: 'power3.in',
                 immediateRender: false,
               }, 0.04)
-              .fromTo(innovationsSignal, {
+              .fromTo(innovacionesSignal, {
                 x: 0,
                 y: 0,
                 scale: 0.74,
@@ -241,14 +241,14 @@ export function GalleryScene() {
                 ease: 'power3.in',
                 immediateRender: false,
               }, 0.08)
-              .fromTo(indoorSignal, {
+              .fromTo(outdoorSignal, {
                 x: 0,
                 y: 0,
                 scale: 0.74,
                 autoAlpha: 0.42,
               }, {
-                x: indoorTravelX,
-                y: indoorTravelY,
+                x: outdoorTravelX,
+                y: outdoorTravelY,
                 scale: cursorScale,
                 autoAlpha: 0,
                 duration: 0.82,
@@ -292,7 +292,7 @@ export function GalleryScene() {
             }
 
             touchExitTimeline
-              .fromTo(indoorSignal, {
+              .fromTo(outdoorSignal, {
                 x: 0,
                 y: 0,
                 scale: 0.74,
@@ -306,7 +306,7 @@ export function GalleryScene() {
                 ease: 'power3.in',
                 immediateRender: false,
               }, 0)
-              .fromTo(outdoorSignal, {
+              .fromTo(indoorSignal, {
                 x: 0,
                 y: 0,
                 scale: 0.74,
@@ -319,7 +319,7 @@ export function GalleryScene() {
                 ease: 'power3.in',
                 immediateRender: false,
               }, 0.04)
-              .fromTo(innovationsSignal, {
+              .fromTo(innovacionesSignal, {
                 x: 0,
                 y: 0,
                 scale: 0.74,
@@ -356,7 +356,7 @@ export function GalleryScene() {
           '.collection-carousel__pagination',
         )
         const collectionId = collection.dataset.sceneId
-        const isInnovations = collectionId === 'innovations'
+        const isInnovations = collectionId === 'innovaciones'
         const horizontalDirection = collectionId === 'indoor'
           ? -1
           : collectionId === 'outdoor'
@@ -647,7 +647,7 @@ export function GalleryScene() {
           .trim()
         collectionScale = collection.classList.contains('collection--outdoor')
           ? 1.03
-          : collection.classList.contains('collection--innovations')
+          : collection.classList.contains('collection--innovaciones')
             ? 0.97
             : 1
         const initialScale = matrixScaleAt(event.clientX, event.clientY)
@@ -998,7 +998,7 @@ export function GalleryScene() {
           </svg>
         </Link>
 
-        {collection.id !== 'innovations' && (
+        {collection.id !== 'innovaciones' && (
           <Link
             className="collection-heading__availability"
             to="/disponibilidad"
@@ -1088,7 +1088,7 @@ export function GalleryScene() {
         </div>
 
         <div className="grid-heading__bottom">
-          <p>Indoor · Outdoor · Innovations</p>
+          <p>Outdoor · Indoor · Innovaciones</p>
           <span>Desliza y explora nuestros medios</span>
         </div>
       </header>

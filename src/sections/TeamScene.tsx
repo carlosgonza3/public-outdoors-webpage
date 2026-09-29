@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, useGSAP } from '../animation/gsap'
 import { setPageTone } from '../animation/pageTone'
-import zaydaPortrait from '../assets/images/1-zaida.JPG'
-import erikaPortrait from '../assets/images/erika-2.JPG'
-import irisPortrait from '../assets/images/iris-1.JPG'
-import rosemaryPortrait from '../assets/images/rosmery-1.JPG'
+import zaydaPortrait from '../assets/images/1-zaida.webp'
+import erikaPortrait from '../assets/images/erika-2.webp'
+import irisPortrait from '../assets/images/iris-1.webp'
+import rosemaryPortrait from '../assets/images/rosmery-1.webp'
 import { SectionAmbient } from '../components/SectionAmbient'
 
 type TeamSceneProps = {
@@ -29,7 +29,7 @@ type TeamMember = {
 const teamMembers = [
   {
     name: 'Zayda Reyes',
-    role: 'Ejecutiva de Ventas',
+    role: 'Especialista en Medios',
     description:
       'Soy una profesional de ventas con más de 12 años de experiencia en comercialización y\n' +
         'desarrollo de negocios. Me apasiona conectar con las personas, construir relaciones de\n' +
@@ -40,7 +40,7 @@ const teamMembers = [
   },
   {
     name: 'Iris Quinteros',
-    role: ' Ejecutiva de Ventas',
+    role: ' Especialista en Medios',
     description:
       'Soy creativa y amante de la publicidad. Me gusta construir relaciones cercanas y de\n' +
         'confianza con cada cliente para alcanzar juntos objetivos alineados con la estrategia de su\n' +
@@ -50,7 +50,7 @@ const teamMembers = [
   },
   {
     name: 'Rosemary Daboub',
-    role: ' Ejecutiva de Ventas',
+    role: ' Especialista en Medios',
     description:
       'Tengo 13 años en PUBLIC y me enorgullece ser parte de esta familia. Me especializo en\n' +
         'ventas directas y estoy aquí para ayudarte a encontrar el espacio ideal para elevar tu\n' +
@@ -114,7 +114,7 @@ function PlaceholderPortrait({ accent, variant }: PortraitProps) {
         <path d="M334 505c20 15 43 15 64 0" fill="none" stroke="#8e5141" strokeWidth="8" strokeLinecap="round" />
       </g>
       <path d="M36 52h150M36 52v150" fill="none" stroke="#f7f5ef" strokeWidth="3" opacity=".72" />
-      <text x="42" y="842" fill="#f7f5ef" fontSize="18" fontWeight="700" letterSpacing="4">RETRATO PENDIENTE</text>
+      <text x="42" y="842" fill="#f7f5ef" fontSize="20.7" fontWeight="700" letterSpacing="4">RETRATO PENDIENTE</text>
     </svg>
   )
 }

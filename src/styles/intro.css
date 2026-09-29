@@ -88,6 +88,13 @@
   will-change: auto;
 }
 
+/* The intro field rotates and pans beyond the viewport. Let its gradients
+   bleed beyond this intermediate layer so its diagonal edge never becomes
+   visible; the intro section still provides the final viewport clipping. */
+.intro .ambient-field {
+  overflow: visible;
+}
+
 .purpose-glow {
   position: absolute;
   display: block;
@@ -250,7 +257,7 @@
 
 .eyebrow {
   margin: 0 0 ;
-  font-size: .72rem;
+  font-size: .828rem;
   font-weight: 700;
   letter-spacing: .12em;
   font-weight: normal;
@@ -290,7 +297,7 @@
 .reveal-content p {
   max-width: 34rem;
   margin-top: 2rem;
-  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-size: clamp(1.15rem, 1.725vw, 1.438rem);
   line-height: 1.5;
 }
 
@@ -333,7 +340,7 @@
   justify-items: center;
   gap: .55rem;
   transform: translateX(-50%);
-  font-size: clamp(.62rem, .72vw, .72rem);
+  font-size: clamp(.713rem, .828vw, .828rem);
   font-weight: 700;
   color: #07080b;
   letter-spacing: .18em;

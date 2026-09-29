@@ -958,7 +958,14 @@ export function ContactCard({
               alt="Public"
             />
             <p>Hagamos visible tu próxima idea.</p>
-            <h2 id={titleId}>Hablemos.</h2>
+            <h2 id={titleId}>
+              <span>Hablemos</span>
+              <span className="contact-card__title-dots" aria-hidden="true">
+                <i className="contact-card__title-dot contact-card__title-dot--red" />
+                <i className="contact-card__title-dot contact-card__title-dot--blue" />
+                <i className="contact-card__title-dot contact-card__title-dot--green" />
+              </span>
+            </h2>
           </div>
 
           <div className="contact-card__details">
@@ -1013,9 +1020,9 @@ export function ContactCard({
 
         <footer className="contact-card__footer contact-card__reveal">
           <div className="contact-card__services" aria-hidden="true">
-            <span>Indoor</span>
             <span>Outdoor</span>
-            <span>Innovations</span>
+            <span>Indoor</span>
+            <span>Innovaciones</span>
           </div>
 
           <nav className="contact-card__socials" aria-label="Redes sociales">

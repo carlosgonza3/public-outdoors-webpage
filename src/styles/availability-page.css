@@ -55,7 +55,7 @@
   border-radius: 999px;
   background: rgb(7 8 11 / 46%);
   color: rgb(247 245 239 / 72%);
-  font-size: .68rem;
+  font-size: .782rem;
   font-family: inherit;
   font-weight: 700;
   letter-spacing: .14em;
@@ -98,7 +98,7 @@
   gap: .65rem;
   margin: 0 0 clamp(1rem, 2vw, 1.5rem);
   color: rgb(247 245 239 / 58%);
-  font-size: clamp(.62rem, .8vw, .75rem);
+  font-size: clamp(.713rem, .92vw, .863rem);
   font-weight: 700;
   letter-spacing: .2em;
   text-transform: uppercase;
@@ -124,7 +124,7 @@
   max-width: 32rem;
   margin: clamp(1.65rem, 3vw, 2.5rem) 0 0;
   color: rgb(247 245 239 / 58%);
-  font-size: clamp(.95rem, 1.35vw, 1.2rem);
+  font-size: clamp(1.093rem, 1.553vw, 1.38rem);
   line-height: 1.55;
 }
 
@@ -138,7 +138,7 @@
   padding-top: 1rem;
   border-top: 1px solid rgb(247 245 239 / 12%);
   color: rgb(247 245 239 / 34%);
-  font-size: .58rem;
+  font-size: .667rem;
   font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;

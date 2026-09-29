@@ -17,9 +17,14 @@ export const pages: Record<string, PageMetadata> = {
     title: 'Publicidad exterior en El Salvador | PUBLIC',
     description: 'Conoce los medios outdoor de PUBLIC: vallas, pantallas digitales y publicidad de gran formato en puntos estratégicos de El Salvador.',
   },
-  '/innovations': {
+  '/innovaciones': {
     title: 'Innovación publicitaria en El Salvador | PUBLIC',
     description: 'Explora propuestas de PUBLIC que combinan creatividad, tecnología y nuevos formatos para transformar la presencia de tu marca en El Salvador.',
+  },
+  '/innovations': {
+    title: 'Innovaciones | PUBLIC',
+    description: 'Esta página ahora está disponible en la ruta /innovaciones.',
+    noindex: true,
   },
   '/disponibilidad': {
     title: 'Disponibilidad de espacios publicitarios | PUBLIC',
