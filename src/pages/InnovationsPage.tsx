@@ -116,7 +116,7 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
   }, [modal])
 
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const strip = showcaseStrip.current
       const track = strip?.querySelector<HTMLElement>(
         '.innovations-showcase-strip__track',
@@ -135,7 +135,8 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
         },
       )
       const playback = { rate: 1 }
-      const easeToStop = () => {
+      let keyboardInteraction = false
+      const easeToStop = contextSafe!(() => {
         gsap.to(playback, {
           rate: 0,
           duration: 0.7,
@@ -143,8 +144,8 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
           overwrite: true,
           onUpdate: () => loop.timeScale(playback.rate),
         })
-      }
-      const easeToMotion = () => {
+      })
+      const easeToMotion = contextSafe!(() => {
         loop.play()
         gsap.to(playback, {
           rate: 1,
@@ -153,6 +154,15 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
           overwrite: true,
           onUpdate: () => loop.timeScale(playback.rate),
         })
+      })
+      const markKeyboardInteraction = () => {
+        keyboardInteraction = true
+      }
+      const markPointerInteraction = () => {
+        keyboardInteraction = false
+      }
+      const pauseForKeyboardFocus = () => {
+        if (keyboardInteraction) easeToStop()
       }
       const resumeAfterFocus = (event: FocusEvent) => {
         if (!strip.contains(event.relatedTarget as Node | null)) easeToMotion()
@@ -161,16 +171,20 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
         loop.paused(!entry.isIntersecting)
       })
 
+      document.addEventListener('keydown', markKeyboardInteraction, true)
+      document.addEventListener('pointerdown', markPointerInteraction, true)
       strip.addEventListener('pointerenter', easeToStop)
       strip.addEventListener('pointerleave', easeToMotion)
-      strip.addEventListener('focusin', easeToStop)
+      strip.addEventListener('focusin', pauseForKeyboardFocus)
       strip.addEventListener('focusout', resumeAfterFocus)
       visibilityObserver.observe(strip)
       return () => {
         visibilityObserver.disconnect()
+        document.removeEventListener('keydown', markKeyboardInteraction, true)
+        document.removeEventListener('pointerdown', markPointerInteraction, true)
         strip.removeEventListener('pointerenter', easeToStop)
         strip.removeEventListener('pointerleave', easeToMotion)
-        strip.removeEventListener('focusin', easeToStop)
+        strip.removeEventListener('focusin', pauseForKeyboardFocus)
         strip.removeEventListener('focusout', resumeAfterFocus)
       }
     },
