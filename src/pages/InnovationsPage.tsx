@@ -3,6 +3,7 @@ import { CollectionPage } from './CollectionPage'
 import { ContactCard } from '../components/ContactCard'
 import { LightboxImage } from '../components/ImageLightbox'
 import { projectCollections } from '../data/projects'
+import { innovationShowcaseImages } from '../data/innovationShowcase'
 import { prefersReducedMotion } from '../animation/motion'
 import { gsap, useGSAP } from '../animation/gsap'
 
@@ -28,6 +29,7 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
   const [recommendationText, setRecommendationText] = useState('')
   const [ideaFocused, setIdeaFocused] = useState(false)
   const ideaForm = useRef<HTMLFormElement>(null)
+  const showcaseStrip = useRef<HTMLElement>(null)
   const recommendationTimeline = useRef<gsap.core.Timeline | null>(null)
   const project = innovationsCollection.projects[0]
 
@@ -78,6 +80,102 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
   useEffect(() => {
     recommendationTimeline.current?.paused(ideaFocused)
   }, [ideaFocused])
+
+  useEffect(() => {
+    if (window.location.hash !== '#imagina-tu-marca') return
+
+    const frame = window.requestAnimationFrame(() => {
+      const target = document.getElementById('imagina-tu-marca')
+      if (!target) return
+
+      const behavior = prefersReducedMotion() ? 'auto' : 'smooth'
+
+      if (modal) {
+        const panel = target.closest<HTMLElement>('.route-modal__panel')
+        if (!panel) return
+
+        let targetTop = 0
+        let current: HTMLElement | null = target
+
+        while (current && current !== panel) {
+          targetTop += current.offsetTop
+          current = current.offsetParent as HTMLElement | null
+        }
+
+        panel.scrollTo({
+          top: Math.max(0, targetTop - 24),
+          behavior,
+        })
+        return
+      }
+
+      target.scrollIntoView({ behavior, block: 'start' })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [modal])
+
+  useGSAP(
+    () => {
+      const strip = showcaseStrip.current
+      const track = strip?.querySelector<HTMLElement>(
+        '.innovations-showcase-strip__track',
+      )
+      if (!strip || !track || prefersReducedMotion()) return
+
+      const loop = gsap.fromTo(
+        track,
+        { xPercent: -50 },
+        {
+          xPercent: 0,
+          duration: 34,
+          ease: 'none',
+          repeat: -1,
+          force3D: true,
+        },
+      )
+      const playback = { rate: 1 }
+      const easeToStop = () => {
+        gsap.to(playback, {
+          rate: 0,
+          duration: 0.7,
+          ease: 'power2.out',
+          overwrite: true,
+          onUpdate: () => loop.timeScale(playback.rate),
+        })
+      }
+      const easeToMotion = () => {
+        loop.play()
+        gsap.to(playback, {
+          rate: 1,
+          duration: 0.9,
+          ease: 'power2.inOut',
+          overwrite: true,
+          onUpdate: () => loop.timeScale(playback.rate),
+        })
+      }
+      const resumeAfterFocus = (event: FocusEvent) => {
+        if (!strip.contains(event.relatedTarget as Node | null)) easeToMotion()
+      }
+      const visibilityObserver = new IntersectionObserver(([entry]) => {
+        loop.paused(!entry.isIntersecting)
+      })
+
+      strip.addEventListener('pointerenter', easeToStop)
+      strip.addEventListener('pointerleave', easeToMotion)
+      strip.addEventListener('focusin', easeToStop)
+      strip.addEventListener('focusout', resumeAfterFocus)
+      visibilityObserver.observe(strip)
+      return () => {
+        visibilityObserver.disconnect()
+        strip.removeEventListener('pointerenter', easeToStop)
+        strip.removeEventListener('pointerleave', easeToMotion)
+        strip.removeEventListener('focusin', easeToStop)
+        strip.removeEventListener('focusout', resumeAfterFocus)
+      }
+    },
+    { scope: showcaseStrip },
+  )
 
   const prepareIdeaEmail = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -145,6 +243,50 @@ export function InnovationsPage({ modal = false }: InnovationsPageProps) {
                 decoding="async"
               />
             </div>
+
+            <div
+              className="innovations-showcase-strip__intro"
+              id="imagina-tu-marca"
+            >
+              <p>Ideas que ya hicimos realidad</p>
+              <h2 id="innovaciones-showcase-title">
+                Imagina tu marca aquí.
+              </h2>
+            </div>
+
+            <section
+              className="innovations-showcase-strip"
+              aria-labelledby="innovaciones-showcase-title"
+              ref={showcaseStrip}
+            >
+              <div className="innovations-showcase-strip__track">
+                {[0, 1].map((groupIndex) => (
+                  <div
+                    className="innovations-showcase-strip__group"
+                    aria-hidden={groupIndex === 1 || undefined}
+                    key={groupIndex}
+                  >
+                    {innovationShowcaseImages.map((image, index) => (
+                      <figure
+                        className={`innovations-showcase-strip__tile is-tile-${index + 1}`}
+                        key={image.src}
+                      >
+                        <LightboxImage
+                          src={image.src}
+                          alt={groupIndex === 0 ? image.alt : ''}
+                          caption="Innovaciones · Imagina tu marca aquí"
+                          triggerAriaHidden={groupIndex === 1 || undefined}
+                          triggerClassName="innovations-showcase-strip__expand"
+                          triggerTabIndex={groupIndex === 1 ? -1 : undefined}
+                          loading="eager"
+                          decoding="async"
+                        />
+                      </figure>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </section>
 
             <div className="innovations-proof__caption">
               <div className="innovations-proof__message">

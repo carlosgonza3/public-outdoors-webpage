@@ -30,7 +30,9 @@ interface LightboxImageProps
   alt: string
   caption?: string
   src: string
+  triggerAriaHidden?: boolean
   triggerClassName?: string
+  triggerTabIndex?: number
 }
 
 const ImageLightboxContext = createContext<ImageLightboxContextValue | null>(
@@ -126,7 +128,9 @@ export function LightboxImage({
   alt,
   caption,
   src,
+  triggerAriaHidden,
   triggerClassName = '',
+  triggerTabIndex,
   ...imageProps
 }: LightboxImageProps) {
   const lightbox = useContext(ImageLightboxContext)
@@ -139,7 +143,9 @@ export function LightboxImage({
     <button
       className={`image-lightbox-trigger ${triggerClassName}`.trim()}
       type="button"
+      aria-hidden={triggerAriaHidden}
       aria-label={`Ampliar ${caption ?? alt}`}
+      tabIndex={triggerTabIndex}
       onClick={(event) =>
         lightbox.openImage({ alt, caption, src }, event.currentTarget)
       }

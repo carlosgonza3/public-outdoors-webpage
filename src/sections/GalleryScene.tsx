@@ -731,7 +731,7 @@ export function GalleryScene() {
   )
 
   const animateCtaFluid = contextSafe((
-    button: HTMLAnchorElement,
+    button: HTMLElement,
     originX: number,
     originY: number,
     fill: boolean,
@@ -861,7 +861,7 @@ export function GalleryScene() {
   })
 
   const getCtaEdgeOrigin = (
-    event: React.PointerEvent<HTMLAnchorElement>,
+    event: React.PointerEvent<HTMLElement>,
   ) => {
     const bounds = event.currentTarget.getBoundingClientRect()
     const relativeX = gsap.utils.clamp(0, 1, (event.clientX - bounds.left) / bounds.width)
@@ -883,7 +883,7 @@ export function GalleryScene() {
   }
 
   const handleCtaPointerEnter = (
-    event: React.PointerEvent<HTMLAnchorElement>,
+    event: React.PointerEvent<HTMLElement>,
   ) => {
     if (event.pointerType === 'touch') return
     const origin = getCtaEdgeOrigin(event)
@@ -891,19 +891,19 @@ export function GalleryScene() {
   }
 
   const handleCtaPointerLeave = (
-    event: React.PointerEvent<HTMLAnchorElement>,
+    event: React.PointerEvent<HTMLElement>,
   ) => {
     if (event.pointerType === 'touch') return
     const origin = getCtaEdgeOrigin(event)
     animateCtaFluid(event.currentTarget, origin.x, origin.y, false)
   }
 
-  const handleCtaFocus = (event: React.FocusEvent<HTMLAnchorElement>) => {
+  const handleCtaFocus = (event: React.FocusEvent<HTMLElement>) => {
     if (!event.currentTarget.matches(':focus-visible')) return
     animateCtaFluid(event.currentTarget, 50, 50, true)
   }
 
-  const handleCtaBlur = (event: React.FocusEvent<HTMLAnchorElement>) => {
+  const handleCtaBlur = (event: React.FocusEvent<HTMLElement>) => {
     animateCtaFluid(event.currentTarget, 50, 50, false)
   }
 
@@ -971,6 +971,36 @@ export function GalleryScene() {
     })
   }
 
+  const openInnovationShowcase = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return
+    }
+
+    event.preventDefault()
+    const sourceBounds = event.currentTarget.getBoundingClientRect()
+
+    navigate('/innovaciones#imagina-tu-marca', {
+      state: {
+        backgroundLocation: location,
+        backgroundScrollY: window.scrollY,
+        transitionOrigin: {
+          x: sourceBounds.x,
+          y: sourceBounds.y,
+          width: sourceBounds.width,
+          height: sourceBounds.height,
+        },
+      },
+    })
+  }
+
   const renderHeadingActions = (
     collection: (typeof projectCollections)[number],
   ) => {
@@ -998,7 +1028,26 @@ export function GalleryScene() {
           </svg>
         </Link>
 
-        {collection.id !== 'innovaciones' && (
+        {collection.id === 'innovaciones' ? (
+          <Link
+            className="collection-heading__availability"
+            to="/innovaciones#imagina-tu-marca"
+            onClick={openInnovationShowcase}
+            onPointerEnter={handleCtaPointerEnter}
+            onPointerLeave={handleCtaPointerLeave}
+            onFocus={handleCtaFocus}
+            onBlur={handleCtaBlur}
+          >
+            <span className="collection-heading__fluid" aria-hidden="true">
+              <i className="collection-heading__fluid-wave" />
+              <i className="collection-heading__fluid-wave" />
+              <i className="collection-heading__fluid-wave" />
+            </span>
+            <span className="collection-heading__availability-label">
+              Imagina tu marca aquí
+            </span>
+          </Link>
+        ) : (
           <Link
             className="collection-heading__availability"
             to="/disponibilidad"
@@ -1210,6 +1259,7 @@ export function GalleryScene() {
         </i>
         <i className="gallery-ambient__glass" />
       </div>
+
     </section>
   )
 }

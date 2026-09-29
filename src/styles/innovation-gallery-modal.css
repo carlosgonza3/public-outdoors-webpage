@@ -1,0 +1,265 @@
+.innovation-gallery-modal {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 3vw, 3rem);
+  isolation: isolate;
+  box-sizing: border-box;
+  animation: innovation-gallery-modal-in .32s ease both;
+}
+
+.innovation-gallery-modal__backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgb(4 6 5 / 86%);
+  cursor: default;
+  backdrop-filter: blur(24px) saturate(.7);
+  -webkit-backdrop-filter: blur(24px) saturate(.7);
+}
+
+.innovation-gallery-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 86rem);
+  height: min(86dvh, 55rem);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(.75rem, 1.5vw, 1.25rem);
+  color: #f7f5ef;
+  animation: innovation-gallery-panel-in .52s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.innovation-gallery-modal__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-right: 7rem;
+}
+
+.innovation-gallery-modal__header p,
+.innovation-gallery-modal__header h2 { margin: 0; }
+
+.innovation-gallery-modal__header p,
+.innovation-gallery-modal__header > span {
+  color: rgb(247 245 239 / 54%);
+  font-size: .736rem;
+  font-weight: 720;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.innovation-gallery-modal__header h2 {
+  margin-top: .25rem;
+  font-size: clamp(1.75rem, 3.2vw, 3.5rem);
+  font-weight: 520;
+  letter-spacing: -.045em;
+  line-height: .95;
+}
+
+.innovation-gallery-modal__stage {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgb(247 245 239 / 14%);
+  border-radius: clamp(.75rem, 1.2vw, 1.25rem);
+  background: #0d0f0e;
+  touch-action: pan-y;
+}
+
+.innovation-gallery-modal__stage > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  animation: innovation-gallery-image-in .38s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.innovation-gallery-modal__arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  width: clamp(2.75rem, 4vw, 3.75rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 50%;
+  background: rgb(7 9 8 / 58%);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateY(-50%);
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+}
+
+.innovation-gallery-modal__arrow.is-previous { left: clamp(.65rem, 1.5vw, 1.25rem); }
+.innovation-gallery-modal__arrow.is-next { right: clamp(.65rem, 1.5vw, 1.25rem); }
+
+.innovation-gallery-modal__arrow svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.innovation-gallery-modal__arrow:hover,
+.innovation-gallery-modal__arrow:focus-visible {
+  border-color: #f7f5ef;
+  background: #f7f5ef;
+  color: #090b0a;
+  outline: none;
+}
+
+.innovation-gallery-modal__thumbnails {
+  display: flex;
+  justify-content: center;
+  gap: clamp(.4rem, .8vw, .7rem);
+  overflow-x: auto;
+  padding: .1rem .1rem .5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(247 245 239 / 35%) transparent;
+}
+
+.innovation-gallery-modal__thumbnails button {
+  width: clamp(3.6rem, 6vw, 5.5rem);
+  height: clamp(2.75rem, 4.5vw, 4rem);
+  flex: 0 0 auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: .45rem;
+  background: transparent;
+  opacity: .46;
+  cursor: pointer;
+  transform: translateZ(0);
+  transition: opacity .25s ease, border-color .25s ease, transform .25s ease;
+}
+
+.innovation-gallery-modal__thumbnails button:hover,
+.innovation-gallery-modal__thumbnails button:focus-visible,
+.innovation-gallery-modal__thumbnails button.is-active {
+  border-color: #38d430;
+  opacity: 1;
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.innovation-gallery-modal__thumbnails img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.innovation-gallery-modal__close {
+  position: absolute;
+  z-index: 2;
+  top: clamp(1rem, 2.5vw, 2rem);
+  right: clamp(1rem, 2.5vw, 2rem);
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .72rem .95rem;
+  border: 1px solid rgb(255 255 255 / 32%);
+  border-radius: 999px;
+  background: rgb(6 8 8 / 58%);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: inherit;
+  font-size: .782rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: color .3s ease, border-color .3s ease, background-color .3s ease;
+}
+
+.innovation-gallery-modal__close span {
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: .6;
+}
+
+.innovation-gallery-modal__close:hover,
+.innovation-gallery-modal__close:focus-visible {
+  border-color: #fff;
+  background: #fff;
+  color: #090b0a;
+  outline: none;
+}
+
+@keyframes innovation-gallery-modal-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes innovation-gallery-panel-in {
+  from { opacity: 0; transform: translateY(1.25rem) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes innovation-gallery-image-in {
+  from { opacity: 0; transform: scale(.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 720px) {
+  .innovation-gallery-modal { padding: 4.25rem .75rem max(.75rem, env(safe-area-inset-bottom)); }
+
+  .innovation-gallery-modal__panel {
+    width: 100%;
+    height: 100%;
+    gap: .65rem;
+  }
+
+  .innovation-gallery-modal__header {
+    align-items: end;
+    padding-right: 0;
+  }
+
+  .innovation-gallery-modal__header h2 { font-size: clamp(1.7rem, 8vw, 2.35rem); }
+  .innovation-gallery-modal__header p { font-size: .667rem; }
+
+  .innovation-gallery-modal__stage { border-radius: .7rem; }
+  .innovation-gallery-modal__arrow { width: 2.65rem; }
+
+  .innovation-gallery-modal__thumbnails {
+    justify-content: flex-start;
+    scroll-padding-inline: .1rem;
+  }
+
+  .innovation-gallery-modal__thumbnails button {
+    width: 3.75rem;
+    height: 3rem;
+  }
+
+  .innovation-gallery-modal__close {
+    top: max(.7rem, env(safe-area-inset-top));
+    right: .75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .innovation-gallery-modal,
+  .innovation-gallery-modal__panel,
+  .innovation-gallery-modal__stage > img { animation: none; }
+}
