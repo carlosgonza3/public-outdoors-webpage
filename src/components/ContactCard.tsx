@@ -1,5 +1,11 @@
 import { usePageTone } from '../hooks/usePageTone'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
@@ -689,6 +695,28 @@ export function ContactCard({
       )
   }, [mode, onClose])
 
+  const goToCollection = (
+    event: MouseEvent<HTMLAnchorElement>,
+    collectionId: 'indoor' | 'outdoor' | 'innovaciones',
+  ) => {
+    const collection = document.getElementById(`${collectionId}-gallery`)
+
+    // On collection detail pages, let the link navigate back to the matching
+    // section on the home page.
+    if (!collection) return
+
+    event.preventDefault()
+    window.dispatchEvent(new Event('public:navigate-to-media'))
+    window.requestAnimationFrame(() => {
+      collection.scrollIntoView({
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    })
+
+    if (mode === 'modal') requestClose()
+  }
+
   useEffect(() => {
     if (mode !== 'modal') return
 
@@ -1019,11 +1047,26 @@ export function ContactCard({
         </div>
 
         <footer className="contact-card__footer contact-card__reveal">
-          <div className="contact-card__services" aria-hidden="true">
-            <span>Outdoor</span>
-            <span>Indoor</span>
-            <span>Innovaciones</span>
-          </div>
+          <nav className="contact-card__services" aria-label="Categorías de medios">
+            <a
+              href="/#outdoor-gallery"
+              onClick={(event) => goToCollection(event, 'outdoor')}
+            >
+              Outdoor
+            </a>
+            <a
+              href="/#indoor-gallery"
+              onClick={(event) => goToCollection(event, 'indoor')}
+            >
+              Indoor
+            </a>
+            <a
+              href="/#innovaciones-gallery"
+              onClick={(event) => goToCollection(event, 'innovaciones')}
+            >
+              Innovaciones
+            </a>
+          </nav>
 
           <nav className="contact-card__socials" aria-label="Redes sociales">
             <span>Síguenos</span>

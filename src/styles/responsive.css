@@ -829,7 +829,7 @@
     width: min(20rem, 94vw);
     height: clamp(7rem, 18vh, 10rem);
   }
-  .grid-heading__signal i {
+  .grid-heading__signal a {
     width: clamp(2.75rem, 15vw, 4.25rem);
   }
 
@@ -999,8 +999,12 @@
     aspect-ratio: auto;
   }
 
+  .collection--innovaciones .card-visual--image img {
+    object-position: 20% center;
+  }
+
   .grid-heading__signal,
-  .grid-heading__signal i,
+  .grid-heading__signal a,
   .project-card {
     will-change: auto;
   }
@@ -1072,7 +1076,7 @@
     height: 6rem;
   }
 
-  .grid-heading__signal i {
+  .grid-heading__signal a {
     width: clamp(2.65rem, 13vw, 3.25rem);
   }
 
@@ -1338,7 +1342,7 @@
     height: 7rem;
   }
 
-  .grid-heading__signal i {
+  .grid-heading__signal a {
     width: clamp(3.75rem, 6vw, 5.75rem);
   }
 
@@ -1557,7 +1561,7 @@
     padding: 3.5rem 1.25rem 2rem;
   }
 
-  .grid-heading__signal i {
+  .grid-heading__signal a {
     width: clamp(3.1rem, 14vw, 4rem);
   }
 

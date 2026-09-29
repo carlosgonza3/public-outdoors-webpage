@@ -19,8 +19,8 @@ const metrics = [
     label: 'Campañas exitosas',
   },
   {
-    value: '21+',
-    label: 'Años de experiencia en el mercado',
+    value: '24+',
+    label: 'Años de experiencia',
   },
 ]
 

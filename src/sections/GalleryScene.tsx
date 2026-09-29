@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { gsap, useGSAP } from '../animation/gsap'
 import { prefersReducedMotion } from '../animation/motion'
@@ -57,7 +57,7 @@ export function GalleryScene() {
       const headingBottom = heading?.querySelector<HTMLElement>('.grid-heading__bottom')
       const headingSignal = heading?.querySelector<HTMLElement>('.grid-heading__signal')
       const headingSignals = heading
-        ? gsap.utils.toArray<HTMLElement>('.grid-heading__signal i', heading)
+        ? gsap.utils.toArray<HTMLAnchorElement>('.grid-heading__signal a', heading)
         : []
       const collections = gsap.utils.toArray<HTMLElement>('.project-collection')
 
@@ -1069,6 +1069,23 @@ export function GalleryScene() {
     })
   }
 
+  const goToCollection = (
+    event: MouseEvent<HTMLAnchorElement>,
+    collectionId: ProjectCollection['id'],
+  ) => {
+    const collection = document.getElementById(`${collectionId}-gallery`)
+    if (!collection) return
+
+    event.preventDefault()
+    window.dispatchEvent(new Event('public:navigate-to-media'))
+    window.requestAnimationFrame(() => {
+      collection.scrollIntoView({
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    })
+  }
+
   return (
     <section className="project-grid-section" ref={section}>
       <header className="grid-heading" data-scene-id="gallery-intro">
@@ -1081,11 +1098,23 @@ export function GalleryScene() {
           </span>
         </h2>
 
-        <div className="grid-heading__signal" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </div>
+        <nav className="grid-heading__signal" aria-label="Categorías de la galería">
+          <a
+            href="#outdoor-gallery"
+            aria-label="Ir a la categoría Outdoor"
+            onClick={(event) => goToCollection(event, 'outdoor')}
+          />
+          <a
+            href="#indoor-gallery"
+            aria-label="Ir a la categoría Indoor"
+            onClick={(event) => goToCollection(event, 'indoor')}
+          />
+          <a
+            href="#innovaciones-gallery"
+            aria-label="Ir a la categoría Innovaciones"
+            onClick={(event) => goToCollection(event, 'innovaciones')}
+          />
+        </nav>
 
         <div className="grid-heading__bottom">
           <p>Outdoor · Indoor · Innovaciones</p>
