@@ -274,7 +274,11 @@ export function ContactCard({
       if (isSafari()) {
         tiltReady.current = false
         const timeline = gsap
-          .timeline()
+          .timeline({
+            onComplete: () => {
+              tiltReady.current = true
+            },
+          })
           .set(overlay.current, { autoAlpha: 0 })
           .set(cardMotion.current, {
             autoAlpha: 0,
@@ -361,13 +365,6 @@ export function ContactCard({
       return
     }
 
-    if (desktopSafari) {
-      tiltReady.current = false
-      setMotionAccess('unavailable')
-      gsap.set(stage, { clearProps: 'transform' })
-      return
-    }
-
     if (mode === 'scroll') tiltReady.current = !deferEmbeddedTilt
 
     gsap.set(stage, {
@@ -398,6 +395,33 @@ export function ContactCard({
       rotateY(0)
       shiftX(0)
       shiftY(0)
+    })
+
+    let safariInteractionLocked = false
+    let safariReleaseTimer: number | undefined
+
+    const isInteractiveTarget = (target: EventTarget | null) =>
+      target instanceof Element && Boolean(target.closest('a, button'))
+
+    const lockSafariTiltForInteraction = safe((event: PointerEvent) => {
+      if (!desktopSafari || !isInteractiveTarget(event.target)) return
+
+      safariInteractionLocked = true
+      window.clearTimeout(safariReleaseTimer)
+      rotateX(0)
+      rotateY(0)
+      shiftX(0)
+      shiftY(0)
+    })
+
+    const releaseSafariTiltAfterInteraction = safe(() => {
+      if (!desktopSafari || !safariInteractionLocked) return
+
+      window.clearTimeout(safariReleaseTimer)
+      safariReleaseTimer = window.setTimeout(() => {
+        safariInteractionLocked = false
+        resetTilt()
+      }, 80)
     })
 
     if (mobileExperience) {
@@ -583,8 +607,14 @@ export function ContactCard({
     }
 
     const handlePointerMove = safe((event: PointerEvent) => {
+      if (desktopSafari && isInteractiveTarget(event.target)) {
+        lockSafariTiltForInteraction(event)
+        return
+      }
+
       if (
         event.pointerType === 'touch' ||
+        safariInteractionLocked ||
         !tiltReady.current ||
         closing.current
       ) return
@@ -599,11 +629,26 @@ export function ContactCard({
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
     window.addEventListener('blur', resetTilt)
     document.documentElement.addEventListener('pointerleave', resetTilt)
+    if (desktopSafari) {
+      stage.addEventListener('pointerover', lockSafariTiltForInteraction, true)
+      stage.addEventListener('pointerout', releaseSafariTiltAfterInteraction, true)
+      stage.addEventListener('pointerdown', lockSafariTiltForInteraction, true)
+      window.addEventListener('pointerup', releaseSafariTiltAfterInteraction, true)
+      window.addEventListener('pointercancel', releaseSafariTiltAfterInteraction, true)
+    }
 
     return () => {
+      window.clearTimeout(safariReleaseTimer)
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('blur', resetTilt)
       document.documentElement.removeEventListener('pointerleave', resetTilt)
+      if (desktopSafari) {
+        stage.removeEventListener('pointerover', lockSafariTiltForInteraction, true)
+        stage.removeEventListener('pointerout', releaseSafariTiltAfterInteraction, true)
+        stage.removeEventListener('pointerdown', lockSafariTiltForInteraction, true)
+        window.removeEventListener('pointerup', releaseSafariTiltAfterInteraction, true)
+        window.removeEventListener('pointercancel', releaseSafariTiltAfterInteraction, true)
+      }
       gsap.killTweensOf(stage, ['rotationX', 'rotationY', 'x', 'y'])
       tiltReady.current = false
     }
