@@ -15,7 +15,7 @@ const metrics = [
     label: 'Clientes',
   },
   {
-    value: '80+',
+    value: '200+',
     label: 'Campañas exitosas',
   },
   {
