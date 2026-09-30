@@ -38,6 +38,10 @@ export function PurposeScene() {
       const contactMotion = contactContainer?.querySelector<HTMLElement>(
         '.contact-card__motion',
       )
+      const questionWordElements = gsap.utils.toArray<HTMLElement>(
+        '.purpose-stage__word > span',
+        section.current,
+      )
       const mobile = isMobileExperience()
       const iosSafari = isIOSSafari()
       const safari = isSafari()
@@ -117,7 +121,7 @@ export function PurposeScene() {
 
       gsap.set(statement.current, { autoAlpha: 0 })
       gsap.set(action.current, { autoAlpha: 0 })
-      gsap.set('.purpose-stage__word > span', { yPercent: 115, autoAlpha: 0 })
+      gsap.set(questionWordElements, { yPercent: 115, autoAlpha: 0 })
       gsap.set('.purpose-statement__word', { yPercent: 72, autoAlpha: 0 })
       gsap.set('.purpose-action__word--lead > span', {
         yPercent: 70,
@@ -158,6 +162,64 @@ export function PurposeScene() {
         force3D: true,
       })
 
+      const questionEntry = gsap.timeline({
+        scrollTrigger: {
+          trigger: section.current,
+          start: 'top bottom',
+          end: 'top top',
+          scrub: 0.55,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      questionEntry
+        .fromTo(
+          question.current,
+          { yPercent: -50 },
+          { yPercent: 0, duration: 1, ease: 'none' },
+          0,
+        )
+        .to(
+          questionWordElements,
+          {
+            yPercent: 0,
+            autoAlpha: 1,
+            duration: 0.72,
+            stagger: 0.06,
+            ease: 'power3.out',
+          },
+          0.04,
+        )
+
+      const snapContactTransition = (
+        progress: number,
+        trigger?: ScrollTrigger,
+      ) => {
+        const contactTweens = timeline?.getTweensOf(contactMotion) ?? []
+        const openingTween = contactTweens[0]
+        const closingTween = contactTweens.at(-1)
+        const timelineDuration = timeline?.duration() ?? 0
+
+        if (!openingTween || !closingTween || timelineDuration === 0) {
+          return progress
+        }
+
+        const openingStart = openingTween.startTime() / timelineDuration
+        const openingEnd = openingTween.endTime() / timelineDuration
+        const closingStart = closingTween.startTime() / timelineDuration
+        const closingEnd = closingTween.endTime() / timelineDuration
+
+        if (progress > openingStart && progress < openingEnd) {
+          return (trigger?.direction ?? 1) < 0 ? openingStart : openingEnd
+        }
+
+        if (progress > closingStart && progress < closingEnd) {
+          return (trigger?.direction ?? 1) < 0 ? closingStart : closingEnd
+        }
+
+        return progress
+      }
+
       const timeline = gsap.timeline({
         defaults: { ease: 'power3.inOut' },
         scrollTrigger: {
@@ -167,6 +229,13 @@ export function PurposeScene() {
           pin: true,
           pinType: iosSafari ? 'transform' : 'fixed',
           scrub: 1.35,
+          snap: {
+            snapTo: snapContactTransition,
+            delay: 0.28,
+            duration: { min: 0.6, max: 1.2 },
+            ease: 'power1.inOut',
+            inertia: false,
+          },
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onEnter: () => setPageTone('#03131c', true),
@@ -189,17 +258,6 @@ export function PurposeScene() {
             ease: 'sine.out',
           },
           0,
-        )
-        .to(
-          '.purpose-stage__word > span',
-          {
-            yPercent: 0,
-            autoAlpha: 1,
-            duration: 0.75,
-            stagger: 0.075,
-            ease: 'power4.out',
-          },
-          0.08,
         )
         .to({}, { duration: 0.45 })
         .to(question.current, {
@@ -448,6 +506,7 @@ export function PurposeScene() {
         )
 
       return () => {
+        questionEntry.kill()
         timeline.kill()
       }
     },
