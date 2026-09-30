@@ -35,8 +35,11 @@
   width: 100%;
   height: 100%;
   min-height: 0;
+  padding: 2px;
   border-radius: calc(clamp(1rem, 2vw, 1.5rem) + 2px);
   isolation: isolate;
+  background: #111417;
+  box-sizing: border-box;
   transform-style: preserve-3d;
   transform-origin: center;
   will-change: transform;
@@ -52,20 +55,20 @@
   content: '';
   position: absolute;
   pointer-events: none;
-  background: conic-gradient(
-    from var(--contact-glow-angle),
-    rgb(255 255 255 / 16%) 0deg,
-    rgb(255 255 255 / 10%) 35deg,
-    rgb(255 1 9 / 95%) 78deg,
-    rgb(0 176 244 / 100%) 120deg,
-    rgb(56 212 48 / 95%) 162deg,
-    rgb(255 255 255 / 18%) 215deg,
-    rgb(255 255 255 / 10%) 360deg
-  );
-  animation: contact-glow-rotate 4.8s linear infinite;
 }
 
 .contact-card__stage::before {
+  background: conic-gradient(
+    from var(--contact-glow-angle),
+    #111417 0deg,
+    #111417 34deg,
+    #ff0109 78deg,
+    #00b0f4 120deg,
+    #38d430 162deg,
+    #111417 216deg,
+    #111417 360deg
+  );
+  animation: contact-glow-rotate 4.8s linear infinite;
   z-index: 2;
   inset: 0;
   padding: 3px;
@@ -79,10 +82,33 @@
 
 .contact-card__stage::after {
   z-index: 0;
-  inset: -7px;
-  border-radius: calc(clamp(1rem, 2vw, 1.5rem) + 7px);
-  opacity: .52;
-  filter: blur(14px);
+  inset: -4rem;
+  border-radius: calc(clamp(1rem, 2vw, 1.5rem) + 4rem);
+  opacity: .46;
+  background: conic-gradient(
+    from var(--contact-glow-angle),
+    transparent 0deg,
+    transparent 36deg,
+    rgb(255 1 9 / 62%) 78deg,
+    rgb(0 176 244 / 66%) 120deg,
+    rgb(56 212 48 / 62%) 162deg,
+    transparent 216deg,
+    transparent 360deg
+  );
+  filter: blur(20px);
+  -webkit-mask-image: radial-gradient(
+    ellipse closest-side,
+    #000 52%,
+    rgb(0 0 0 / 82%) 68%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse closest-side,
+    #000 52%,
+    rgb(0 0 0 / 82%) 68%,
+    transparent 100%
+  );
+  animation: contact-glow-rotate 4.8s linear infinite;
 }
 
 .contact-card {
@@ -916,9 +942,10 @@
   }
 
   .contact-card__stage::after {
-    inset: -4px;
-    opacity: .38;
-    filter: blur(8px);
+    inset: -1.75rem;
+    border-radius: calc(clamp(.75rem, 2vw, 1.1rem) + 1.75rem);
+    opacity: .34;
+    filter: blur(12px);
   }
 
   .contact-card__whatsapp-panel {

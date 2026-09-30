@@ -18,6 +18,7 @@ try {
   for (const route of ['', 'indoor/', 'outdoor/', 'innovaciones/', 'innovations/', 'disponibilidad/']) {
     const html = read(`${route}index.html`)
     assert.match(html, /lang="es"/)
+    assert.doesNotMatch(html, /safari-tint-rail/)
     const tone = !route ? '#f7f5ef' : route === 'disponibilidad/' ? '#07080b' : '#0b0d0c'
     assert.ok(html.includes(`name="theme-color" content="${tone}"`))
     assert.ok(html.includes(`background-color: ${tone}`))
@@ -55,7 +56,7 @@ try {
   assert.ok(!existsSync(join(output, 'sitemap.xml')))
   assert.match(read('404.html'), /href="\/public-outdoors\/"/)
   assert.throws(() => build({ VITE_SITE_URL: '', VITE_BASE_PATH: '/', VITE_ALLOW_INDEXING: 'true' }))
-  console.log('Release checks passed: production metadata, assets, sitemap, analytics gating, subpath previews, 404, invalid configuration.')
+  console.log('Release checks passed: production metadata, browser tones without fixed tint rails, assets, sitemap, analytics gating, subpath previews, 404, invalid configuration.')
 } finally {
   rmSync(output, { recursive: true, force: true })
 }

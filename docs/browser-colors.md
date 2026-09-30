@@ -6,7 +6,7 @@ The site's light tone is its existing warm white (`#f7f5ef`). Dark sections use 
 
 Collection and availability pages set their tone on mount. Their generated HTML also includes a dark initial background and metadata to avoid a light loading flash. The `pageshow` listener reapplies the current tone after browser history restoration.
 
-Safari has fixed, noninteractive six-pixel strips at both viewport edges using the current tone. This extends the existing bottom-edge workaround to the top and desktop Safari. It is a rendering hint, not a guarantee of native toolbar appearance. Keep these strips synchronized with overlays. `apple-mobile-web-app-status-bar-style` remains stable; changing it dynamically is not a reliable toolbar color mechanism.
+Safari uses the same `theme-color`, document background, and color-scheme hints as the other browsers. Do not add fixed viewport-edge tint strips: iOS Safari can paint bottom-fixed layers at the wrong vertical position when its floating toolbar expands or collapses, causing a strip to cross page content. `apple-mobile-web-app-status-bar-style` remains stable; changing it dynamically is not a reliable toolbar color mechanism.
 
 ## Browser expectations
 
@@ -14,7 +14,7 @@ Safari has fixed, noninteractive six-pixel strips at both viewport edges using t
 - Safari: behavior varies with version, toolbar layout, website tint settings, and OS appearance. Backgrounds and viewport-edge surfaces matter in newer Safari versions.
 - Desktop Chrome/Edge and Firefox: do not assume a website can recolor the entire native browser frame. Page backgrounds and native page controls still follow the site's scheme.
 
-References: [Chrome theme-color](https://developer.chrome.com/blog/support-for-theme-color-in-chrome-39-for-android/), [Safari 15 theme-color](https://webkit.org/blog/11989/new-webkit-features-in-safari-15/), [WebKit explanation of Safari viewport-edge tinting](https://bugs.webkit.org/show_bug.cgi?id=301756).
+References: [Chrome theme-color](https://developer.chrome.com/blog/support-for-theme-color-in-chrome-39-for-android/), [Safari 15 theme-color](https://webkit.org/blog/11989/new-webkit-features-in-safari-15/), [WebKit explanation of Safari viewport-edge tinting](https://bugs.webkit.org/show_bug.cgi?id=301756), [WebKit fixed-position regression](https://bugs.webkit.org/show_bug.cgi?id=312149).
 
 ## Validation
 

@@ -29,8 +29,4 @@ export function initializeIOSSafariWorkaround() {
   if (!isIOSSafari()) return
 
   document.documentElement.classList.add('is-ios-safari')
-
-  if (new URLSearchParams(window.location.search).has('debug-safari-tint')) {
-    document.documentElement.classList.add('debug-safari-tint')
-  }
 }
