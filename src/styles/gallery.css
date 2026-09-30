@@ -611,6 +611,10 @@
   object-fit: cover;
 }
 
+.collection--indoor .indoor-card--three .card-visual--image img {
+  object-position: left center;
+}
+
 .collection--outdoor .outdoor-card--two .card-visual--image img { object-position: 68% center; }
 
 .collection--outdoor .outdoor-card--three .card-visual--image img {
