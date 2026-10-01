@@ -116,7 +116,7 @@ function getOfficeMapTarget() {
 }
 
 const whatsappContacts = [
-  { name: 'Iris Cisneros', number: '+503 7840 0641', whatsapp: '50378400641' },
+  { name: 'Iris Quinteros', number: '+503 7840 0641', whatsapp: '50378400641' },
   { name: 'Zayda Reyes', number: '+503 7607 9725', whatsapp: '50376079725' },
   { name: 'Rosemary Daboub', number: '+503 7855 7192', whatsapp: '50378557192' },
 ]
