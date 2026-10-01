@@ -84,7 +84,7 @@ export const projectCollections: ProjectCollection[] = [
     projects: [
       {
         id: '07',
-        title: 'Innovaciones 01',
+        title: 'Innovaciones',
         image: innovationsOne,
         alt: 'Instalación publicitaria innovadora de Burger King',
       },

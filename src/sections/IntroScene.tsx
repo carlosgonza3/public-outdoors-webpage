@@ -111,14 +111,14 @@ export function IntroScene({
       }
 
       const finePointer = window.matchMedia('(pointer: fine)').matches
-      const press = { y: 0, rotation: 0, scale: 1 }
+      const press = { x: 0, y: 0, rotation: 0, scale: 1, scaleX: 1 }
       const pulse = { scale: 1 }
       const renderMobileLogoMotion = () => {
         if (!mobileLogoInteraction.current) return
         const scale = press.scale * pulse.scale
         mobileLogoInteraction.current.style.transform =
-          `translate(-50%, -50%) translate3d(0, ${press.y}px, 0) ` +
-          `rotate(${press.rotation}deg) scale(${scale})`
+          `translate(-50%, -50%) translate3d(${press.x}px, ${press.y}px, 0) ` +
+          `rotate(${press.rotation}deg) scale(${scale}) scaleX(${press.scaleX})`
       }
       const renderPulse = () => {
         const transform = `scale(${pulse.scale})`
@@ -216,7 +216,9 @@ export function IntroScene({
       let logoButtonActive = true
       let logoPressLocked = false
       let logoPresses = 0
+      let logoJumpStreak = 0
       let logoPressResetTimer: number | undefined
+      let logoJumpStreakResetTimer: number | undefined
 
       const renderPress = () => {
         if (mobile) {
@@ -224,8 +226,10 @@ export function IntroScene({
           return
         }
 
+        const scaleX = press.scale * press.scaleX
         const transform =
-          `translate(0 ${press.y}) rotate(${press.rotation}) scale(${press.scale})`
+          `translate(${press.x} ${press.y}) rotate(${press.rotation}) ` +
+          `scale(${scaleX} ${press.scale})`
         markPress.current?.setAttribute('transform', transform)
         colorMarkPress.current?.setAttribute('transform', transform)
       }
@@ -246,18 +250,91 @@ export function IntroScene({
         if (!logoButtonActive || logoPressLocked) return
 
         window.clearTimeout(logoPressResetTimer)
+        window.clearTimeout(logoJumpStreakResetTimer)
         logoPresses += 1
         const isTriplePress = logoPresses === 3
+        const isEasterEgg = isTriplePress && logoJumpStreak === 2
 
         if (isTriplePress) {
           logoPresses = 0
+          logoJumpStreak = isEasterEgg ? 0 : logoJumpStreak + 1
+
+          if (!isEasterEgg) {
+            logoJumpStreakResetTimer = window.setTimeout(() => {
+              logoJumpStreak = 0
+            }, 5000)
+          }
         } else {
           logoPressResetTimer = window.setTimeout(() => {
             logoPresses = 0
+            logoJumpStreak = 0
+            window.clearTimeout(logoJumpStreakResetTimer)
           }, 900)
         }
 
         pressTimeline.pause().clear()
+
+        if (isEasterEgg) {
+          const exitX = window.innerWidth * 0.38
+          const exitY = window.innerHeight * 0.68
+          setLogoPressLocked(true)
+          pressTimeline
+            .to(press, {
+              x: -4,
+              y: 3.6,
+              rotation: -9,
+              scale: 0.72,
+              duration: 0.1,
+              ease: 'power3.in',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              x: exitX,
+              y: -exitY,
+              rotation: 720,
+              scale: 0.62,
+              duration: 0.58,
+              ease: 'power4.in',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              x: exitX * 0.18,
+              y: -exitY * 0.32,
+              rotation: 900,
+              scale: 0.96,
+              scaleX: -1,
+              duration: 0.34,
+              ease: 'power2.inOut',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              x: -exitX * 0.04,
+              y: -18,
+              rotation: 1080,
+              scale: 1.02,
+              scaleX: 1,
+              duration: 0.36,
+              ease: 'power2.out',
+              onUpdate: renderPress,
+            })
+            .to(press, {
+              x: 0,
+              y: 0,
+              rotation: 1080,
+              scale: 1,
+              duration: 0.28,
+              ease: 'power3.out',
+              onUpdate: renderPress,
+              onComplete: () => {
+                press.rotation = 0
+                press.scaleX = 1
+                renderPress()
+                setLogoPressLocked(false)
+              },
+            })
+            .restart()
+          return
+        }
 
         if (isTriplePress) {
           setLogoPressLocked(true)
@@ -356,11 +433,15 @@ export function IntroScene({
 
         if (active) return
         window.clearTimeout(logoPressResetTimer)
+        window.clearTimeout(logoJumpStreakResetTimer)
         logoPresses = 0
+        logoJumpStreak = 0
         pressTimeline.pause(0).clear()
+        press.x = 0
         press.y = 0
         press.rotation = 0
         press.scale = 1
+        press.scaleX = 1
         logoPressLocked = false
         renderPress()
         syncLogoButtonInteractivity()
@@ -553,6 +634,7 @@ export function IntroScene({
           pressTimeline.kill()
           logoButton.current?.removeEventListener('click', handleLogoPress)
           window.clearTimeout(logoPressResetTimer)
+          window.clearTimeout(logoJumpStreakResetTimer)
           mobileTimeline.kill()
         }
       }
@@ -923,6 +1005,7 @@ export function IntroScene({
         )
         logoButton.current?.removeEventListener('click', handleLogoPress)
         window.clearTimeout(logoPressResetTimer)
+        window.clearTimeout(logoJumpStreakResetTimer)
         window.clearTimeout(quietTimer)
         window.removeEventListener('wheel', stopMomentum)
         window.removeEventListener('touchstart', startTouchGesture)
