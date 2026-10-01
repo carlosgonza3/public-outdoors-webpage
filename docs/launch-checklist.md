@@ -1,7 +1,8 @@
 # PUBLIC launch checklist
 
-Production domain: https://publicoutdoors.com. Hosting provider: not selected.
-This document records preparation, not a completed deployment.
+Production domain: https://publicoutdoors.com. Hosting provider: Netlify.
+The domain and GitHub repository are connected. The temporary coming-soon
+branch remains published until the Phase 1 release from `main`.
 
 ## Already prepared
 
@@ -16,23 +17,25 @@ This document records preparation, not a completed deployment.
 - Netlify build configuration, security headers, and immutable caching for hashed assets.
 - Automated build-output checks: `npm run check:release`.
 
-## Content blocker
+## Content approval
 
-`src/sections/TeamScene.tsx` explicitly contains placeholder names, roles, biographies and illustrated portraits (Alex Rivera, Sofía Méndez, Mateo Cruz, Valeria Santos). Replace these with approved team content or hide the section and its navigation links before launch. Also verify the impact figures and company timeline.
+Confirm the current team names, roles, biographies, and portraits with PUBLIC.
+Also verify the impact figures and company timeline.
 
 ## Hosting and domain
 
-1. Choose a static host and connect this repository. Use Node 24, `npm ci`, `npm run lint && npm run build`, publish `dist`.
+1. In the connected Netlify project, use Node 24, `npm ci`, `npm run lint && npm run build`, and publish `dist`.
 2. Set production build variables:
    - `VITE_SITE_URL=https://publicoutdoors.com`
    - `VITE_BASE_PATH=/`
    - `VITE_ALLOW_INDEXING=true`
    - `VITE_CLOUDFLARE_ANALYTICS_TOKEN=` (optional; see below)
 3. Keep previews and branch deployments at `VITE_ALLOW_INDEXING=false`. The Netlify configuration does this for its standard preview contexts. Keep the existing GitHub Pages build as a noindex preview, or retire it after production is working.
-4. Configure apex and www DNS with the selected provider's exact records. Preserve existing MX, SPF, DKIM, DMARC and verification records. Confirm email still works.
-5. Enable HTTPS, redirect HTTP and www to `https://publicoutdoors.com`, preserving paths and query strings. Serve route directories consistently with their trailing-slash canonical URLs.
-6. Serve known route directories before the 404 fallback. Unknown URLs must return HTTP 404. `_headers` and `_redirects` are provider-specific; configure equivalent behavior on hosts that do not support them. GitHub Pages does not apply these header files.
-7. Record who owns the hosting/DNS accounts and how to restore the previous deploy. Do not change production DNS until preview checks pass.
+4. Test `main` through a Netlify branch deploy or Deploy Preview. Once approved, change the Netlify production branch from `production/coming-soon` to `main`.
+5. Verify the apex and www domain status in Netlify and the DNS records at the authoritative DNS provider. Preserve existing MX, SPF, DKIM, DMARC and verification records. Confirm email still works.
+6. Enable HTTPS, redirect HTTP and www to `https://publicoutdoors.com`, preserving paths and query strings. Serve route directories consistently with their trailing-slash canonical URLs.
+7. Serve known route directories before the 404 fallback. Unknown URLs must return HTTP 404. GitHub Pages does not apply the Netlify `_headers` and `_redirects` files.
+8. Record who owns the hosting/DNS accounts and how to restore the previous deploy. Keep the last successful coming-soon deploy available until production verification is complete.
 
 ## Analytics
 

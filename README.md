@@ -23,11 +23,11 @@ Phase 1 includes:
 - Route-specific SEO metadata, Open Graph/Twitter metadata, organization
   structured data, sitemap generation, and crawler controls.
 - Optional cookie-free Cloudflare Web Analytics support.
-- GitHub Pages preview deployment and a Netlify configuration that can be used
-  if Netlify is selected as the production host.
+- GitHub Pages preview deployment and production-ready Netlify configuration.
 
-The production hosting provider has not yet been selected. Publishing and DNS
-work are therefore outside the current repository state. See
+Netlify is the production host, the GitHub repository is connected, and the
+production domain is configured. The temporary coming-soon branch remains live
+until the Phase 1 release is promoted from `main`. See
 [`docs/launch-checklist.md`](docs/launch-checklist.md) before release.
 
 ## Technology stack
@@ -41,8 +41,8 @@ work are therefore outside the current repository state. See
 | Image export | `html-to-image` |
 | Styling | Plain CSS organized by section/component |
 | Quality checks | ESLint, TypeScript build, custom release checks |
-| Current hosting preview | GitHub Pages |
-| Possible production hosting | Netlify or another static host |
+| Preview hosting | GitHub Pages and Netlify Deploy Previews |
+| Production hosting | Netlify |
 | Planned Phase 2 content | Sanity CMS or an equivalent headless CMS |
 
 ## Requirements
@@ -213,22 +213,28 @@ Pushes to `main` currently run `.github/workflows/deploy-pages.yml`. The workflo
 uses the repository name as `VITE_BASE_PATH` and leaves indexing disabled. This
 is a preview channel, not the intended public production deployment.
 
-### Netlify option
+### Netlify production
 
-`netlify.toml`, `public/_headers`, and `public/_redirects` contain a ready
-starting point for Netlify. Netlify should use Node 24, run the repository
-checks/build, and publish `dist`.
+The Netlify project is connected to this GitHub repository and to
+`publicoutdoors.com`. `netlify.toml`, `public/_headers`, and
+`public/_redirects` define the build, security headers, caching, and routing
+behavior. Netlify uses Node 24, runs `npm run lint && npm run build`, and
+publishes `dist`.
 
-### Other static hosts
+The temporary `production/coming-soon` branch is the production branch until
+launch. After the `main` branch passes the release checklist, change Netlify's
+production branch to `main`. Future releases should use feature branches and
+pull requests for Deploy Previews, then merge approved changes into `main`.
 
-The chosen provider must:
+### Hosting requirements
+
+The production configuration must:
 
 - Serve the generated route directories and hashed assets from `dist/`.
 - Return `404.html` with an actual HTTP 404 status for unknown URLs.
 - Redirect HTTP and `www` to `https://publicoutdoors.com` while preserving paths
   and query strings.
-- Apply equivalent security and caching headers if it does not understand
-  Netlify `_headers` and `_redirects` files.
+- Apply the security and caching rules in Netlify `_headers` and `_redirects`.
 - Avoid long-lived caching for HTML; fingerprinted files under `/assets/` may be
   cached for one year.
 
@@ -338,8 +344,8 @@ instead of sending credentials or writes directly from the public app.
    accurate.
 2. Confirm whether the public experience shows live status, approximate status,
    or a request-to-confirm workflow.
-3. Choose the production host so CMS updates and cache invalidation can be
-   designed correctly.
+3. Define how Netlify deploys and cache invalidation should respond to CMS
+   updates.
 4. Confirm the URL model for individual spaces and whether unpublished or
    unavailable spaces remain accessible.
 5. Approve the geographic precision, contact workflow, analytics events, and
@@ -350,9 +356,7 @@ instead of sending credentials or writes directly from the public app.
 
 ## Known launch considerations
 
-- `src/sections/TeamScene.tsx` currently labels its names, biographies, and
-  portraits as placeholder content. Replace or hide that section before public
-  launch.
+- Confirm the team names, roles, biographies, and portraits with PUBLIC.
 - Verify all impact figures, timeline copy, contact details, client logos, and
   image usage rights with PUBLIC.
 - Confirm whether the Phase 1 availability placeholder should remain linked in

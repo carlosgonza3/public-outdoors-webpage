@@ -45,6 +45,9 @@ try {
   assert.doesNotMatch(read('sitemap.xml'), /disponibilidad/)
   assert.match(read('robots.txt'), /Sitemap: https:\/\/publicoutdoors.com\/sitemap.xml/)
   assert.match(read('404.html'), /noindex, follow/)
+  assert.match(read('404.html'), /background:#f7f5ef/)
+  assert.match(read('404.html'), /src="\/favicon.svg"/)
+  assert.match(read('404.html'), /Página no encontrada/)
   assert.match(read('_redirects'), /\/404.html\s+404/)
   build({ VITE_SITE_URL: '', VITE_BASE_PATH: '/public-outdoors/', VITE_ALLOW_INDEXING: 'false' })
   for (const route of ['', 'indoor/', 'outdoor/', 'innovaciones/', 'innovations/', 'disponibilidad/']) {
@@ -55,6 +58,7 @@ try {
   }
   assert.ok(!existsSync(join(output, 'sitemap.xml')))
   assert.match(read('404.html'), /href="\/public-outdoors\/"/)
+  assert.match(read('404.html'), /src="\/public-outdoors\/favicon.svg"/)
   assert.throws(() => build({ VITE_SITE_URL: '', VITE_BASE_PATH: '/', VITE_ALLOW_INDEXING: 'true' }))
   console.log('Release checks passed: production metadata, browser tones without fixed tint rails, assets, sitemap, analytics gating, subpath previews, 404, invalid configuration.')
 } finally {

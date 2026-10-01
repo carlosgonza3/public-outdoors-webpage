@@ -24,8 +24,8 @@ type TeamMember = {
   accent: string
 }
 
-// Import each portrait from src/assets above and assign it here. An empty path
-// keeps the illustrated placeholder visible until the portrait is available.
+// Import each approved portrait from src/assets above and assign it here. An
+// empty path displays the illustrated fallback instead of a broken image.
 const teamMembers = [
   {
     name: 'Zayda Reyes',

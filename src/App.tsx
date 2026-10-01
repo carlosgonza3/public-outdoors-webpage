@@ -6,12 +6,12 @@ import {
 } from 'react-router-dom'
 import { useCallback, useState } from 'react'
 import { PageMetadata } from './components/PageMetadata'
-import { Link } from 'react-router-dom'
 import { ContactCard } from './components/ContactCard'
 import { SiteNavigation } from './components/SiteNavigation'
 import { AvailabilityPage } from './pages/AvailabilityPage'
 import { IndoorPage } from './pages/IndoorPage'
 import { InnovationsPage } from './pages/InnovationsPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 import { OutdoorPage } from './pages/OutdoorPage'
 import { GalleryScene } from './sections/GalleryScene'
 import { HistoryScene } from './sections/HistoryScene'
@@ -92,7 +92,7 @@ function App() {
         <Route path="/innovaciones" element={<InnovationsPage />} />
         <Route path="/innovations" element={<Navigate to="/innovaciones" replace />} />
         <Route path="/disponibilidad" element={<AvailabilityPage />} />
-        <Route path="*" element={<main style={{ padding: '10vw' }}><h1>Página no encontrada</h1><Link to="/">Volver al inicio</Link></main>} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {backgroundLocation && (

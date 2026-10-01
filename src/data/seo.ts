@@ -6,7 +6,7 @@ export interface PageMetadata {
 
 export const pages: Record<string, PageMetadata> = {
   '/': {
-    title: 'PUBLIC | Publicidad exterior e indoor en El Salvador',
+    title: 'PUBLIC | Publicidad outdoor e indoor en El Salvador',
     description: 'Conecta tu marca con las personas con PUBLIC. Publicidad exterior, medios indoor y soluciones innovadoras en El Salvador. Conoce nuestros espacios.',
   },
   '/indoor': {
@@ -14,7 +14,7 @@ export const pages: Record<string, PageMetadata> = {
     description: 'Descubre los medios indoor de PUBLIC: pantallas y espacios publicitarios en centros comerciales para conectar tu marca con las personas.',
   },
   '/outdoor': {
-    title: 'Publicidad exterior en El Salvador | PUBLIC',
+    title: 'Publicidad outdoor en El Salvador | PUBLIC',
     description: 'Conoce los medios outdoor de PUBLIC: vallas, pantallas digitales y publicidad de gran formato en puntos estratégicos de El Salvador.',
   },
   '/innovaciones': {

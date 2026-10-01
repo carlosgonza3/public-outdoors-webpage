@@ -1,0 +1,93 @@
+.not-found-page {
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.25rem, 3vw, 3rem);
+  box-sizing: border-box;
+  color: #000;
+  background: #f7f5ef;
+}
+
+.not-found-page__content {
+  width: min(52rem, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.not-found-page__mark {
+  width: clamp(2.8rem, 4.5vw, 4.25rem);
+  height: auto;
+  margin-bottom: clamp(1.6rem, 3vw, 2.5rem);
+}
+
+.not-found-page__eyebrow {
+  margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+  color: rgb(23 61 53 / 52%);
+  font-size: clamp(.713rem, .92vw, .863rem);
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.not-found-page h1 {
+  margin: 0;
+  color: #000;
+  font-size: clamp(3.5rem, 9vw, 7.75rem);
+  font-weight: 520;
+  line-height: .88;
+  letter-spacing: -.075em;
+}
+
+.not-found-page__copy {
+  max-width: 30rem;
+  margin: clamp(1.65rem, 3vw, 2.4rem) 0 0;
+  color: #000;
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  line-height: 1.55;
+}
+
+.not-found-page__action {
+  min-height: 3.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  margin-top: clamp(1.7rem, 3vw, 2.4rem);
+  padding: .2rem 1.2rem;
+  border: 1px solid rgb(0 0 0 / 24%);
+  border-radius: 999px;
+  color: #000;
+  background: transparent;
+  font-size: .782rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color .3s ease, border-color .3s ease, background-color .3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .not-found-page__action:hover {
+    border-color: #000;
+    color: #f7f5ef;
+    background: #000;
+  }
+}
+
+@media (max-width: 600px) {
+  .not-found-page h1 {
+    font-size: clamp(3.5rem, 17vw, 5.5rem);
+  }
+
+  .not-found-page__copy {
+    max-width: 22rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-found-page__action {
+    transition: none;
+  }
+}
